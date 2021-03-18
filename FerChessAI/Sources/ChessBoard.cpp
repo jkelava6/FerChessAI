@@ -228,7 +228,7 @@ bool ChessBoard::AreCoordsValid(int Row, int File)
 	return 0 <= Row && Row < 8 && 0 <= File && File < 8;
 }
 
-void ChessBoard::CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, Array<int> Rows, Array<int> Files)
+void ChessBoard::CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, Array<int>& Rows, Array<int>& Files)
 {
 	int NewRow = Row + DeltaRow;
 	int NewFile = File + DeltaFile;

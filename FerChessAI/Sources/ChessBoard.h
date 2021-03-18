@@ -61,7 +61,7 @@ public:
 	void CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& Files);
 private:
 	bool AreCoordsValid(int Row, int File);
-	void CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, Array<int> Rows, Array<int> Files);
+	void CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, Array<int>& Rows, Array<int>& Files);
 private:
 	ChessPiece* Pieces;
 	Array<RevertMove> MoveStack;

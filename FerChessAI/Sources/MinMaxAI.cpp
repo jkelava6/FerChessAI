@@ -182,10 +182,6 @@ float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth)
 			Board.CollectMoves(Row, File, Rows, Files);
 
 			const int MoveCount = Rows.Count();
-			if (Depth == 1 && MoveCount == 1 && Board(Row, File) == ChessPiece::WhiteQueen)
-			{
-				Evaluate(Board);
-			}
 			for (int Move = 0; Move < MoveCount; ++Move)
 			{
 				Board.Move(Row, File, Rows[Move], Files[Move]);
