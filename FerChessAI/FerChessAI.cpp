@@ -88,7 +88,7 @@ int main()
 
     while (true)
     {
-        if (bPlayersTurn)
+        while (bPlayersTurn)
         {
             int RowFrom;
             int FileFrom;
@@ -102,12 +102,31 @@ int main()
             FileTo = GetNumber('a');
             RowTo = GetNumber('1');
 
-            Board.Move(RowFrom, FileFrom, RowTo, FileTo);
-            DebugBoard(Board);
+            Array<int> PossibleRows;
+            Array<int> PossibleFiles;
+            Board.CollectMoves(RowFrom, FileFrom, PossibleRows, PossibleFiles);
+            bool bMoveValid = false;
+            const int PossibleMoves = PossibleRows.Count();
+            for (int Move = 0; Move < PossibleMoves; ++Move)
+            {
+                if (RowTo == PossibleRows[Move] && FileTo == PossibleFiles[Move])
+                {
+                    bMoveValid = true;
+                    break;
+                }
+            }
 
-
-            Board.FlipBoard();
-            bPlayersTurn = false;
+            if (bMoveValid)
+            {
+                Board.Move(RowFrom, FileFrom, RowTo, FileTo);
+                DebugBoard(Board);
+                Board.FlipBoard();
+                bPlayersTurn = false;
+            }
+            else
+            {
+                printf("Impossible move!\n");
+            }
         }
 
         if (!bPlayersTurn)
