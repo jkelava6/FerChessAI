@@ -12,7 +12,7 @@ struct EvaluatedMove
 {
 public:
 	EvaluatedMove(int MoveRowFrom = -1, int MoveFileFrom = -1,
-		int MoveRowTo = -1, int MoveFileTo = -1, float BoardEval = MINMAX_EVAL_LOSS);
+		int MoveRowTo = -1, int MoveFileTo = -1, float BoardEval = 2.0f * MINMAX_EVAL_LOSS);
 public:
 	float Evaluation;
 	__int8 RowFrom;
