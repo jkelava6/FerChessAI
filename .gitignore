@@ -1,7 +1,7 @@
 ## CODIFLY Custom Project Ignores DOWN
 
 # Java workspace complete ignore
-JavaWS/
+# JavaWS/
 # Eclipse settings ignore
 .metadata/
 .settings/
