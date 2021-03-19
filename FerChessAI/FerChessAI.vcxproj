@@ -143,14 +143,18 @@
   <ItemGroup>
     <ClCompile Include="Sources\Array.cpp" />
     <ClCompile Include="Sources\ChessBoard.cpp" />
-    <ClCompile Include="FerChessAI.cpp" />
+    <ClCompile Include="Sources\Executable\FerChessAI.cpp" />
+    <ClCompile Include="Sources\Executable\JavaAgent.cpp" />
     <ClCompile Include="Sources\GenericAI.cpp" />
+    <ClCompile Include="Sources\JavaIO\JavaTokenIO.cpp" />
     <ClCompile Include="Sources\MinMaxAI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Array.h" />
     <ClInclude Include="Sources\ChessBoard.h" />
+    <ClInclude Include="Sources\Executable\MainSwitch.h" />
     <ClInclude Include="Sources\GenericAI.h" />
+    <ClInclude Include="Sources\JavaIO\JavaTokenIO.h" />
     <ClInclude Include="Sources\Math.h" />
     <ClInclude Include="Sources\StdH.h" />
     <ClInclude Include="Sources\MinMaxAI.h" />

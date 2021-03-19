@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 
 public class Display {
 	
+	public static Display debugDisplay = null;
+	
 	private JFrame frame;
 	private Canvas canvas;
 	
@@ -23,6 +25,7 @@ public class Display {
 		this.height = height;
 		
 		CreateDisplay(decorated, fixedSize);
+		debugDisplay = this;
 	}
 	
 	private void CreateDisplay(boolean decorated, boolean fixedSize) {

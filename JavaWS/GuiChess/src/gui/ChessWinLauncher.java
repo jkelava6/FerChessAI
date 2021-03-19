@@ -1,6 +1,5 @@
+package gui;
 import app.Launcher;
-import gui.GuiChessRoot;
-import gui.GuiFrame;
 
 public class ChessWinLauncher {
 	

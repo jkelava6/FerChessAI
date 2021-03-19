@@ -1,6 +1,9 @@
 // FerChessAI.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include <Executable/MainSwitch.h>
+#if MAIN_USE_DEBUG_UI
+
 #include <StdH.h>
 #include <ChessBoard.h>
 #include <MinMaxAI.h>
@@ -142,6 +145,8 @@ int main()
         }
     }
 }
+
+#endif
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu

@@ -18,7 +18,7 @@ inline int AbsI(int Value)
 	return Value >= 0 ? Value : -Value;
 }
 
-inline int AbsF(float Value)
+inline float AbsF(float Value)
 {
 	return Value >= 0.0f ? Value : -Value;
 }
