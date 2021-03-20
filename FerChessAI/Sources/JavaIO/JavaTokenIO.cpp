@@ -125,6 +125,7 @@ extern void ReadJavaTokenAny(char* OutToken, char* OutMessage)
 			{
 				OutToken[TokenLength++] = ReadChar;
 			}
+			continue;
 		}
 
 		if (EndProgress < EndSeqLen)
@@ -141,6 +142,10 @@ extern void ReadJavaTokenAny(char* OutToken, char* OutMessage)
 			{
 				OutMessage[MessageLen] = '\0';
 				break;
+			}
+			if (EndProgress > 0)
+			{
+				continue;
 			}
 		}
 

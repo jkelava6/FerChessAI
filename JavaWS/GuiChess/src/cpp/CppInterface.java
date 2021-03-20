@@ -93,7 +93,7 @@ public class CppInterface implements Runnable {
 				{
 					System.err.print(ReadCode);
 					System.err.flush();
-					Thread.sleep(100);
+					Thread.sleep(10);
 					continue;
 				}
 				char ReadChar = (char)ReadCode;

@@ -53,17 +53,43 @@ int main()
 
 		if (strcmp(TokenBuffer, TokenExeMove) == 0)
 		{
+			int RowFrom = MessageBuffer[0] - '0';
+			const int FileFrom = MessageBuffer[1] - '0';
+			int RowTo = MessageBuffer[2] - '0';
+			const int FileTo = MessageBuffer[3] - '0';
+			if (!bWhiteTurn)
+			{
+				Board.FlipBoard();
+				RowFrom = 7 - RowFrom;
+				RowTo = 7 - RowTo;
+			}
+
+			Array<int> Rows;
+			Array<int> Files;
+			Board.CollectMoves(RowFrom, FileFrom, Rows, Files);
+			bool bMoveValid = false;
+			for (int Move = 0; Move < Rows.Count(); ++Move)
+			{
+				if (Rows[Move] == RowTo && Files[Move] == FileTo)
+				{
+					Board.Move(RowFrom, FileFrom, RowTo, FileTo);
+					bMoveValid = true;
+					break;
+				}
+			}
+
 			if (!bWhiteTurn)
 			{
 				Board.FlipBoard();
 			}
-			// read the move
-			Board.Move(0, 0, 0, 0);
-			if (!bWhiteTurn)
+			if (bMoveValid)
 			{
-				Board.FlipBoard();
+				bWhiteTurn = !bWhiteTurn;
 			}
-			bWhiteTurn = !bWhiteTurn;
+			else
+			{
+				WriteJavaToken("error", "Impossible move!");
+			}
 			SendBoard(Board);
 			continue;
 		}
@@ -86,17 +112,33 @@ int main()
 
 		if (strcmp(TokenBuffer, TokenSearchMoves) == 0)
 		{
+			int RowFrom = MessageBuffer[0] - '0';
+			const int FileFrom = MessageBuffer[1] - '0';
+			int RowTo = MessageBuffer[2] - '0';
+			const int FileTo = MessageBuffer[3] - '0';
+			if (!bWhiteTurn)
+			{
+				Board.FlipBoard();
+				RowFrom = 7 - RowFrom;
+				RowTo = 7 - RowTo;
+			}
+
+			Array<int> Rows;
+			Array<int> Files;
+			Board.CollectMoves(RowFrom, FileFrom, Rows, Files);
+			char Moves[128];
+			for (int Move = 0; Move < Rows.Count(); ++Move)
+			{
+				Moves[2 * Move] = '0' + (bWhiteTurn ? Rows[Move] : 7 - Rows[Move]);
+				Moves[2 * Move + 1] = '0' + Files[Move];
+			}
+			Moves[Rows.Count() * 2] = '\0';
+			WriteJavaToken("moves", Moves);
+
 			if (!bWhiteTurn)
 			{
 				Board.FlipBoard();
 			}
-			// implement move search
-			WriteJavaToken("moves", "");
-			if (!bWhiteTurn)
-			{
-				Board.FlipBoard();
-			}
-			bWhiteTurn = !bWhiteTurn;
 			continue;
 		}
 	}

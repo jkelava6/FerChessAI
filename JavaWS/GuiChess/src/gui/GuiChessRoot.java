@@ -11,6 +11,9 @@ public class GuiChessRoot extends GuiGroup
 	CppInterface cppInterface;
 	Thread cppThread;
 	GuiChessCanvas canvas;
+	boolean bWhitesTurn = true;
+	boolean bWhiteAI = false;
+	boolean bBlackAI = true;
 
 	public GuiChessRoot(GuiOwner owner, GuiFrame size)
 	{
@@ -35,10 +38,10 @@ public class GuiChessRoot extends GuiGroup
 		if (cppInterface.Result != null && cppInterface.Task == null)
 		{
 			CppResult result = cppInterface.Result;
-			cppInterface.Result = null;
 			
 			if (result.token.equals("board"))
 			{
+				cppInterface.Result = null;
 				for (int row = 0; row < 8; ++row)
 				{
 					for (int file = 0; file < 8; ++file)
@@ -48,7 +51,15 @@ public class GuiChessRoot extends GuiGroup
 						canvas.pieces[row][file] = pieceInt;
 					}
 				}
+			}
+		}
+		
+		if (cppInterface.Task == null && cppInterface.Result == null)
+		{
+			if (bWhitesTurn && bWhiteAI || !bWhitesTurn && bBlackAI)
+			{
 				cppInterface.Task = new CppDoActionGetBoard("ai", "");
+				bWhitesTurn = !bWhitesTurn;
 			}
 		}
 	}
