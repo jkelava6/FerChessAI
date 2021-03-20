@@ -42,7 +42,7 @@ public:
 	void Change(ChessBoard& Board, int Row, int File, ChessPiece Piece);
 	void Revert(ChessBoard& Board);
 private:
-	Array<RevertSquare> ChangedInOrder = Array<RevertSquare>(4);
+	Array<RevertSquare> ChangedInOrder;
 };
 
 class ChessBoard
@@ -50,6 +50,8 @@ class ChessBoard
 public:
 	ChessBoard();
 	~ChessBoard();
+	DECLARE_NOCOPY(ChessBoard);
+	DECLARE_NOMOVE(ChessBoard);
 public:
 	void EmptyBoard();
 	void DefaultBoard();
@@ -71,6 +73,8 @@ class DoubleBoard
 {
 public:
 	DoubleBoard();
+	DECLARE_NOCOPY(DoubleBoard);
+	DECLARE_NOMOVE(DoubleBoard);
 public:
 	void EmptyBoard();
 	void DefaultBoard();
