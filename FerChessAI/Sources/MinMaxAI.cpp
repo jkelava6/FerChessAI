@@ -168,7 +168,7 @@ float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth, bo
 
 	EvaluatedMove BestMove;
 
-	for (int Row = 0; Row < 8; ++Row)
+	for (int Row = 7; Row >= 0; --Row)
 	{
 		for (int File = 0; File < 8; ++File)
 		{

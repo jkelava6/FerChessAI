@@ -34,7 +34,7 @@ public:
 	EvaluatedMove LastPlayedMove;
 private:
 	int MaxDepth = 4;
-	int MaxVolatileDepth = 6;
+	int MaxVolatileDepth = 8;
 };
 
 
