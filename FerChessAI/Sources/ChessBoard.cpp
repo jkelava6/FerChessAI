@@ -108,7 +108,19 @@ ChessPiece& ChessBoard::Square(int Row, int File)
 void ChessBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 {
 	RevertMove& MoveLog = MoveStack.Push();
-	MoveLog.Change(*this, RowTo, FileTo, Square(RowFrom, FileFrom));
+	ChessPiece MovedPiece = Square(RowFrom, FileFrom);
+	if (MovedPiece == ChessPiece::WhitePawn && RowTo == 7)
+	{
+		MoveLog.Change(*this, RowTo, FileTo, ChessPiece::WhiteQueen);
+	}
+	else if (MovedPiece == ChessPiece::BlackPawn && RowTo == 0)
+	{
+		MoveLog.Change(*this, RowTo, FileTo, ChessPiece::BlackQueen);
+	}
+	else
+	{
+		MoveLog.Change(*this, RowTo, FileTo, MovedPiece);
+	}
 	MoveLog.Change(*this, RowFrom, FileFrom, ChessPiece::None);
 }
 
