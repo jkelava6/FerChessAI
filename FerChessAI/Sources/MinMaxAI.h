@@ -29,11 +29,12 @@ public:
 	virtual void PlayMove(DoubleBoard& Board) override;
 private:
 	float Evaluate(DoubleBoard& Board);
-	float MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth);
+	float MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth, bool bVolatile);
 public:
 	EvaluatedMove LastPlayedMove;
 private:
 	int MaxDepth = 4;
+	int MaxVolatileDepth = 6;
 };
 
 

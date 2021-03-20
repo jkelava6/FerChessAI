@@ -24,7 +24,7 @@ MinMaxAI::MinMaxAI()
 
 void MinMaxAI::PlayMove(DoubleBoard& Board)
 {
-	float Evaluation = MinMax(Board, -100.0f, -100.0f, 0);
+	float Evaluation = MinMax(Board, -100.0f, -100.0f, 0, false);
 	Board.Move(LastPlayedMove.RowFrom, LastPlayedMove.FileFrom, LastPlayedMove.RowTo, LastPlayedMove.FileTo);
 }
 
@@ -153,9 +153,9 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 	return MaterialScore + PositionalScore / MaterialScoreMultiplier;
 }
 
-float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth)
+float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth, bool bVolatile)
 {
-	if (Depth == MaxDepth)
+	if (Depth >= (bVolatile ? MaxVolatileDepth : MaxDepth))
 	{
 		return Evaluate(Board);
 	}
@@ -184,9 +184,10 @@ float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth)
 			const int MoveCount = Rows.Count();
 			for (int Move = 0; Move < MoveCount; ++Move)
 			{
+				bool bPieceTaken = Board(Rows[Move], Files[Move]) < ChessPiece::None;
 				Board.Move(Row, File, Rows[Move], Files[Move]);
 				Board.FlipBoard();
-				const float MoveEval = -MinMax(Board, Max(BestMove.Evaluation, Beta), Alfa, Depth + 1);
+				const float MoveEval = -MinMax(Board, Max(BestMove.Evaluation, Beta), Alfa, Depth + 1, bPieceTaken);
 				Board.FlipBoard();
 				Board.Undo();
 
