@@ -34,9 +34,15 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 	float PositionalScore = 0.0f;
 	constexpr float MaterialScoreMultiplier = 1000.0f;
 
-	constexpr float RookRowScores[] = { 0.3f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.8f };
+	constexpr float RookRowScores[] = { 0.02f, 0.01f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.8f };
 	bool bWhiteKingPresent = false;
 	bool bBlackKingPresent = false;
+	bool WhitePawns[8] = { false };
+	bool BlackPawns[8] = { false };
+	bool WhiteRooks[8] = { false };
+	bool BlackRooks[8] = { false };
+	constexpr float DoublePawnsPenalty = 3.0f;
+	constexpr float DoubleRooksReward = 3.0f;
 
 	for (int Row = 0; Row < 8; ++Row)
 	{
@@ -59,7 +65,12 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				MaterialScore += 1.0f;
 				const float CentralizedScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
 				const float AdvancedScore = (Row - 1.0f) / 5.0f;
-				PositionalScore += (CentralizedScore + AdvancedScore + CentralizedScore * AdvancedScore) / 3.0f;
+				PositionalScore += 1.5f * (CentralizedScore + AdvancedScore + CentralizedScore * 3 * AdvancedScore) / 5.0f;
+				if (WhitePawns[File])
+				{
+					PositionalScore -= DoublePawnsPenalty;
+				}
+				WhitePawns[File] = true;
 				break;
 			}
 			case ChessPiece::WhiteKnight:
@@ -72,17 +83,22 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 			}
 			case ChessPiece::WhiteBishop:
 			{
-				MaterialScore += 3.0;
+				MaterialScore += 3.1f;
 				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
 				const float FileScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
 				const float DiagonalScore = 1.0f - AbsF(FileScore - RowScore);
-				PositionalScore += (2.0f * RowScore + FileScore + 2.0f * DiagonalScore) / 5.0f;
+				PositionalScore += 0.8f * (RowScore + DiagonalScore) / 2.0f;
 				break;
 			}
 			case ChessPiece::WhiteRook:
 			{
 				MaterialScore += 5.0f;
 				PositionalScore += RookRowScores[Row];
+				if (WhiteRooks[File])
+				{
+					PositionalScore += DoubleRooksReward;
+				}
+				WhiteRooks[File] = true;
 				break;
 			}
 			case ChessPiece::WhiteQueen:
@@ -100,7 +116,12 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				MaterialScore -= 1.0f;
 				const float CentralizedScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
 				const float AdvancedScore = (6.0f - Row) / 5.0f;
-				PositionalScore -= (CentralizedScore + AdvancedScore + CentralizedScore * AdvancedScore) / 3.0f;
+				PositionalScore -= 1.5f * (CentralizedScore + AdvancedScore + CentralizedScore * 3 * AdvancedScore) / 5.0f;
+				if (BlackPawns[File])
+				{
+					PositionalScore += DoublePawnsPenalty;
+				}
+				BlackPawns[File] = true;
 				break;
 			}
 			case ChessPiece::BlackKnight:
@@ -113,16 +134,21 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 			}
 			case ChessPiece::BlackBishop:
 			{
-				MaterialScore -= 3.0;
+				MaterialScore -= 3.1f;
 				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
 				const float FileScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
 				const float DiagonalScore = 1.0f - AbsF(FileScore - RowScore);
-				PositionalScore -= (2.0f * RowScore + FileScore + 2.0f * DiagonalScore) / 5.0f;
+				PositionalScore -= 0.8f * (RowScore + DiagonalScore) / 2.0f;
 				break;
 			}
 			case ChessPiece::BlackRook:
 				MaterialScore -= 5.0f;
 				PositionalScore -= RookRowScores[7 - Row];
+				if (BlackRooks[File])
+				{
+					PositionalScore -= DoubleRooksReward;
+				}
+				BlackRooks[File] = true;
 				break;
 			case ChessPiece::BlackQueen:
 			{
