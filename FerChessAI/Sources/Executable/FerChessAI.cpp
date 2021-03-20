@@ -141,7 +141,7 @@ int main()
                 'a' + AI.LastPlayedMove.FileTo, '8' - AI.LastPlayedMove.RowTo, AI.LastPlayedMove.Evaluation);
 
             Board.FlipBoard();
-            //bPlayersTurn = true;
+            bPlayersTurn = true;
         }
     }
 }
