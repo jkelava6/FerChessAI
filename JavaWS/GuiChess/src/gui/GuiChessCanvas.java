@@ -94,6 +94,22 @@ public class GuiChessCanvas extends GuiElement {
 				}
 			}
 		}
+
+		RenderColor moveColor = new RenderColor(127, 0, 0, 255);
+		renderer.SetColor(moveColor);
+		for (int move = 0; move < ranks.size(); ++move)
+		{
+			int row = ranks.elementAt(move);
+			int file = files.elementAt(move);
+			int rowFlipProcessed = bFlipped ? row : 7 - row;
+			GuiFrame square = area.SubFrame(new GuiFrame(file * squareSize, rowFlipProcessed * squareSize,
+					(file + 1) * squareSize, (rowFlipProcessed + 1) * squareSize));
+			float moveSize = 0.15f;
+			float halfSize = 0.5f * moveSize;
+			GuiFrame moveMark = square.SubFrame(new GuiFrame(0.5f - halfSize, 0.5f - halfSize,
+					0.5f + halfSize, 0.5f + halfSize));
+			renderer.FillEllipse(moveMark.IntLeft(), moveMark.IntTop(), moveMark.IntWidth(), moveMark.IntHeight());
+		}
 	}
 	
 	@Override
