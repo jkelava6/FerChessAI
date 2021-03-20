@@ -59,7 +59,7 @@ public class GuiChessCanvas extends GuiElement {
 			{
 				GuiFrame square = area.SubFrame(new GuiFrame(file * squareSize, (7 - row) * squareSize,
 						(file + 1) * squareSize, (8 - row) * squareSize));
-				RenderColor color = ((row + file) % 2 == 0) ? RenderColor.COL_BLACK : RenderColor.COL_WHITE;
+				RenderColor color = ((row + file) % 2 == 0) ? RenderColor.COL_GRAY : RenderColor.COL_WHITE;
 				renderer.SetColor(color);
 				renderer.FillBox(square.IntLeft(), square.IntTop(), square.IntWidth(), square.IntHeight());
 				
