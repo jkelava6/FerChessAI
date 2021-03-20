@@ -227,6 +227,10 @@ float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth, bo
 
 					if (-MoveEval < Alfa)
 					{
+						if (Depth == 0)
+						{
+							LastPlayedMove = BestMove;
+						}
 						return MoveEval;
 					}
 				}
