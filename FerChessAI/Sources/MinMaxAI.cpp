@@ -186,7 +186,7 @@ float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth)
 			{
 				Board.Move(Row, File, Rows[Move], Files[Move]);
 				Board.FlipBoard();
-				const float MoveEval = -MinMax(Board, Beta, Alfa, Depth + 1);
+				const float MoveEval = -MinMax(Board, Max(BestMove.Evaluation, Beta), Alfa, Depth + 1);
 				Board.FlipBoard();
 				Board.Undo();
 
@@ -197,6 +197,11 @@ float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth)
 					BestMove.FileFrom = File;
 					BestMove.RowTo = Rows[Move];
 					BestMove.FileTo = Files[Move];
+
+					if (-MoveEval < Alfa)
+					{
+						return MoveEval;
+					}
 				}
 			}
 		}
