@@ -19,7 +19,7 @@ public class WindowsImage extends RenderImage {
 		super(imageString, area.SubFrame(GuiFrame.FRAME_FILL()));
 		try {
 			image = ImageIO.read(new ByteArrayInputStream(imageString));
-			System.out.println(image);
+			//System.out.println(image);
 			if (image == null) {
 				return;
 			}
@@ -39,7 +39,7 @@ public class WindowsImage extends RenderImage {
 			this.area.hiX *= image.getWidth(null);
 			this.area.loY *= image.getHeight(null);
 			this.area.hiY *= image.getHeight(null);
-			System.out.printf("%f %f %f %f\n", area.loX, area.loY, area.hiX, area.hiY);
+			//System.out.printf("%f %f %f %f\n", area.loX, area.loY, area.hiX, area.hiY);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

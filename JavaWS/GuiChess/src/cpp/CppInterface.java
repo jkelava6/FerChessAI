@@ -23,6 +23,7 @@ public class CppInterface implements Runnable {
 	{
 		if (cppAgent != null)
 		{
+			System.err.println("Closing CPP process.");
 			cppAgent.destroy();
 		}
 	}
@@ -36,8 +37,7 @@ public class CppInterface implements Runnable {
 		
 		try {
 			String command = fileExecutable;
-			ProcessBuilder builder = new ProcessBuilder(
-			"cmd.exe", "/c", command);
+			ProcessBuilder builder = new ProcessBuilder(command);
 			builder.redirectErrorStream(true);
 			cppAgent = builder.start();
 			
@@ -77,6 +77,7 @@ public class CppInterface implements Runnable {
 	{
 		token = "<" + token + ">";
 		StringBuilder message = new StringBuilder();
+		System.err.print("FROM CPP: ");
 		try {
 			final int tokenLength = token.length();
 			final String endSequence = "</>";
@@ -90,10 +91,13 @@ public class CppInterface implements Runnable {
 				int ReadCode = input.read();
 				if (ReadCode == -1)
 				{
-					Thread.sleep(10);
+					System.err.print(ReadCode);
+					System.err.flush();
+					Thread.sleep(100);
 					continue;
 				}
 				char ReadChar = (char)ReadCode;
+				System.err.print(ReadChar);
 
 				if (tokenProgress < tokenLength)
 				{
@@ -117,11 +121,11 @@ public class CppInterface implements Runnable {
 					if (ReadChar == endSequence.charAt(endProgress))
 					{
 						++endProgress;
+						if (endProgress == endSeqLen)
+						{
+							break;
+						}
 						continue;
-					}
-					if (endProgress == endSeqLen)
-					{
-						break;
 					}
 				}
 
@@ -131,13 +135,16 @@ public class CppInterface implements Runnable {
 			e.printStackTrace();
 		}
 		
+		System.err.println(" [End Receieve]");
 		return message.toString();
 	}
 	
 	public void WriteToken(String token, String message)
 	{
 		try {
+			System.err.format("TO CPP: <%s>%s</>\n", token, message);
 			output.write(String.format("<%s>%s</>", token, message));
+			output.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
