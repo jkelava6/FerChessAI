@@ -41,8 +41,10 @@ public:
 public:
 	void Change(ChessBoard& Board, int Row, int File, ChessPiece Piece);
 	void Revert(ChessBoard& Board);
+	void SetMask(__int64 BitMask);
 private:
 	Array<RevertSquare> ChangedInOrder;
+	__int64 MovedMask = 0;
 };
 
 class ChessBoard
@@ -61,12 +63,17 @@ public:
 	void Move(int RowFrom, int FileFrom, int RowTo, int FileTo);
 	void Undo();
 	void CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& Files);
+	void SetMoved(__int64 BitMask);
 private:
 	bool AreCoordsValid(int Row, int File);
 	void CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, Array<int>& Rows, Array<int>& Files);
+	bool IsMoved(int Row, int File);
+	void LogMoved(int Row, int File);
+	bool IsAttacked(int Row, int File);
 private:
 	ChessPiece* Pieces;
 	Array<RevertMove> MoveStack;
+	__int64 MovedMask = 0;
 };
 
 class DoubleBoard

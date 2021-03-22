@@ -1,6 +1,9 @@
 #pragma once
 
 
+#include <Math.h>
+
+
 template <class Type> class Array
 {
 private:
@@ -25,9 +28,14 @@ public:
 
 	Array<Type>& operator= (const Array<Type>& Copied)
 	{
+		if (Data)
+		{
+			delete[] Data;
+		}
+
 		AllocatedSize = Copied.AllocatedSize;
 		UsedSize = Copied.UsedSize;
-		Data = new Type[UsedSize];
+		Data = new Type[AllocatedSize];
 		for (int Index = 0; Index < UsedSize; ++Index)
 		{
 			Data[Index] = Copied.Data[Index];
@@ -43,6 +51,11 @@ public:
 
 	Array<Type>& operator= (Array<Type>&& Moved)
 	{
+		if (Data)
+		{
+			delete[] Data;
+		}
+
 		AllocatedSize = Moved.AllocatedSize;
 		UsedSize = Moved.UsedSize;
 		Data = Moved.Data;
@@ -77,7 +90,7 @@ public:
 	{
 		if (UsedSize == AllocatedSize)
 		{
-			Prealocate(AllocatedSize * 2);
+			Prealocate(Max(AllocatedSize * 2, 1));
 		}
 		return Data[UsedSize++];
 	}

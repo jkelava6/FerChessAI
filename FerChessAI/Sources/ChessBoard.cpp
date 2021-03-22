@@ -3,6 +3,8 @@
 #include <StdH.h>
 #include <ChessBoard.h>
 
+#include <Math.h>
+
 
 RevertSquare::RevertSquare() = default;
 
@@ -13,8 +15,13 @@ RevertSquare::RevertSquare(int ChangedRow, int ChangedFile, ChessPiece OldPiece)
 {
 }
 
+#include <JavaIO/JavaTokenIO.h>
 void RevertSquare::Restore(ChessBoard& Board)
 {
+	if (Piece < ChessPiece::BlackKing || Piece > ChessPiece::WhiteKing)
+	{
+		WriteJavaToken("error", "invalid piece");
+	}
 	Board(Row, File) = Piece;
 }
 
@@ -28,11 +35,19 @@ void RevertMove::Change(ChessBoard& Board, int Row, int File, ChessPiece Piece)
 
 void RevertMove::Revert(ChessBoard& Board)
 {
+	bool bCastle = ChangedInOrder.Count() == 4;
 	for (; ChangedInOrder.Count() > 0;)
 	{
 		ChangedInOrder.Top().Restore(Board);
 		ChangedInOrder.Pop();
 	}
+
+	Board.SetMoved(MovedMask);
+}
+
+void RevertMove::SetMask(__int64 BitMask)
+{
+	MovedMask = BitMask;
 }
 
 ChessBoard::ChessBoard()
@@ -122,6 +137,45 @@ void ChessBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 		MoveLog.Change(*this, RowTo, FileTo, MovedPiece);
 	}
 	MoveLog.Change(*this, RowFrom, FileFrom, ChessPiece::None);
+
+	MoveLog.SetMask(MovedMask);
+	LogMoved(RowTo, FileTo);
+
+	// castling
+	if (MovedPiece == ChessPiece::WhiteKing && AbsI(FileTo - FileFrom) == 2)
+	{
+		if (FileTo == 6)
+		{
+			if (FileFrom != 4)
+			{
+				WriteJavaToken("error", "where from?!");
+			}
+			MoveLog.Change(*this, 0, 5, ChessPiece::WhiteRook);
+			MoveLog.Change(*this, 0, 7, ChessPiece::None);
+		}
+		else
+		{
+			MoveLog.Change(*this, 0, 3, ChessPiece::WhiteRook);
+			MoveLog.Change(*this, 0, 0, ChessPiece::None);
+		}
+	}
+	if (MovedPiece == ChessPiece::BlackKing && AbsI(FileTo - FileFrom) == 2)
+	{
+		if (FileTo == 6)
+		{
+			if (FileFrom != 4)
+			{
+				WriteJavaToken("error", "where from?!");
+			}
+			MoveLog.Change(*this, 7, 5, ChessPiece::BlackRook);
+			MoveLog.Change(*this, 7, 7, ChessPiece::None);
+		}
+		else
+		{
+			MoveLog.Change(*this, 7, 3, ChessPiece::BlackRook);
+			MoveLog.Change(*this, 7, 0, ChessPiece::None);
+		}
+	}
 }
 
 void ChessBoard::Undo()
@@ -226,6 +280,22 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 				Files.Push() = NewFile;
 			}
 		}
+		// castling
+		if (!IsMoved(Row, File) && !IsAttacked(Row, File))
+		{
+			if (Square(0, 0) == ChessPiece::WhiteRook && !IsMoved(0, 0)
+				&& Square(0, 3) == ChessPiece::None && Square(0, 2) == ChessPiece::None && !IsAttacked(0, 3))
+			{
+				Rows.Push() = 0;
+				Files.Push() = 2;
+			}
+			if (Square(0, 7) == ChessPiece::WhiteRook && !IsMoved(0, 7)
+				&& Square(0, 5) == ChessPiece::None && Square(0, 6) == ChessPiece::None && !IsAttacked(0, 5))
+			{
+				Rows.Push() = 0;
+				Files.Push() = 6;
+			}
+		}
 		break;
 	}
 	default:
@@ -258,6 +328,26 @@ void ChessBoard::CollectLineMovement(int Row, int File, int DeltaRow, int DeltaF
 		NewRow += DeltaRow;
 		NewFile += DeltaFile;
 	}
+}
+
+bool ChessBoard::IsMoved(int Row, int File)
+{
+	return MovedMask & ((__int64)1 << (8 * Row + File));
+}
+
+void ChessBoard::LogMoved(int Row, int File)
+{
+	MovedMask |= ((__int64)1 << (8 * Row + File));
+}
+
+void ChessBoard::SetMoved(__int64 BitMask)
+{
+	MovedMask = BitMask;
+}
+
+bool ChessBoard::IsAttacked(int Row, int File)
+{
+	return false;
 }
 
 DoubleBoard::DoubleBoard() = default;
