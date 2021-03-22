@@ -45,9 +45,15 @@ void RevertMove::Revert(ChessBoard& Board)
 	Board.SetMoved(MovedMask);
 }
 
-void RevertMove::SetMask(__int64 BitMask)
+void RevertMove::SaveMask(__int64 BitMask)
 {
 	MovedMask = BitMask;
+}
+
+void RevertMove::SaveEnPassant(int Row, int File)
+{
+	EnPassantRow = Row;
+	EnPassantFile = File;
 }
 
 ChessBoard::ChessBoard()
@@ -138,7 +144,24 @@ void ChessBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 	}
 	MoveLog.Change(*this, RowFrom, FileFrom, ChessPiece::None);
 
-	MoveLog.SetMask(MovedMask);
+	// en passant
+	if (RowTo == EnPassantRow && FileTo == EnPassantFile)
+	{
+		MoveLog.Change(*this, RowFrom, FileTo, ChessPiece::None);
+	}
+
+	MoveLog.SaveEnPassant(EnPassantRow, EnPassantFile);
+	if ((MovedPiece == ChessPiece::WhitePawn || MovedPiece == ChessPiece::BlackPawn)
+		&& AbsI(RowTo - RowFrom) == 2)
+	{
+		SetEnPassant((RowFrom + RowTo) / 2, FileTo);
+	}
+	else
+	{
+		SetEnPassant(-1, -1);
+	}
+
+	MoveLog.SaveMask(MovedMask);
 	LogMoved(RowTo, FileTo);
 
 	// castling
@@ -190,28 +213,27 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 	{
 	case ChessPiece::WhitePawn:
 	{
-		if (Row < 7 /* This should always be true after promotions are implemented */)
+		if (Square(Row + 1, File) == ChessPiece::None)
 		{
-			if (Square(Row + 1, File) == ChessPiece::None)
+			Rows.Push() = Row + 1;
+			Files.Push() = File;
+			if (Row == 1 && Square(Row + 2, File) == ChessPiece::None)
 			{
-				Rows.Push() = Row + 1;
+				Rows.Push() = Row + 2;
 				Files.Push() = File;
-				if (Row == 1 && Square(Row + 2, File) == ChessPiece::None)
-				{
-					Rows.Push() = Row + 2;
-					Files.Push() = File;
-				}
 			}
-			if (File > 0 && Square(Row + 1, File - 1) < ChessPiece::None)
-			{
-				Rows.Push() = Row + 1;
-				Files.Push() = File - 1;
-			}
-			if (File < 7 && Square(Row + 1, File + 1) < ChessPiece::None)
-			{
-				Rows.Push() = Row + 1;
-				Files.Push() = File + 1;
-			}
+		}
+		if (File > 0 && Square(Row + 1, File - 1) < ChessPiece::None
+			|| Row + 1 == EnPassantRow && File - 1 == EnPassantFile)
+		{
+			Rows.Push() = Row + 1;
+			Files.Push() = File - 1;
+		}
+		if (File < 7 && Square(Row + 1, File + 1) < ChessPiece::None
+			|| Row + 1 == EnPassantRow && File + 1 == EnPassantFile)
+		{
+			Rows.Push() = Row + 1;
+			Files.Push() = File + 1;
 		}
 		break;
 	}
@@ -348,6 +370,12 @@ void ChessBoard::SetMoved(__int64 BitMask)
 bool ChessBoard::IsAttacked(int Row, int File)
 {
 	return false;
+}
+
+void ChessBoard::SetEnPassant(int Row, int File)
+{
+	EnPassantRow = Row;
+	EnPassantFile = File;
 }
 
 DoubleBoard::DoubleBoard() = default;

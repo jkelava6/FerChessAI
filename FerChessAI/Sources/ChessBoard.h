@@ -41,10 +41,13 @@ public:
 public:
 	void Change(ChessBoard& Board, int Row, int File, ChessPiece Piece);
 	void Revert(ChessBoard& Board);
-	void SetMask(__int64 BitMask);
+	void SaveMask(__int64 BitMask);
+	void SaveEnPassant(int Row, int File);
 private:
 	Array<RevertSquare> ChangedInOrder;
 	__int64 MovedMask = 0;
+	int EnPassantRow = -1;
+	int EnPassantFile = -1;
 };
 
 class ChessBoard
@@ -64,6 +67,7 @@ public:
 	void Undo();
 	void CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& Files);
 	void SetMoved(__int64 BitMask);
+	void SetEnPassant(int Row, int File);
 private:
 	bool AreCoordsValid(int Row, int File);
 	void CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, Array<int>& Rows, Array<int>& Files);
@@ -71,9 +75,11 @@ private:
 	void LogMoved(int Row, int File);
 	bool IsAttacked(int Row, int File);
 private:
-	ChessPiece* Pieces;
+	ChessPiece* Pieces = nullptr;
 	Array<RevertMove> MoveStack;
 	__int64 MovedMask = 0;
+	int EnPassantRow = -1;
+	int EnPassantFile = -1;
 };
 
 class DoubleBoard
