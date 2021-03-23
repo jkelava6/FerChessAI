@@ -369,6 +369,84 @@ void ChessBoard::SetMoved(__int64 BitMask)
 
 bool ChessBoard::IsAttacked(int Row, int File)
 {
+	const int DeltaRowDiagAll[] = { -1, -1, 1, 1 };
+	const int DeltaFileDiagAll[] = { -1, 1, -1, 1 };
+	ARRAY_MATCH(DeltaRowDiagAll, DeltaFileDiagAll);
+	const int DeltaRowStraightAll[] = { -1, 0, 1, 0 };
+	const int DeltaFileStraightAll[] = { 0, -1, 0, 1 };
+	ARRAY_MATCH(DeltaRowStraightAll, DeltaFileStraightAll);
+	const int DeltaRowKnightAll[] = { -2, -1, 1, 2, 2, 1, -1, -2 };
+	const int DeltaFileKnightAll[] = { -1, -2, -2, -1, 1, 2, 2, 1 };
+	ARRAY_MATCH(DeltaRowKnightAll, DeltaFileKnightAll);
+
+	for (int Dir = 0; Dir < ARRAY_SIZE(DeltaRowDiagAll); ++Dir)
+	{
+		const int DeltaRow = DeltaRowDiagAll[Dir];
+		const int DeltaFile = DeltaFileDiagAll[Dir];
+		int CheckRow = Row + DeltaRow;
+		int CheckFile = File + DeltaFile;
+		if (AreCoordsValid(CheckRow, CheckFile))
+		{
+			if (Square(CheckRow, CheckFile) == ChessPiece::BlackKing)
+			{
+				return true;
+			}
+			while (AreCoordsValid(CheckRow, CheckFile))
+			{
+				const ChessPiece Piece = Square(CheckRow, CheckFile);
+				if (Piece == ChessPiece::BlackBishop || Piece == ChessPiece::BlackQueen)
+				{
+					return true;
+				}
+				if (Piece != ChessPiece::None)
+				{
+					break;
+				}
+				CheckRow += DeltaRow;
+				CheckFile += DeltaFile;
+			}
+		}
+	}
+
+	for (int Dir = 0; Dir < ARRAY_SIZE(DeltaRowStraightAll); ++Dir)
+	{
+		const int DeltaRow = DeltaRowStraightAll[Dir];
+		const int DeltaFile = DeltaFileStraightAll[Dir];
+		int CheckRow = Row + DeltaRow;
+		int CheckFile = File + DeltaFile;
+		if (AreCoordsValid(CheckRow, CheckFile))
+		{
+			if (Square(CheckRow, CheckFile) == ChessPiece::BlackKing)
+			{
+				return true;
+			}
+			while (AreCoordsValid(CheckRow, CheckFile))
+			{
+				const ChessPiece Piece = Square(CheckRow, CheckFile);
+				if (Piece == ChessPiece::BlackRook || Piece == ChessPiece::BlackQueen)
+				{
+					return true;
+				}
+				if (Piece != ChessPiece::None)
+				{
+					break;
+				}
+				CheckRow += DeltaRow;
+				CheckFile += DeltaFile;
+			}
+		}
+	}
+
+	for (int Dir = 0; Dir < ARRAY_SIZE(DeltaRowKnightAll); ++Dir)
+	{
+		const int CheckRow = Row + DeltaRowKnightAll[Dir];
+		const int CheckFile = File + DeltaFileKnightAll[Dir];
+		if (AreCoordsValid(CheckRow, CheckFile) && Square(CheckRow, CheckFile) == ChessPiece::BlackKnight)
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
