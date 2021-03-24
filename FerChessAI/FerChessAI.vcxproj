@@ -151,6 +151,9 @@
     <ClCompile Include="Sources\GenericAI.cpp" />
     <ClCompile Include="Sources\JavaIO\JavaTokenIO.cpp" />
     <ClCompile Include="Sources\MinMaxAI.cpp" />
+    <ClCompile Include="Sources\NeuNet\Dna.cpp" />
+    <ClCompile Include="Sources\NeuNet\Network.cpp" />
+    <ClCompile Include="Sources\NeuNet\Node.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Array.h" />
@@ -159,6 +162,9 @@
     <ClInclude Include="Sources\GenericAI.h" />
     <ClInclude Include="Sources\JavaIO\JavaTokenIO.h" />
     <ClInclude Include="Sources\Math.h" />
+    <ClInclude Include="Sources\NeuNet\Dna.h" />
+    <ClInclude Include="Sources\NeuNet\Network.h" />
+    <ClInclude Include="Sources\NeuNet\Node.h" />
     <ClInclude Include="Sources\StdH.h" />
     <ClInclude Include="Sources\MinMaxAI.h" />
   </ItemGroup>

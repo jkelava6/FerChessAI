@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <Math.h>
 
 
@@ -13,7 +12,7 @@ private:
 
 
 public:
-	Array(int InitialSize = 16)
+	Array(int InitialSize = 0)
 	{
 		Prealocate(InitialSize);
 	}
@@ -74,13 +73,17 @@ public:
 
 	void Prealocate(int Size)
 	{
-		Type* NewData = new Type[Size];
+		Type* NewData = Size > 0 ? new Type[Size] : nullptr;
+		UsedSize = Min(Size, UsedSize);
 
 		for (int Index = 0; Index < UsedSize; ++Index)
 		{
 			NewData[Index] = Data[Index];
 		}
-		delete[] Data;
+		if (Data)
+		{
+			delete[] Data;
+		}
 
 		Data = NewData;
 		AllocatedSize = Size;
@@ -90,7 +93,7 @@ public:
 	{
 		if (UsedSize == AllocatedSize)
 		{
-			Prealocate(Max(AllocatedSize * 2, 1));
+			Prealocate(AllocatedSize != 0 ? AllocatedSize * 2 : 16);
 		}
 		return Data[UsedSize++];
 	}
