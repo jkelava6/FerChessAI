@@ -12,6 +12,7 @@ void FNetwork::FromDna(FDna& Dna)
 
 	Inputs = Dna.ReadInt();
 	Outputs = Dna.ReadInt();
+	RecurrentPerLevel.PopAll();
 	RecurrentPerLevel.Prealocate(Dna.ReadInt());
 	TotalRecurrent = 0;
 	for (int Level = 0; Level < RecurrentPerLevel.Count(); ++Level)
@@ -25,6 +26,7 @@ void FNetwork::FromDna(FDna& Dna)
 	const int FirstMiddleNode = Inputs + TotalRecurrent;
 	FirstOutput = Inputs + TotalRecurrent + MiddleNodes;
 
+	Nodes.PopAll();
 	Nodes.Prealocate(TotalNodes);
 	for (int Node = Inputs; Inputs < TotalNodes; ++Node)
 	{

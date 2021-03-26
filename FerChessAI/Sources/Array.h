@@ -98,9 +98,9 @@ public:
 		return Data[UsedSize++];
 	}
 
-	void Pop()
+	Type&& Pop()
 	{
-		--UsedSize;
+		return Move(Data[UsedSize--]);
 	}
 
 	int Count()
@@ -116,6 +116,29 @@ public:
 	Type& Top()
 	{
 		return Data[UsedSize - 1];
+	}
+
+	void PopAll(bool bSetToDefault = false)
+	{
+		if (bSetToDefault)
+		{
+			for (int Index = 0; Index < UsedSize; ++Index)
+			{
+				Data[Index] = Type();
+			}
+		}
+		UsedSize = 0;
+	}
+
+	void Clear()
+	{
+		if (Data)
+		{
+			delete[] Data;
+		}
+		Data = nullptr;
+		UsedSize = 0;
+		AllocatedSize = 0;
 	}
 
 };
