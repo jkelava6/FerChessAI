@@ -25,11 +25,11 @@ class FRevertSquare
 {
 public:
 	FRevertSquare();
-	FRevertSquare(int ChangedRow, int ChangedFile, FChessPiece OldPiece);
+	FRevertSquare(int ChangedRank, int ChangedFile, FChessPiece OldPiece);
 public:
 	void Restore(FChessBoard& Board);
 private:
-	int Row = -1;
+	int Rank = -1;
 	int File = -1;
 	FChessPiece Piece = FChessPiece::None;
 };
@@ -39,14 +39,14 @@ class FRevertMove
 public:
 	FRevertMove();
 public:
-	void Change(FChessBoard& Board, int Row, int File, FChessPiece Piece);
+	void Change(FChessBoard& Board, int Rank, int File, FChessPiece Piece);
 	void Revert(FChessBoard& Board);
 	void SaveMask(__int64 BitMask);
-	void SaveEnPassant(int Row, int File);
+	void SaveEnPassant(int Rank, int File);
 private:
 	TArray<FRevertSquare> ChangedInOrder;
 	__int64 MovedMask = 0;
-	int EnPassantRow = -1;
+	int EnPassantRank = -1;
 	int EnPassantFile = -1;
 };
 
@@ -60,26 +60,26 @@ public:
 public:
 	void EmptyBoard();
 	void DefaultBoard();
-	FChessPiece& operator()(int Row, int File);
-	FChessPiece& Square(int Row, int File);
+	FChessPiece& operator()(int Rank, int File);
+	FChessPiece& Square(int Rank, int File);
 
-	void Move(int RowFrom, int FileFrom, int RowTo, int FileTo);
+	void Move(int RankFrom, int FileFrom, int RankTo, int FileTo);
 	void Undo();
-	void CollectMoves(int Row, int File, TArray<int>& Rows, TArray<int>& Files);
+	void CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<int>& Files);
 	void SetMoved(__int64 BitMask);
-	void SetEnPassant(int Row, int File);
+	void SetEnPassant(int Rank, int File);
 	void CopyPositionFrom(FChessBoard& Board);
 private:
-	bool AreCoordsValid(int Row, int File);
-	void CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, TArray<int>& Rows, TArray<int>& Files);
-	bool IsMoved(int Row, int File);
-	void LogMoved(int Row, int File);
-	bool IsAttacked(int Row, int File);
+	bool AreCoordsValid(int Rank, int File);
+	void CollectLineMovement(int Rank, int File, int DeltaRank, int DeltaFile, TArray<int>& Ranks, TArray<int>& Files);
+	bool IsMoved(int Rank, int File);
+	void LogMoved(int Rank, int File);
+	bool IsAttacked(int Rank, int File);
 private:
 	FChessPiece* Pieces = nullptr;
 	TArray<FRevertMove> MoveStack;
 	__int64 MovedMask = 0;
-	int EnPassantRow = -1;
+	int EnPassantRank = -1;
 	int EnPassantFile = -1;
 };
 
@@ -92,12 +92,12 @@ public:
 public:
 	void EmptyBoard();
 	void DefaultBoard();
-	const FChessPiece& operator()(int Row, int File);
-	const FChessPiece& Square(int Row, int File);
+	const FChessPiece& operator()(int Rank, int File);
+	const FChessPiece& Square(int Rank, int File);
 
-	void Move(int RowFrom, int FileFrom, int RowTo, int FileTo);
+	void Move(int RankFrom, int FileFrom, int RankTo, int FileTo);
 	void Undo();
-	void CollectMoves(int Row, int File, TArray<int>& Rows, TArray<int>& Files);
+	void CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<int>& Files);
 
 	void FlipBoard();
 private:

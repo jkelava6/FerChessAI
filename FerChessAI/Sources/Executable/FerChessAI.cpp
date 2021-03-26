@@ -25,12 +25,12 @@ int GetNumber(char Base)
 
 void DebugBoard(FDoubleBoard& Board)
 {
-    for (int Row = 7; Row >= 0; --Row)
+    for (int Rank = 7; Rank >= 0; --Rank)
     {
         for (int File = 0; File < 8; ++File)
         {
             char Piece = ' ';
-            switch (Board(Row, File))
+            switch (Board(Rank, File))
             {
             case ChessPiece::WhitePawn:
                 Piece = 'P';
@@ -93,26 +93,26 @@ int main()
     {
         while (bPlayersTurn)
         {
-            int RowFrom;
+            int RankFrom;
             int FileFrom;
-            int RowTo;
+            int RankTo;
             int FileTo;
 
             DebugBoard(Board);
             printf("Your move: ");
             FileFrom = GetNumber('a');
-            RowFrom = GetNumber('1');
+            RankFrom = GetNumber('1');
             FileTo = GetNumber('a');
-            RowTo = GetNumber('1');
+            RankTo = GetNumber('1');
 
-            Array<int> PossibleRows;
+            Array<int> PossibleRanks;
             Array<int> PossibleFiles;
-            Board.CollectMoves(RowFrom, FileFrom, PossibleRows, PossibleFiles);
+            Board.CollectMoves(RankFrom, FileFrom, PossibleRanks, PossibleFiles);
             bool bMoveValid = false;
-            const int PossibleMoves = PossibleRows.Count();
+            const int PossibleMoves = PossibleRanks.Count();
             for (int Move = 0; Move < PossibleMoves; ++Move)
             {
-                if (RowTo == PossibleRows[Move] && FileTo == PossibleFiles[Move])
+                if (RankTo == PossibleRanks[Move] && FileTo == PossibleFiles[Move])
                 {
                     bMoveValid = true;
                     break;
@@ -121,7 +121,7 @@ int main()
 
             if (bMoveValid)
             {
-                Board.Move(RowFrom, FileFrom, RowTo, FileTo);
+                Board.Move(RankFrom, FileFrom, RankTo, FileTo);
                 DebugBoard(Board);
                 Board.FlipBoard();
                 bPlayersTurn = false;
@@ -137,8 +137,8 @@ int main()
             printf("AI move ... ");
             AI.PlayMove(Board);
 
-            printf("%c%c - %c%c [%4.1f]\n", 'a' + AI.LastPlayedMove.FileFrom, '8' - AI.LastPlayedMove.RowFrom,
-                'a' + AI.LastPlayedMove.FileTo, '8' - AI.LastPlayedMove.RowTo, AI.LastPlayedMove.Evaluation);
+            printf("%c%c - %c%c [%4.1f]\n", 'a' + AI.LastPlayedMove.FileFrom, '8' - AI.LastPlayedMove.RankFrom,
+                'a' + AI.LastPlayedMove.FileTo, '8' - AI.LastPlayedMove.RankTo, AI.LastPlayedMove.Evaluation);
 
             Board.FlipBoard();
             bPlayersTurn = true;

@@ -8,12 +8,12 @@
 #include <Math.h>
 
 
-FEvaluatedMove::FEvaluatedMove(int MoveRowFrom /*= -1*/, int MoveFileFrom /*= -1*/,
-	int MoveRowTo /*= -1*/, int MoveFileTo /*= -1*/, float BoardEval /*= MINMAX_EVAL_LOSS*/) :
+FEvaluatedMove::FEvaluatedMove(int MoveRankFrom /*= -1*/, int MoveFileFrom /*= -1*/,
+	int MoveRankTo /*= -1*/, int MoveFileTo /*= -1*/, float BoardEval /*= MINMAX_EVAL_LOSS*/) :
 	Evaluation(BoardEval),
-	RowFrom(MoveRowFrom),
+	RankFrom(MoveRankFrom),
 	FileFrom(MoveFileFrom),
-	RowTo(MoveRowTo),
+	RankTo(MoveRankTo),
 	FileTo(MoveFileTo)
 {
 }
@@ -25,7 +25,7 @@ FMinMaxAI::FMinMaxAI()
 bool FMinMaxAI::PlayMove(FDoubleBoard& Board)
 {
 	float Evaluation = MinMax(Board, -100.0f, -100.0f, 0, false);
-	Board.Move(LastPlayedMove.RowFrom, LastPlayedMove.FileFrom, LastPlayedMove.RowTo, LastPlayedMove.FileTo);
+	Board.Move(LastPlayedMove.RankFrom, LastPlayedMove.FileFrom, LastPlayedMove.RankTo, LastPlayedMove.FileTo);
 	return true;
 }
 
@@ -41,7 +41,7 @@ float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 	float PositionalScore = 0.0f;
 	constexpr float MaterialScoreMultiplier = 1000.0f;
 
-	constexpr float RookRowScores[] = { 0.02f, 0.01f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.8f };
+	constexpr float RookRankScores[] = { 0.02f, 0.01f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.8f };
 	bool bWhiteKingPresent = false;
 	bool bBlackKingPresent = false;
 	bool WhitePawns[8] = { false };
@@ -51,11 +51,11 @@ float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 	constexpr float DoublePawnsPenalty = 3.0f;
 	constexpr float DoubleRooksReward = 3.0f;
 
-	for (int Row = 0; Row < 8; ++Row)
+	for (int Rank = 0; Rank < 8; ++Rank)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			FChessPiece Piece = Board(Row, File);
+			FChessPiece Piece = Board(Rank, File);
 			if (Piece == FChessPiece::None)
 			{
 				continue;
@@ -71,7 +71,7 @@ float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 			{
 				MaterialScore += 1.0f;
 				const float CentralizedScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
-				const float AdvancedScore = (Row - 1.0f) / 5.0f;
+				const float AdvancedScore = (Rank - 1.0f) / 5.0f;
 				PositionalScore += 1.5f * (CentralizedScore + AdvancedScore + CentralizedScore * 3 * AdvancedScore) / 5.0f;
 				if (WhitePawns[File])
 				{
@@ -83,24 +83,24 @@ float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 			case FChessPiece::WhiteKnight:
 			{
 				MaterialScore += 3.0f;
-				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
+				const float RankScore = (3.5f - AbsF(3.5f - Rank)) / 3.0f;
 				const float FileScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
-				PositionalScore += (RowScore + FileScore + RowScore * FileScore) / 3.0f;
+				PositionalScore += (RankScore + FileScore + RankScore * FileScore) / 3.0f;
 				break;
 			}
 			case FChessPiece::WhiteBishop:
 			{
 				MaterialScore += 3.1f;
-				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
+				const float RankScore = (3.5f - AbsF(3.5f - Rank)) / 3.0f;
 				const float FileScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
-				const float DiagonalScore = 1.0f - AbsF(FileScore - RowScore);
-				PositionalScore += 0.8f * (RowScore + DiagonalScore) / 2.0f;
+				const float DiagonalScore = 1.0f - AbsF(FileScore - RankScore);
+				PositionalScore += 0.8f * (RankScore + DiagonalScore) / 2.0f;
 				break;
 			}
 			case FChessPiece::WhiteRook:
 			{
 				MaterialScore += 5.0f;
-				PositionalScore += RookRowScores[Row];
+				PositionalScore += RookRankScores[Rank];
 				if (WhiteRooks[File])
 				{
 					PositionalScore += DoubleRooksReward;
@@ -122,7 +122,7 @@ float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 			{
 				MaterialScore -= 1.0f;
 				const float CentralizedScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
-				const float AdvancedScore = (6.0f - Row) / 5.0f;
+				const float AdvancedScore = (6.0f - Rank) / 5.0f;
 				PositionalScore -= 1.5f * (CentralizedScore + AdvancedScore + CentralizedScore * 3 * AdvancedScore) / 5.0f;
 				if (BlackPawns[File])
 				{
@@ -134,23 +134,23 @@ float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 			case FChessPiece::BlackKnight:
 			{
 				MaterialScore -= 3.0f;
-				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
+				const float RankScore = (3.5f - AbsF(3.5f - Rank)) / 3.0f;
 				const float FileScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
-				PositionalScore -= (RowScore + FileScore + RowScore * FileScore) / 3.0f;
+				PositionalScore -= (RankScore + FileScore + RankScore * FileScore) / 3.0f;
 				break;
 			}
 			case FChessPiece::BlackBishop:
 			{
 				MaterialScore -= 3.1f;
-				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
+				const float RankScore = (3.5f - AbsF(3.5f - Rank)) / 3.0f;
 				const float FileScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
-				const float DiagonalScore = 1.0f - AbsF(FileScore - RowScore);
-				PositionalScore -= 0.8f * (RowScore + DiagonalScore) / 2.0f;
+				const float DiagonalScore = 1.0f - AbsF(FileScore - RankScore);
+				PositionalScore -= 0.8f * (RankScore + DiagonalScore) / 2.0f;
 				break;
 			}
 			case FChessPiece::BlackRook:
 				MaterialScore -= 5.0f;
-				PositionalScore -= RookRowScores[7 - Row];
+				PositionalScore -= RookRankScores[7 - Rank];
 				if (BlackRooks[File])
 				{
 					PositionalScore -= DoubleRooksReward;
@@ -201,24 +201,24 @@ float FMinMaxAI::MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, 
 
 	FEvaluatedMove BestMove;
 
-	for (int Row = 7; Row >= 0; --Row)
+	for (int Rank = 7; Rank >= 0; --Rank)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			if (Board(Row, File) <= FChessPiece::None)
+			if (Board(Rank, File) <= FChessPiece::None)
 			{
 				continue;
 			}
 
-			TArray<int> Rows;
+			TArray<int> Ranks;
 			TArray<int> Files;
-			Board.CollectMoves(Row, File, Rows, Files);
+			Board.CollectMoves(Rank, File, Ranks, Files);
 
-			const int MoveCount = Rows.Count();
+			const int MoveCount = Ranks.Count();
 			for (int Move = 0; Move < MoveCount; ++Move)
 			{
-				bool bPieceTaken = Board(Rows[Move], Files[Move]) < FChessPiece::None;
-				Board.Move(Row, File, Rows[Move], Files[Move]);
+				bool bPieceTaken = Board(Ranks[Move], Files[Move]) < FChessPiece::None;
+				Board.Move(Rank, File, Ranks[Move], Files[Move]);
 				Board.FlipBoard();
 				const float MoveEval = -MinMax(Board, Max(BestMove.Evaluation, Beta), Alfa, Depth + 1, bPieceTaken);
 				Board.FlipBoard();
@@ -227,9 +227,9 @@ float FMinMaxAI::MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, 
 				if (MoveEval > BestMove.Evaluation)
 				{
 					BestMove.Evaluation = MoveEval;
-					BestMove.RowFrom = Row;
+					BestMove.RankFrom = Rank;
 					BestMove.FileFrom = File;
-					BestMove.RowTo = Rows[Move];
+					BestMove.RankTo = Ranks[Move];
 					BestMove.FileTo = Files[Move];
 
 					if (-MoveEval < Alfa)

@@ -11,13 +11,13 @@ constexpr float MINMAX_EVAL_WIN = 1e9f;
 struct FEvaluatedMove
 {
 public:
-	FEvaluatedMove(int MoveRowFrom = -1, int MoveFileFrom = -1,
-		int MoveRowTo = -1, int MoveFileTo = -1, float BoardEval = 2.0f * MINMAX_EVAL_LOSS);
+	FEvaluatedMove(int MoveRankFrom = -1, int MoveFileFrom = -1,
+		int MoveRankTo = -1, int MoveFileTo = -1, float BoardEval = 2.0f * MINMAX_EVAL_LOSS);
 public:
 	float Evaluation;
-	__int8 RowFrom;
+	__int8 RankFrom;
 	__int8 FileFrom;
-	__int8 RowTo;
+	__int8 RankTo;
 	__int8 FileTo;
 };
 

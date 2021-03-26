@@ -13,11 +13,11 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 {
 	LastMoveVerdict = ELastMoveResult::None;
 
-	for (int Row = 0; Row < 8; ++Row)
+	for (int Rank = 0; Rank < 8; ++Rank)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			Network.SetInput(Row * 8 + File, (float)Board(Row, File));
+			Network.SetInput(Rank * 8 + File, (float)Board(Rank, File));
 		}
 	}
 	Network.ResetRecurrent(0);
@@ -49,21 +49,21 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 				}
 			}
 
-			const int RowFrom = Values[0];
+			const int RankFrom = Values[0];
 			const int FileFrom = Values[1];
-			const int RowTo = Values[2];
+			const int RankTo = Values[2];
 			const int FileTo = Values[3];
 
-			TArray<int> Rows(16);
+			TArray<int> Ranks(16);
 			TArray<int> Files(16);
-			Board.CollectMoves(RowFrom, RowTo, Rows, Files);
+			Board.CollectMoves(RankFrom, RankTo, Ranks, Files);
 
-			const int NumOfMoves = Rows.Count();
+			const int NumOfMoves = Ranks.Count();
 			for (int Move = 0; Move < NumOfMoves; ++Move)
 			{
-				if (RowTo == Rows[Move] && FileTo == Files[Move])
+				if (RankTo == Ranks[Move] && FileTo == Files[Move])
 				{
-					Board.Move(RowFrom, FileFrom, RowTo, FileTo);
+					Board.Move(RankFrom, FileFrom, RankTo, FileTo);
 					LastMoveVerdict = ELastMoveResult::Valid;
 					return true;
 				}

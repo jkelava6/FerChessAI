@@ -14,11 +14,11 @@
 
 void WriteBoard(FDoubleBoard& Board, char* Target)
 {
-	for (int Row = 0; Row < 8; ++Row)
+	for (int Rank = 0; Rank < 8; ++Rank)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			Target[8 * Row + File] = 'a' + (char)((int)Board(Row, File) - (int)FChessPiece::BlackKing);
+			Target[8 * Rank + File] = 'a' + (char)((int)Board(Rank, File) - (int)FChessPiece::BlackKing);
 		}
 	}
 	Target[64] = '\0';
@@ -53,26 +53,26 @@ int main()
 
 		if (strcmp(TokenBuffer, TokenExeMove) == 0)
 		{
-			int RowFrom = MessageBuffer[0] - '0';
+			int RankFrom = MessageBuffer[0] - '0';
 			const int FileFrom = MessageBuffer[1] - '0';
-			int RowTo = MessageBuffer[2] - '0';
+			int RankTo = MessageBuffer[2] - '0';
 			const int FileTo = MessageBuffer[3] - '0';
 			if (!bWhiteTurn)
 			{
 				Board.FlipBoard();
-				RowFrom = 7 - RowFrom;
-				RowTo = 7 - RowTo;
+				RankFrom = 7 - RankFrom;
+				RankTo = 7 - RankTo;
 			}
 
-			TArray<int> Rows;
+			TArray<int> Ranks;
 			TArray<int> Files;
-			Board.CollectMoves(RowFrom, FileFrom, Rows, Files);
+			Board.CollectMoves(RankFrom, FileFrom, Ranks, Files);
 			bool bMoveValid = false;
-			for (int Move = 0; Move < Rows.Count(); ++Move)
+			for (int Move = 0; Move < Ranks.Count(); ++Move)
 			{
-				if (Rows[Move] == RowTo && Files[Move] == FileTo)
+				if (Ranks[Move] == RankTo && Files[Move] == FileTo)
 				{
-					Board.Move(RowFrom, FileFrom, RowTo, FileTo);
+					Board.Move(RankFrom, FileFrom, RankTo, FileTo);
 					bMoveValid = true;
 					break;
 				}
@@ -112,27 +112,27 @@ int main()
 
 		if (strcmp(TokenBuffer, TokenSearchMoves) == 0)
 		{
-			int RowFrom = MessageBuffer[0] - '0';
+			int RankFrom = MessageBuffer[0] - '0';
 			const int FileFrom = MessageBuffer[1] - '0';
-			int RowTo = MessageBuffer[2] - '0';
+			int RankTo = MessageBuffer[2] - '0';
 			const int FileTo = MessageBuffer[3] - '0';
 			if (!bWhiteTurn)
 			{
 				Board.FlipBoard();
-				RowFrom = 7 - RowFrom;
-				RowTo = 7 - RowTo;
+				RankFrom = 7 - RankFrom;
+				RankTo = 7 - RankTo;
 			}
 
-			TArray<int> Rows;
+			TArray<int> Ranks;
 			TArray<int> Files;
-			Board.CollectMoves(RowFrom, FileFrom, Rows, Files);
+			Board.CollectMoves(RankFrom, FileFrom, Ranks, Files);
 			char Moves[128];
-			for (int Move = 0; Move < Rows.Count(); ++Move)
+			for (int Move = 0; Move < Ranks.Count(); ++Move)
 			{
-				Moves[2 * Move] = '0' + (bWhiteTurn ? Rows[Move] : 7 - Rows[Move]);
+				Moves[2 * Move] = '0' + (bWhiteTurn ? Ranks[Move] : 7 - Ranks[Move]);
 				Moves[2 * Move + 1] = '0' + Files[Move];
 			}
-			Moves[Rows.Count() * 2] = '\0';
+			Moves[Ranks.Count() * 2] = '\0';
 			WriteJavaToken("moves", Moves);
 
 			if (!bWhiteTurn)
