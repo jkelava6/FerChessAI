@@ -18,7 +18,7 @@ void WriteBoard(FDoubleBoard& Board, char* Target)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			Target[8 * Rank + File] = 'a' + (char)((int)Board(Rank, File) - (int)FChessPiece::BlackKing);
+			Target[8 * Rank + File] = 'a' + (char)((int)Board(Rank, File) - (int)EChessPiece::BlackKing);
 		}
 	}
 	Target[64] = '\0';

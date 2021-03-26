@@ -4,7 +4,7 @@
 
 class FChessBoard;
 
-enum class FChessPiece : int
+enum class EChessPiece : int
 {
 	None = 0,
 	WhitePawn = 1,
@@ -25,13 +25,13 @@ class FRevertSquare
 {
 public:
 	FRevertSquare();
-	FRevertSquare(int ChangedRank, int ChangedFile, FChessPiece OldPiece);
+	FRevertSquare(int ChangedRank, int ChangedFile, EChessPiece OldPiece);
 public:
 	void Restore(FChessBoard& Board);
 private:
 	int Rank = -1;
 	int File = -1;
-	FChessPiece Piece = FChessPiece::None;
+	EChessPiece Piece = EChessPiece::None;
 };
 
 class FRevertMove
@@ -39,7 +39,7 @@ class FRevertMove
 public:
 	FRevertMove();
 public:
-	void Change(FChessBoard& Board, int Rank, int File, FChessPiece Piece);
+	void Change(FChessBoard& Board, int Rank, int File, EChessPiece Piece);
 	void Revert(FChessBoard& Board);
 	void SaveMask(__int64 BitMask);
 	void SaveEnPassant(int Rank, int File);
@@ -60,8 +60,8 @@ public:
 public:
 	void EmptyBoard();
 	void DefaultBoard();
-	FChessPiece& operator()(int Rank, int File);
-	FChessPiece& Square(int Rank, int File);
+	EChessPiece& operator()(int Rank, int File);
+	EChessPiece& Square(int Rank, int File);
 
 	void Move(int RankFrom, int FileFrom, int RankTo, int FileTo);
 	void Undo();
@@ -69,18 +69,27 @@ public:
 	void SetMoved(__int64 BitMask);
 	void SetEnPassant(int Rank, int File);
 	void CopyPositionFrom(FChessBoard& Board);
+	bool IsAttacked(int Rank, int File);
 private:
 	bool AreCoordsValid(int Rank, int File);
 	void CollectLineMovement(int Rank, int File, int DeltaRank, int DeltaFile, TArray<int>& Ranks, TArray<int>& Files);
 	bool IsMoved(int Rank, int File);
 	void LogMoved(int Rank, int File);
-	bool IsAttacked(int Rank, int File);
 private:
-	FChessPiece* Pieces = nullptr;
+	EChessPiece* Pieces = nullptr;
 	TArray<FRevertMove> MoveStack;
 	__int64 MovedMask = 0;
 	int EnPassantRank = -1;
 	int EnPassantFile = -1;
+};
+
+enum class EGameState : int
+{
+	ActiveWhite,
+	ActiveBlack,
+	OverWhite,
+	OverDraw,
+	OverBlack
 };
 
 class FDoubleBoard
@@ -92,8 +101,9 @@ public:
 public:
 	void EmptyBoard();
 	void DefaultBoard();
-	const FChessPiece& operator()(int Rank, int File);
-	const FChessPiece& Square(int Rank, int File);
+	const EChessPiece& operator()(int Rank, int File);
+	const EChessPiece& Square(int Rank, int File);
+	EGameState GetGameState();
 
 	void Move(int RankFrom, int FileFrom, int RankTo, int FileTo);
 	void Undo();

@@ -26,6 +26,8 @@ class FMinMaxAI : public IChessAI
 public:
 	FMinMaxAI();
 public:
+	static float Eval(FDoubleBoard& Board, int NormalDepth, int VolatileDepth);
+
 	virtual bool PlayMove(FDoubleBoard& Board) override;
 	void SetDepths(int Normal, int Volatile);
 private:
