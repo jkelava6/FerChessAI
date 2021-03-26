@@ -8,7 +8,7 @@
 
 
 
-ChessAI::ChessAI() = default;
+IChessAI::IChessAI() = default;
 
 
 

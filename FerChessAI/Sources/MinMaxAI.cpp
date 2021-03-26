@@ -8,7 +8,7 @@
 #include <Math.h>
 
 
-EvaluatedMove::EvaluatedMove(int MoveRowFrom /*= -1*/, int MoveFileFrom /*= -1*/,
+FEvaluatedMove::FEvaluatedMove(int MoveRowFrom /*= -1*/, int MoveFileFrom /*= -1*/,
 	int MoveRowTo /*= -1*/, int MoveFileTo /*= -1*/, float BoardEval /*= MINMAX_EVAL_LOSS*/) :
 	Evaluation(BoardEval),
 	RowFrom(MoveRowFrom),
@@ -18,24 +18,24 @@ EvaluatedMove::EvaluatedMove(int MoveRowFrom /*= -1*/, int MoveFileFrom /*= -1*/
 {
 }
 
-MinMaxAI::MinMaxAI()
+FMinMaxAI::FMinMaxAI()
 {
 }
 
-bool MinMaxAI::PlayMove(DoubleBoard& Board)
+bool FMinMaxAI::PlayMove(FDoubleBoard& Board)
 {
 	float Evaluation = MinMax(Board, -100.0f, -100.0f, 0, false);
 	Board.Move(LastPlayedMove.RowFrom, LastPlayedMove.FileFrom, LastPlayedMove.RowTo, LastPlayedMove.FileTo);
 	return true;
 }
 
-void MinMaxAI::SetDepths(int Normal, int Volatile)
+void FMinMaxAI::SetDepths(int Normal, int Volatile)
 {
 	MaxDepth = Normal;
 	MaxVolatileDepth = Volatile;
 }
 
-float MinMaxAI::Evaluate(DoubleBoard& Board)
+float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 {
 	float MaterialScore = 0.0f;
 	float PositionalScore = 0.0f;
@@ -55,19 +55,19 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			ChessPiece Piece = Board(Row, File);
-			if (Piece == ChessPiece::None)
+			FChessPiece Piece = Board(Row, File);
+			if (Piece == FChessPiece::None)
 			{
 				continue;
 			}
 
-			bool bWhite = Piece > ChessPiece::None;
-			ChessPiece PieceValue = bWhite ? Piece : (ChessPiece)-(int)Piece;
+			bool bWhite = Piece > FChessPiece::None;
+			FChessPiece PieceValue = bWhite ? Piece : (FChessPiece)-(int)Piece;
 			float PieceColor = bWhite ? 1.0f : -1.0f;
 
 			switch (Piece)
 			{
-			case ChessPiece::WhitePawn:
+			case FChessPiece::WhitePawn:
 			{
 				MaterialScore += 1.0f;
 				const float CentralizedScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
@@ -80,7 +80,7 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				WhitePawns[File] = true;
 				break;
 			}
-			case ChessPiece::WhiteKnight:
+			case FChessPiece::WhiteKnight:
 			{
 				MaterialScore += 3.0f;
 				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
@@ -88,7 +88,7 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				PositionalScore += (RowScore + FileScore + RowScore * FileScore) / 3.0f;
 				break;
 			}
-			case ChessPiece::WhiteBishop:
+			case FChessPiece::WhiteBishop:
 			{
 				MaterialScore += 3.1f;
 				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
@@ -97,7 +97,7 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				PositionalScore += 0.8f * (RowScore + DiagonalScore) / 2.0f;
 				break;
 			}
-			case ChessPiece::WhiteRook:
+			case FChessPiece::WhiteRook:
 			{
 				MaterialScore += 5.0f;
 				PositionalScore += RookRowScores[Row];
@@ -108,17 +108,17 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				WhiteRooks[File] = true;
 				break;
 			}
-			case ChessPiece::WhiteQueen:
+			case FChessPiece::WhiteQueen:
 			{
 				MaterialScore += 9.0f;
 				break;
 			}
-			case ChessPiece::WhiteKing:
+			case FChessPiece::WhiteKing:
 			{
 				bWhiteKingPresent = true;
 				break;
 			}
-			case ChessPiece::BlackPawn:
+			case FChessPiece::BlackPawn:
 			{
 				MaterialScore -= 1.0f;
 				const float CentralizedScore = (3.5f - AbsF(3.5f - File)) / 3.0f;
@@ -131,7 +131,7 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				BlackPawns[File] = true;
 				break;
 			}
-			case ChessPiece::BlackKnight:
+			case FChessPiece::BlackKnight:
 			{
 				MaterialScore -= 3.0f;
 				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
@@ -139,7 +139,7 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				PositionalScore -= (RowScore + FileScore + RowScore * FileScore) / 3.0f;
 				break;
 			}
-			case ChessPiece::BlackBishop:
+			case FChessPiece::BlackBishop:
 			{
 				MaterialScore -= 3.1f;
 				const float RowScore = (3.5f - AbsF(3.5f - Row)) / 3.0f;
@@ -148,7 +148,7 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				PositionalScore -= 0.8f * (RowScore + DiagonalScore) / 2.0f;
 				break;
 			}
-			case ChessPiece::BlackRook:
+			case FChessPiece::BlackRook:
 				MaterialScore -= 5.0f;
 				PositionalScore -= RookRowScores[7 - Row];
 				if (BlackRooks[File])
@@ -157,12 +157,12 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 				}
 				BlackRooks[File] = true;
 				break;
-			case ChessPiece::BlackQueen:
+			case FChessPiece::BlackQueen:
 			{
 				MaterialScore -= 9.0f;
 				break;
 			}
-			case ChessPiece::BlackKing:
+			case FChessPiece::BlackKing:
 			{
 				bBlackKingPresent = true;
 				break;
@@ -186,7 +186,7 @@ float MinMaxAI::Evaluate(DoubleBoard& Board)
 	return MaterialScore + PositionalScore / MaterialScoreMultiplier;
 }
 
-float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth, bool bVolatile)
+float FMinMaxAI::MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, bool bVolatile)
 {
 	if (Depth >= (bVolatile ? MaxVolatileDepth : MaxDepth))
 	{
@@ -199,25 +199,25 @@ float MinMaxAI::MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth, bo
 		return CurrentBoardEval;
 	}
 
-	EvaluatedMove BestMove;
+	FEvaluatedMove BestMove;
 
 	for (int Row = 7; Row >= 0; --Row)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			if (Board(Row, File) <= ChessPiece::None)
+			if (Board(Row, File) <= FChessPiece::None)
 			{
 				continue;
 			}
 
-			Array<int> Rows;
-			Array<int> Files;
+			TArray<int> Rows;
+			TArray<int> Files;
 			Board.CollectMoves(Row, File, Rows, Files);
 
 			const int MoveCount = Rows.Count();
 			for (int Move = 0; Move < MoveCount; ++Move)
 			{
-				bool bPieceTaken = Board(Rows[Move], Files[Move]) < ChessPiece::None;
+				bool bPieceTaken = Board(Rows[Move], Files[Move]) < FChessPiece::None;
 				Board.Move(Row, File, Rows[Move], Files[Move]);
 				Board.FlipBoard();
 				const float MoveEval = -MinMax(Board, Max(BestMove.Evaluation, Beta), Alfa, Depth + 1, bPieceTaken);

@@ -11,12 +11,12 @@ enum class ELastMoveResult : __int8
 	FailedInvalid
 };
 
-class FNeuNetFullAI : public ChessAI
+class FNeuNetFullAI : public IChessAI
 {
 public:
 	FNeuNetFullAI();
 public:
-	virtual bool PlayMove(DoubleBoard& Board) override;
+	virtual bool PlayMove(FDoubleBoard& Board) override;
 	void SetTimeControl(int InStartTicks, int InTicksPerMove, int InMaxTicks);
 
 	void StartGame();

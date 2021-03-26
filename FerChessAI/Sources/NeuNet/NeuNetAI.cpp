@@ -9,7 +9,7 @@
 
 FNeuNetFullAI::FNeuNetFullAI() = default;
 
-bool FNeuNetFullAI::PlayMove(DoubleBoard& Board)
+bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 {
 	LastMoveVerdict = ELastMoveResult::None;
 
@@ -54,8 +54,8 @@ bool FNeuNetFullAI::PlayMove(DoubleBoard& Board)
 			const int RowTo = Values[2];
 			const int FileTo = Values[3];
 
-			Array<int> Rows(16);
-			Array<int> Files(16);
+			TArray<int> Rows(16);
+			TArray<int> Files(16);
 			Board.CollectMoves(RowFrom, RowTo, Rows, Files);
 
 			const int NumOfMoves = Rows.Count();

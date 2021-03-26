@@ -6,7 +6,7 @@
 
 #include <StdH.h>
 #include <ChessBoard.h>
-#include <MinMaxAI.h>
+#include <FMinMaxAI.h>
 
 #include <cstdio>
 
@@ -23,7 +23,7 @@ int GetNumber(char Base)
     return Input - Base;
 }
 
-void DebugBoard(DoubleBoard& Board)
+void DebugBoard(FDoubleBoard& Board)
 {
     for (int Row = 7; Row >= 0; --Row)
     {
@@ -80,9 +80,9 @@ void DebugBoard(DoubleBoard& Board)
 
 int main()
 {
-    DoubleBoard Board;
+    FDoubleBoard Board;
     Board.DefaultBoard();
-    MinMaxAI AI;
+    FMinMaxAI AI;
 
     printf("Do you want to play as white? ");
     int PlayAsWhite;

@@ -14,8 +14,8 @@
 
 int main()
 {
-	DoubleBoard Board;
-	MinMaxAI MMAI;
+	FDoubleBoard Board;
+	FMinMaxAI MMAI;
 	MMAI.SetDepths(2, 6);
 	FNeuNetFullAI NNAI;
 	NNAI.SetTimeControl(5, 5, 5);

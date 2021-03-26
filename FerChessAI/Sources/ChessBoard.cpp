@@ -6,9 +6,9 @@
 #include <Math.h>
 
 
-RevertSquare::RevertSquare() = default;
+FRevertSquare::FRevertSquare() = default;
 
-RevertSquare::RevertSquare(int ChangedRow, int ChangedFile, ChessPiece OldPiece) :
+FRevertSquare::FRevertSquare(int ChangedRow, int ChangedFile, FChessPiece OldPiece) :
 	Row(ChangedRow),
 	File(ChangedFile),
 	Piece(OldPiece)
@@ -16,24 +16,24 @@ RevertSquare::RevertSquare(int ChangedRow, int ChangedFile, ChessPiece OldPiece)
 }
 
 #include <JavaIO/JavaTokenIO.h>
-void RevertSquare::Restore(ChessBoard& Board)
+void FRevertSquare::Restore(FChessBoard& Board)
 {
-	if (Piece < ChessPiece::BlackKing || Piece > ChessPiece::WhiteKing)
+	if (Piece < FChessPiece::BlackKing || Piece > FChessPiece::WhiteKing)
 	{
 		WriteJavaToken("error", "invalid piece");
 	}
 	Board(Row, File) = Piece;
 }
 
-RevertMove::RevertMove() = default;
+FRevertMove::FRevertMove() = default;
 
-void RevertMove::Change(ChessBoard& Board, int Row, int File, ChessPiece Piece)
+void FRevertMove::Change(FChessBoard& Board, int Row, int File, FChessPiece Piece)
 {
-	ChangedInOrder.Push() = RevertSquare(Row, File, Board(Row, File));
+	ChangedInOrder.Push() = FRevertSquare(Row, File, Board(Row, File));
 	Board(Row, File) = Piece;
 }
 
-void RevertMove::Revert(ChessBoard& Board)
+void FRevertMove::Revert(FChessBoard& Board)
 {
 	bool bCastle = ChangedInOrder.Count() == 4;
 	for (; ChangedInOrder.Count() > 0;)
@@ -45,113 +45,113 @@ void RevertMove::Revert(ChessBoard& Board)
 	Board.SetMoved(MovedMask);
 }
 
-void RevertMove::SaveMask(__int64 BitMask)
+void FRevertMove::SaveMask(__int64 BitMask)
 {
 	MovedMask = BitMask;
 }
 
-void RevertMove::SaveEnPassant(int Row, int File)
+void FRevertMove::SaveEnPassant(int Row, int File)
 {
 	EnPassantRow = Row;
 	EnPassantFile = File;
 }
 
-ChessBoard::ChessBoard()
+FChessBoard::FChessBoard()
 {
-	Pieces = new ChessPiece[64];
+	Pieces = new FChessPiece[64];
 }
 
-ChessBoard::~ChessBoard()
+FChessBoard::~FChessBoard()
 {
 	delete[] Pieces;
 }
 
-void ChessBoard::EmptyBoard()
+void FChessBoard::EmptyBoard()
 {
 	for (int Row = 0; Row < 8; ++Row)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			Square(Row, File) = ChessPiece::None;
+			Square(Row, File) = FChessPiece::None;
 		}
 	}
 }
 
-void ChessBoard::DefaultBoard()
+void FChessBoard::DefaultBoard()
 {
 	// empty space
 	for (int Row = 2; Row < 6; ++Row)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			Square(Row, File) = ChessPiece::None;
+			Square(Row, File) = FChessPiece::None;
 		}
 	}
 
 	// pawns
 	for (int File = 0; File < 8; ++File)
 	{
-		Square(1, File) = ChessPiece::WhitePawn;
-		Square(6, File) = ChessPiece::BlackPawn;
+		Square(1, File) = FChessPiece::WhitePawn;
+		Square(6, File) = FChessPiece::BlackPawn;
 	}
 
 	// white pieces
-	Square(0, 0) = ChessPiece::WhiteRook;
-	Square(0, 1) = ChessPiece::WhiteKnight;
-	Square(0, 2) = ChessPiece::WhiteBishop;
-	Square(0, 3) = ChessPiece::WhiteQueen;
-	Square(0, 4) = ChessPiece::WhiteKing;
-	Square(0, 5) = ChessPiece::WhiteBishop;
-	Square(0, 6) = ChessPiece::WhiteKnight;
-	Square(0, 7) = ChessPiece::WhiteRook;
+	Square(0, 0) = FChessPiece::WhiteRook;
+	Square(0, 1) = FChessPiece::WhiteKnight;
+	Square(0, 2) = FChessPiece::WhiteBishop;
+	Square(0, 3) = FChessPiece::WhiteQueen;
+	Square(0, 4) = FChessPiece::WhiteKing;
+	Square(0, 5) = FChessPiece::WhiteBishop;
+	Square(0, 6) = FChessPiece::WhiteKnight;
+	Square(0, 7) = FChessPiece::WhiteRook;
 
 	// black pieces
-	Square(7, 0) = ChessPiece::BlackRook;
-	Square(7, 1) = ChessPiece::BlackKnight;
-	Square(7, 2) = ChessPiece::BlackBishop;
-	Square(7, 3) = ChessPiece::BlackQueen;
-	Square(7, 4) = ChessPiece::BlackKing;
-	Square(7, 5) = ChessPiece::BlackBishop;
-	Square(7, 6) = ChessPiece::BlackKnight;
-	Square(7, 7) = ChessPiece::BlackRook;
+	Square(7, 0) = FChessPiece::BlackRook;
+	Square(7, 1) = FChessPiece::BlackKnight;
+	Square(7, 2) = FChessPiece::BlackBishop;
+	Square(7, 3) = FChessPiece::BlackQueen;
+	Square(7, 4) = FChessPiece::BlackKing;
+	Square(7, 5) = FChessPiece::BlackBishop;
+	Square(7, 6) = FChessPiece::BlackKnight;
+	Square(7, 7) = FChessPiece::BlackRook;
 }
 
-ChessPiece& ChessBoard::operator()(int Row, int File)
+FChessPiece& FChessBoard::operator()(int Row, int File)
 {
 	return Pieces[8 * Row + File];
 }
 
-ChessPiece& ChessBoard::Square(int Row, int File)
+FChessPiece& FChessBoard::Square(int Row, int File)
 {
 	return Pieces[8 * Row + File];
 }
 
-void ChessBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
+void FChessBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 {
-	RevertMove& MoveLog = MoveStack.Push();
-	ChessPiece MovedPiece = Square(RowFrom, FileFrom);
-	if (MovedPiece == ChessPiece::WhitePawn && RowTo == 7)
+	FRevertMove& MoveLog = MoveStack.Push();
+	FChessPiece MovedPiece = Square(RowFrom, FileFrom);
+	if (MovedPiece == FChessPiece::WhitePawn && RowTo == 7)
 	{
-		MoveLog.Change(*this, RowTo, FileTo, ChessPiece::WhiteQueen);
+		MoveLog.Change(*this, RowTo, FileTo, FChessPiece::WhiteQueen);
 	}
-	else if (MovedPiece == ChessPiece::BlackPawn && RowTo == 0)
+	else if (MovedPiece == FChessPiece::BlackPawn && RowTo == 0)
 	{
-		MoveLog.Change(*this, RowTo, FileTo, ChessPiece::BlackQueen);
+		MoveLog.Change(*this, RowTo, FileTo, FChessPiece::BlackQueen);
 	}
 	else
 	{
 		MoveLog.Change(*this, RowTo, FileTo, MovedPiece);
 	}
-	MoveLog.Change(*this, RowFrom, FileFrom, ChessPiece::None);
+	MoveLog.Change(*this, RowFrom, FileFrom, FChessPiece::None);
 
 	// en passant
 	if (RowTo == EnPassantRow && FileTo == EnPassantFile)
 	{
-		MoveLog.Change(*this, RowFrom, FileTo, ChessPiece::None);
+		MoveLog.Change(*this, RowFrom, FileTo, FChessPiece::None);
 	}
 
 	MoveLog.SaveEnPassant(EnPassantRow, EnPassantFile);
-	if ((MovedPiece == ChessPiece::WhitePawn || MovedPiece == ChessPiece::BlackPawn)
+	if ((MovedPiece == FChessPiece::WhitePawn || MovedPiece == FChessPiece::BlackPawn)
 		&& AbsI(RowTo - RowFrom) == 2)
 	{
 		SetEnPassant((RowFrom + RowTo) / 2, FileTo);
@@ -165,7 +165,7 @@ void ChessBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 	LogMoved(RowTo, FileTo);
 
 	// castling
-	if (MovedPiece == ChessPiece::WhiteKing && AbsI(FileTo - FileFrom) == 2)
+	if (MovedPiece == FChessPiece::WhiteKing && AbsI(FileTo - FileFrom) == 2)
 	{
 		if (FileTo == 6)
 		{
@@ -173,16 +173,16 @@ void ChessBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 			{
 				WriteJavaToken("error", "where from?!");
 			}
-			MoveLog.Change(*this, 0, 5, ChessPiece::WhiteRook);
-			MoveLog.Change(*this, 0, 7, ChessPiece::None);
+			MoveLog.Change(*this, 0, 5, FChessPiece::WhiteRook);
+			MoveLog.Change(*this, 0, 7, FChessPiece::None);
 		}
 		else
 		{
-			MoveLog.Change(*this, 0, 3, ChessPiece::WhiteRook);
-			MoveLog.Change(*this, 0, 0, ChessPiece::None);
+			MoveLog.Change(*this, 0, 3, FChessPiece::WhiteRook);
+			MoveLog.Change(*this, 0, 0, FChessPiece::None);
 		}
 	}
-	if (MovedPiece == ChessPiece::BlackKing && AbsI(FileTo - FileFrom) == 2)
+	if (MovedPiece == FChessPiece::BlackKing && AbsI(FileTo - FileFrom) == 2)
 	{
 		if (FileTo == 6)
 		{
@@ -190,46 +190,46 @@ void ChessBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 			{
 				WriteJavaToken("error", "where from?!");
 			}
-			MoveLog.Change(*this, 7, 5, ChessPiece::BlackRook);
-			MoveLog.Change(*this, 7, 7, ChessPiece::None);
+			MoveLog.Change(*this, 7, 5, FChessPiece::BlackRook);
+			MoveLog.Change(*this, 7, 7, FChessPiece::None);
 		}
 		else
 		{
-			MoveLog.Change(*this, 7, 3, ChessPiece::BlackRook);
-			MoveLog.Change(*this, 7, 0, ChessPiece::None);
+			MoveLog.Change(*this, 7, 3, FChessPiece::BlackRook);
+			MoveLog.Change(*this, 7, 0, FChessPiece::None);
 		}
 	}
 }
 
-void ChessBoard::Undo()
+void FChessBoard::Undo()
 {
 	MoveStack.Top().Revert(*this);
 	MoveStack.Pop();
 }
 
-void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& Files)
+void FChessBoard::CollectMoves(int Row, int File, TArray<int>& Rows, TArray<int>& Files)
 {
 	switch (Square(Row, File))
 	{
-	case ChessPiece::WhitePawn:
+	case FChessPiece::WhitePawn:
 	{
-		if (Square(Row + 1, File) == ChessPiece::None)
+		if (Square(Row + 1, File) == FChessPiece::None)
 		{
 			Rows.Push() = Row + 1;
 			Files.Push() = File;
-			if (Row == 1 && Square(Row + 2, File) == ChessPiece::None)
+			if (Row == 1 && Square(Row + 2, File) == FChessPiece::None)
 			{
 				Rows.Push() = Row + 2;
 				Files.Push() = File;
 			}
 		}
-		if (File > 0 && Square(Row + 1, File - 1) < ChessPiece::None
+		if (File > 0 && Square(Row + 1, File - 1) < FChessPiece::None
 			|| Row + 1 == EnPassantRow && File - 1 == EnPassantFile)
 		{
 			Rows.Push() = Row + 1;
 			Files.Push() = File - 1;
 		}
-		if (File < 7 && Square(Row + 1, File + 1) < ChessPiece::None
+		if (File < 7 && Square(Row + 1, File + 1) < FChessPiece::None
 			|| Row + 1 == EnPassantRow && File + 1 == EnPassantFile)
 		{
 			Rows.Push() = Row + 1;
@@ -237,7 +237,7 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 		}
 		break;
 	}
-	case ChessPiece::WhiteKnight:
+	case FChessPiece::WhiteKnight:
 	{
 		constexpr int DeltaRow[] = { -2, -1, 1, 2, 2, 1, -1, -2 };
 		constexpr int DeltaFile[] = { -1, -2, -2, -1, 1, 2, 2, 1 };
@@ -245,7 +245,7 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 		{
 			const int NewRow = Row + DeltaRow[Move];
 			const int NewFile = File + DeltaFile[Move];
-			if (!AreCoordsValid(NewRow, NewFile) || Square(NewRow, NewFile) > ChessPiece::None)
+			if (!AreCoordsValid(NewRow, NewFile) || Square(NewRow, NewFile) > FChessPiece::None)
 			{
 				continue;
 			}
@@ -254,7 +254,7 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 		}
 		break;
 	}
-	case ChessPiece::WhiteBishop:
+	case FChessPiece::WhiteBishop:
 	{
 		constexpr int DeltaRowAll[] = { -1, -1, 1, 1 };
 		constexpr int DeltaFileAll[] = { -1, 1, -1, 1 };
@@ -265,7 +265,7 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 		}
 		break;
 	}
-	case ChessPiece::WhiteRook:
+	case FChessPiece::WhiteRook:
 	{
 		constexpr int DeltaRowAll[] = { -1, 0, 1, 0 };
 		constexpr int DeltaFileAll[] = { 0, -1, 0, 1 };
@@ -276,7 +276,7 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 		}
 		break;
 	}
-	case ChessPiece::WhiteQueen:
+	case FChessPiece::WhiteQueen:
 	{
 		constexpr int DeltaRowAll[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
 		constexpr int DeltaFileAll[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
@@ -287,7 +287,7 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 		}
 		break;
 	}
-	case ChessPiece::WhiteKing:
+	case FChessPiece::WhiteKing:
 	{
 		constexpr int DeltaRowAll[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
 		constexpr int DeltaFileAll[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
@@ -296,7 +296,7 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 		{
 			const int NewRow = Row + DeltaRowAll[Direction];
 			const int NewFile = File + DeltaFileAll[Direction];
-			if (AreCoordsValid(NewRow, NewFile) && Square(NewRow, NewFile) <= ChessPiece::None)
+			if (AreCoordsValid(NewRow, NewFile) && Square(NewRow, NewFile) <= FChessPiece::None)
 			{
 				Rows.Push() = NewRow;
 				Files.Push() = NewFile;
@@ -305,14 +305,14 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 		// castling
 		if (!IsMoved(Row, File) && !IsAttacked(Row, File))
 		{
-			if (Square(0, 0) == ChessPiece::WhiteRook && !IsMoved(0, 0)
-				&& Square(0, 3) == ChessPiece::None && Square(0, 2) == ChessPiece::None && !IsAttacked(0, 3))
+			if (Square(0, 0) == FChessPiece::WhiteRook && !IsMoved(0, 0)
+				&& Square(0, 3) == FChessPiece::None && Square(0, 2) == FChessPiece::None && !IsAttacked(0, 3))
 			{
 				Rows.Push() = 0;
 				Files.Push() = 2;
 			}
-			if (Square(0, 7) == ChessPiece::WhiteRook && !IsMoved(0, 7)
-				&& Square(0, 5) == ChessPiece::None && Square(0, 6) == ChessPiece::None && !IsAttacked(0, 5))
+			if (Square(0, 7) == FChessPiece::WhiteRook && !IsMoved(0, 7)
+				&& Square(0, 5) == FChessPiece::None && Square(0, 6) == FChessPiece::None && !IsAttacked(0, 5))
 			{
 				Rows.Push() = 0;
 				Files.Push() = 6;
@@ -327,23 +327,23 @@ void ChessBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& F
 	}
 }
 
-bool ChessBoard::AreCoordsValid(int Row, int File)
+bool FChessBoard::AreCoordsValid(int Row, int File)
 {
 	return 0 <= Row && Row < 8 && 0 <= File && File < 8;
 }
 
-void ChessBoard::CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, Array<int>& Rows, Array<int>& Files)
+void FChessBoard::CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, TArray<int>& Rows, TArray<int>& Files)
 {
 	int NewRow = Row + DeltaRow;
 	int NewFile = File + DeltaFile;
 	while (AreCoordsValid(NewRow, NewFile))
 	{
-		if (Square(NewRow, NewFile) <= ChessPiece::None)
+		if (Square(NewRow, NewFile) <= FChessPiece::None)
 		{
 			Rows.Push() = NewRow;
 			Files.Push() = NewFile;
 		}
-		if (Square(NewRow, NewFile) != ChessPiece::None)
+		if (Square(NewRow, NewFile) != FChessPiece::None)
 		{
 			break;
 		}
@@ -352,22 +352,22 @@ void ChessBoard::CollectLineMovement(int Row, int File, int DeltaRow, int DeltaF
 	}
 }
 
-bool ChessBoard::IsMoved(int Row, int File)
+bool FChessBoard::IsMoved(int Row, int File)
 {
 	return MovedMask & ((__int64)1 << (8 * Row + File));
 }
 
-void ChessBoard::LogMoved(int Row, int File)
+void FChessBoard::LogMoved(int Row, int File)
 {
 	MovedMask |= ((__int64)1 << (8 * Row + File));
 }
 
-void ChessBoard::SetMoved(__int64 BitMask)
+void FChessBoard::SetMoved(__int64 BitMask)
 {
 	MovedMask = BitMask;
 }
 
-bool ChessBoard::IsAttacked(int Row, int File)
+bool FChessBoard::IsAttacked(int Row, int File)
 {
 	const int DeltaRowDiagAll[] = { -1, -1, 1, 1 };
 	const int DeltaFileDiagAll[] = { -1, 1, -1, 1 };
@@ -387,18 +387,18 @@ bool ChessBoard::IsAttacked(int Row, int File)
 		int CheckFile = File + DeltaFile;
 		if (AreCoordsValid(CheckRow, CheckFile))
 		{
-			if (Square(CheckRow, CheckFile) == ChessPiece::BlackKing)
+			if (Square(CheckRow, CheckFile) == FChessPiece::BlackKing)
 			{
 				return true;
 			}
 			while (AreCoordsValid(CheckRow, CheckFile))
 			{
-				const ChessPiece Piece = Square(CheckRow, CheckFile);
-				if (Piece == ChessPiece::BlackBishop || Piece == ChessPiece::BlackQueen)
+				const FChessPiece Piece = Square(CheckRow, CheckFile);
+				if (Piece == FChessPiece::BlackBishop || Piece == FChessPiece::BlackQueen)
 				{
 					return true;
 				}
-				if (Piece != ChessPiece::None)
+				if (Piece != FChessPiece::None)
 				{
 					break;
 				}
@@ -416,18 +416,18 @@ bool ChessBoard::IsAttacked(int Row, int File)
 		int CheckFile = File + DeltaFile;
 		if (AreCoordsValid(CheckRow, CheckFile))
 		{
-			if (Square(CheckRow, CheckFile) == ChessPiece::BlackKing)
+			if (Square(CheckRow, CheckFile) == FChessPiece::BlackKing)
 			{
 				return true;
 			}
 			while (AreCoordsValid(CheckRow, CheckFile))
 			{
-				const ChessPiece Piece = Square(CheckRow, CheckFile);
-				if (Piece == ChessPiece::BlackRook || Piece == ChessPiece::BlackQueen)
+				const FChessPiece Piece = Square(CheckRow, CheckFile);
+				if (Piece == FChessPiece::BlackRook || Piece == FChessPiece::BlackQueen)
 				{
 					return true;
 				}
-				if (Piece != ChessPiece::None)
+				if (Piece != FChessPiece::None)
 				{
 					break;
 				}
@@ -441,7 +441,7 @@ bool ChessBoard::IsAttacked(int Row, int File)
 	{
 		const int CheckRow = Row + DeltaRowKnightAll[Dir];
 		const int CheckFile = File + DeltaFileKnightAll[Dir];
-		if (AreCoordsValid(CheckRow, CheckFile) && Square(CheckRow, CheckFile) == ChessPiece::BlackKnight)
+		if (AreCoordsValid(CheckRow, CheckFile) && Square(CheckRow, CheckFile) == FChessPiece::BlackKnight)
 		{
 			return true;
 		}
@@ -450,37 +450,37 @@ bool ChessBoard::IsAttacked(int Row, int File)
 	return false;
 }
 
-void ChessBoard::SetEnPassant(int Row, int File)
+void FChessBoard::SetEnPassant(int Row, int File)
 {
 	EnPassantRow = Row;
 	EnPassantFile = File;
 }
 
-DoubleBoard::DoubleBoard() = default;
+FDoubleBoard::FDoubleBoard() = default;
 
-void DoubleBoard::EmptyBoard()
+void FDoubleBoard::EmptyBoard()
 {
 	WhiteBoard.EmptyBoard();
 	BlackBoard.EmptyBoard();
 }
 
-void DoubleBoard::DefaultBoard()
+void FDoubleBoard::DefaultBoard()
 {
 	WhiteBoard.DefaultBoard();
 	BlackBoard.DefaultBoard();
 }
 
-const ChessPiece& DoubleBoard::operator()(int Row, int File)
+const FChessPiece& FDoubleBoard::operator()(int Row, int File)
 {
 	return !bFlipped ? WhiteBoard(Row, File) : BlackBoard(Row, File);
 }
 
-const ChessPiece& DoubleBoard::Square(int Row, int File)
+const FChessPiece& FDoubleBoard::Square(int Row, int File)
 {
 	return !bFlipped ? WhiteBoard(Row, File) : BlackBoard(Row, File);
 }
 
-void DoubleBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
+void FDoubleBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 {
 	if (!bFlipped)
 	{
@@ -494,13 +494,13 @@ void DoubleBoard::Move(int RowFrom, int FileFrom, int RowTo, int FileTo)
 	}
 }
 
-void DoubleBoard::Undo()
+void FDoubleBoard::Undo()
 {
 	WhiteBoard.Undo();
 	BlackBoard.Undo();
 }
 
-void DoubleBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& Files)
+void FDoubleBoard::CollectMoves(int Row, int File, TArray<int>& Rows, TArray<int>& Files)
 {
 	if (!bFlipped)
 	{
@@ -512,7 +512,7 @@ void DoubleBoard::CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& 
 	}
 }
 
-void DoubleBoard::FlipBoard()
+void FDoubleBoard::FlipBoard()
 {
 	bFlipped = !bFlipped;
 }

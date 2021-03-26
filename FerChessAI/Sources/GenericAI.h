@@ -1,15 +1,15 @@
 #pragma once
 
 
-class DoubleBoard;
+class FDoubleBoard;
 
 
-class ChessAI
+class IChessAI
 {
 public:
-	ChessAI();
+	IChessAI();
 public:
-	virtual bool PlayMove(DoubleBoard& Board) = 0;
+	virtual bool PlayMove(FDoubleBoard& Board) = 0;
 };
 
 

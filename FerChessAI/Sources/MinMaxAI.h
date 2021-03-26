@@ -8,10 +8,10 @@
 constexpr float MINMAX_EVAL_LOSS = -1e9f;
 constexpr float MINMAX_EVAL_WIN = 1e9f;
 
-struct EvaluatedMove
+struct FEvaluatedMove
 {
 public:
-	EvaluatedMove(int MoveRowFrom = -1, int MoveFileFrom = -1,
+	FEvaluatedMove(int MoveRowFrom = -1, int MoveFileFrom = -1,
 		int MoveRowTo = -1, int MoveFileTo = -1, float BoardEval = 2.0f * MINMAX_EVAL_LOSS);
 public:
 	float Evaluation;
@@ -21,18 +21,18 @@ public:
 	__int8 FileTo;
 };
 
-class MinMaxAI : public ChessAI
+class FMinMaxAI : public IChessAI
 {
 public:
-	MinMaxAI();
+	FMinMaxAI();
 public:
-	virtual bool PlayMove(DoubleBoard& Board) override;
+	virtual bool PlayMove(FDoubleBoard& Board) override;
 	void SetDepths(int Normal, int Volatile);
 private:
-	float Evaluate(DoubleBoard& Board);
-	float MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth, bool bVolatile);
+	float Evaluate(FDoubleBoard& Board);
+	float MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, bool bVolatile);
 public:
-	EvaluatedMove LastPlayedMove;
+	FEvaluatedMove LastPlayedMove;
 private:
 	int MaxDepth = 4;
 	int MaxVolatileDepth = 8;

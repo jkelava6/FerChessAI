@@ -12,19 +12,19 @@
 #include <Windows.h>
 #include <cstring>
 
-void WriteBoard(DoubleBoard& Board, char* Target)
+void WriteBoard(FDoubleBoard& Board, char* Target)
 {
 	for (int Row = 0; Row < 8; ++Row)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			Target[8 * Row + File] = 'a' + (char)((int)Board(Row, File) - (int)ChessPiece::BlackKing);
+			Target[8 * Row + File] = 'a' + (char)((int)Board(Row, File) - (int)FChessPiece::BlackKing);
 		}
 	}
 	Target[64] = '\0';
 }
 
-void SendBoard(DoubleBoard& Board)
+void SendBoard(FDoubleBoard& Board)
 {
 	char BoardString[65];
 	WriteBoard(Board, BoardString);
@@ -33,9 +33,9 @@ void SendBoard(DoubleBoard& Board)
 
 int main()
 {
-	DoubleBoard Board;
+	FDoubleBoard Board;
 	Board.DefaultBoard();
-	MinMaxAI AI;
+	FMinMaxAI AI;
 
 	const int BufferSize = 1000;
 	char MessageBuffer[BufferSize];
@@ -64,8 +64,8 @@ int main()
 				RowTo = 7 - RowTo;
 			}
 
-			Array<int> Rows;
-			Array<int> Files;
+			TArray<int> Rows;
+			TArray<int> Files;
 			Board.CollectMoves(RowFrom, FileFrom, Rows, Files);
 			bool bMoveValid = false;
 			for (int Move = 0; Move < Rows.Count(); ++Move)
@@ -123,8 +123,8 @@ int main()
 				RowTo = 7 - RowTo;
 			}
 
-			Array<int> Rows;
-			Array<int> Files;
+			TArray<int> Rows;
+			TArray<int> Files;
 			Board.CollectMoves(RowFrom, FileFrom, Rows, Files);
 			char Moves[128];
 			for (int Move = 0; Move < Rows.Count(); ++Move)

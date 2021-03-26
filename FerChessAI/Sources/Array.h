@@ -3,7 +3,7 @@
 #include <Math.h>
 
 
-template <class Type> class Array
+template <class Type> class TArray
 {
 private:
 	Type* Data = nullptr;
@@ -12,12 +12,12 @@ private:
 
 
 public:
-	Array(int InitialSize = 0)
+	TArray(int InitialSize = 0)
 	{
 		Prealocate(InitialSize);
 	}
 
-	~Array()
+	~TArray()
 	{
 		if (Data)
 		{
@@ -25,7 +25,7 @@ public:
 		}
 	}
 
-	Array<Type>& operator= (const Array<Type>& Copied)
+	TArray<Type>& operator= (const TArray<Type>& Copied)
 	{
 		if (Data)
 		{
@@ -43,12 +43,12 @@ public:
 		return *this;
 	}
 
-	Array(const Array<Type>& Copied)
+	TArray(const TArray<Type>& Copied)
 	{
 		*this = Copied;
 	}
 
-	Array<Type>& operator= (Array<Type>&& Moved)
+	TArray<Type>& operator= (TArray<Type>&& Moved)
 	{
 		if (Data)
 		{
@@ -66,7 +66,7 @@ public:
 		return *this;
 	}
 
-	Array(Array<Type>&& Moved)
+	TArray(TArray<Type>&& Moved)
 	{
 		*this = Moved;
 	}

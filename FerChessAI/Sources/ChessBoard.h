@@ -2,9 +2,9 @@
 
 #include <Array.h>
 
-class ChessBoard;
+class FChessBoard;
 
-enum class ChessPiece : int
+enum class FChessPiece : int
 {
 	None = 0,
 	WhitePawn = 1,
@@ -21,87 +21,87 @@ enum class ChessPiece : int
 	BlackKing = -6
 };
 
-class RevertSquare
+class FRevertSquare
 {
 public:
-	RevertSquare();
-	RevertSquare(int ChangedRow, int ChangedFile, ChessPiece OldPiece);
+	FRevertSquare();
+	FRevertSquare(int ChangedRow, int ChangedFile, FChessPiece OldPiece);
 public:
-	void Restore(ChessBoard& Board);
+	void Restore(FChessBoard& Board);
 private:
 	int Row = -1;
 	int File = -1;
-	ChessPiece Piece = ChessPiece::None;
+	FChessPiece Piece = FChessPiece::None;
 };
 
-class RevertMove
+class FRevertMove
 {
 public:
-	RevertMove();
+	FRevertMove();
 public:
-	void Change(ChessBoard& Board, int Row, int File, ChessPiece Piece);
-	void Revert(ChessBoard& Board);
+	void Change(FChessBoard& Board, int Row, int File, FChessPiece Piece);
+	void Revert(FChessBoard& Board);
 	void SaveMask(__int64 BitMask);
 	void SaveEnPassant(int Row, int File);
 private:
-	Array<RevertSquare> ChangedInOrder;
+	TArray<FRevertSquare> ChangedInOrder;
 	__int64 MovedMask = 0;
 	int EnPassantRow = -1;
 	int EnPassantFile = -1;
 };
 
-class ChessBoard
+class FChessBoard
 {
 public:
-	ChessBoard();
-	~ChessBoard();
-	DECLARE_NOCOPY(ChessBoard);
-	DECLARE_NOMOVE(ChessBoard);
+	FChessBoard();
+	~FChessBoard();
+	DECLARE_NOCOPY(FChessBoard);
+	DECLARE_NOMOVE(FChessBoard);
 public:
 	void EmptyBoard();
 	void DefaultBoard();
-	ChessPiece& operator()(int Row, int File);
-	ChessPiece& Square(int Row, int File);
+	FChessPiece& operator()(int Row, int File);
+	FChessPiece& Square(int Row, int File);
 
 	void Move(int RowFrom, int FileFrom, int RowTo, int FileTo);
 	void Undo();
-	void CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& Files);
+	void CollectMoves(int Row, int File, TArray<int>& Rows, TArray<int>& Files);
 	void SetMoved(__int64 BitMask);
 	void SetEnPassant(int Row, int File);
 private:
 	bool AreCoordsValid(int Row, int File);
-	void CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, Array<int>& Rows, Array<int>& Files);
+	void CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, TArray<int>& Rows, TArray<int>& Files);
 	bool IsMoved(int Row, int File);
 	void LogMoved(int Row, int File);
 	bool IsAttacked(int Row, int File);
 private:
-	ChessPiece* Pieces = nullptr;
-	Array<RevertMove> MoveStack;
+	FChessPiece* Pieces = nullptr;
+	TArray<FRevertMove> MoveStack;
 	__int64 MovedMask = 0;
 	int EnPassantRow = -1;
 	int EnPassantFile = -1;
 };
 
-class DoubleBoard
+class FDoubleBoard
 {
 public:
-	DoubleBoard();
-	DECLARE_NOCOPY(DoubleBoard);
-	DECLARE_NOMOVE(DoubleBoard);
+	FDoubleBoard();
+	DECLARE_NOCOPY(FDoubleBoard);
+	DECLARE_NOMOVE(FDoubleBoard);
 public:
 	void EmptyBoard();
 	void DefaultBoard();
-	const ChessPiece& operator()(int Row, int File);
-	const ChessPiece& Square(int Row, int File);
+	const FChessPiece& operator()(int Row, int File);
+	const FChessPiece& Square(int Row, int File);
 
 	void Move(int RowFrom, int FileFrom, int RowTo, int FileTo);
 	void Undo();
-	void CollectMoves(int Row, int File, Array<int>& Rows, Array<int>& Files);
+	void CollectMoves(int Row, int File, TArray<int>& Rows, TArray<int>& Files);
 
 	void FlipBoard();
 private:
-	ChessBoard WhiteBoard;
-	ChessBoard BlackBoard;
+	FChessBoard WhiteBoard;
+	FChessBoard BlackBoard;
 	bool bFlipped = false;
 };
 

@@ -27,7 +27,7 @@ public:
 	void CloneTo(FDna& Target);
 private:
 	int NextIndex = 0;
-	Array<int> Data;
+	TArray<int> Data;
 };
 
 

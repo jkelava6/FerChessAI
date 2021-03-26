@@ -31,7 +31,7 @@ public:
 private:
 	float Bias;
 	float State;
-	Array<FNodeInput> Inputs;
+	TArray<FNodeInput> Inputs;
 };
 
 extern float SigmoidFunction(float Input);
