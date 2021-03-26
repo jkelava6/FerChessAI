@@ -5,12 +5,3 @@
 #include <GenericAI.h>
 
 
-
-
-
-IChessAI::IChessAI() = default;
-
-
-
-
-
