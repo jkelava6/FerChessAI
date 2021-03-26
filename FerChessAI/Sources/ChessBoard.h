@@ -68,6 +68,7 @@ public:
 	void CollectMoves(int Row, int File, TArray<int>& Rows, TArray<int>& Files);
 	void SetMoved(__int64 BitMask);
 	void SetEnPassant(int Row, int File);
+	void CopyPositionFrom(FChessBoard& Board);
 private:
 	bool AreCoordsValid(int Row, int File);
 	void CollectLineMovement(int Row, int File, int DeltaRow, int DeltaFile, TArray<int>& Rows, TArray<int>& Files);

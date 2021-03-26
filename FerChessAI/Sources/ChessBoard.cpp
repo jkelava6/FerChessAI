@@ -456,6 +456,21 @@ void FChessBoard::SetEnPassant(int Row, int File)
 	EnPassantFile = File;
 }
 
+void FChessBoard::CopyPositionFrom(FChessBoard& Board)
+{
+	for (int Row = 0; Row < 8; ++Row)
+	{
+		for (int File = 0; File < 8; ++File)
+		{
+			Square(Row, File) = Board(Row, File);
+		}
+	}
+
+	SetMoved(Board.MovedMask);
+	SetEnPassant(Board.EnPassantRow, Board.EnPassantFile);
+	MoveStack = Board.MoveStack;
+}
+
 FDoubleBoard::FDoubleBoard() = default;
 
 void FDoubleBoard::EmptyBoard()
