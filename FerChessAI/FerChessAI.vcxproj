@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\Array.cpp" />
     <ClCompile Include="Sources\ChessBoard.cpp" />
+    <ClCompile Include="Sources\Executable\BasicFullAiEvo.cpp" />
     <ClCompile Include="Sources\Executable\FerChessAI.cpp" />
     <ClCompile Include="Sources\Executable\JavaAgent.cpp" />
     <ClCompile Include="Sources\GenericAI.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="Sources\MinMaxAI.cpp" />
     <ClCompile Include="Sources\NeuNet\Dna.cpp" />
     <ClCompile Include="Sources\NeuNet\Network.cpp" />
+    <ClCompile Include="Sources\NeuNet\NeuNetAI.cpp" />
     <ClCompile Include="Sources\NeuNet\Node.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +166,7 @@
     <ClInclude Include="Sources\Math.h" />
     <ClInclude Include="Sources\NeuNet\Dna.h" />
     <ClInclude Include="Sources\NeuNet\Network.h" />
+    <ClInclude Include="Sources\NeuNet\NeuNetAI.h" />
     <ClInclude Include="Sources\NeuNet\Node.h" />
     <ClInclude Include="Sources\StdH.h" />
     <ClInclude Include="Sources\MinMaxAI.h" />

@@ -9,7 +9,7 @@ class ChessAI
 public:
 	ChessAI();
 public:
-	virtual void PlayMove(DoubleBoard& Board) = 0;
+	virtual bool PlayMove(DoubleBoard& Board) = 0;
 };
 
 

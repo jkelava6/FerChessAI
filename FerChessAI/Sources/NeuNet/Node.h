@@ -34,4 +34,6 @@ private:
 	Array<FNodeInput> Inputs;
 };
 
+extern float SigmoidFunction(float Input);
+
 

@@ -26,7 +26,8 @@ class MinMaxAI : public ChessAI
 public:
 	MinMaxAI();
 public:
-	virtual void PlayMove(DoubleBoard& Board) override;
+	virtual bool PlayMove(DoubleBoard& Board) override;
+	void SetDepths(int Normal, int Volatile);
 private:
 	float Evaluate(DoubleBoard& Board);
 	float MinMax(DoubleBoard& Board, float Alfa, float Beta, int Depth, bool bVolatile);

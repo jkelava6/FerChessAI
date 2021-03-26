@@ -42,10 +42,13 @@ void FNode::Update()
 		Sum += Link.LinkStrength * Link.HarvestNode->GetState();
 	}
 
-	float ExpPlus = PowerNat(Sum);
-	float ExpMinus = 1.0f / ExpPlus;
-	SetState((ExpPlus - ExpMinus) / (ExpPlus + ExpMinus));
+	SetState(SigmoidFunction(Sum));
 }
 
-
+extern float SigmoidFunction(float Input)
+{
+	float ExpPlus = PowerNat(Input);
+	float ExpMinus = 1.0f / ExpPlus;
+	return (ExpPlus - ExpMinus) / (ExpPlus + ExpMinus);
+}
 

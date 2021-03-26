@@ -37,6 +37,11 @@ void FDna::Peek(int Index)
 	NextIndex = Index;
 }
 
+int FDna::Size()
+{
+	return Data.Count();
+}
+
 int FDna::ReadInt()
 {
 	return Data[NextIndex++];
@@ -55,6 +60,46 @@ void FDna::WriteInt(int Value)
 void FDna::WriteFloat(float Value)
 {
 	(*(float*)&Data[NextIndex++]) = Value;
+}
+
+int& FDna::AccesInt(int Index)
+{
+	return Data[Index];
+}
+
+float& FDna::AccesFloat(int Index)
+{
+	return *(float*)&Data[Index];
+}
+
+
+void FDna::PushInt(int Value)
+{
+	Data.Push() = Value;
+}
+
+void FDna::PushFloat(float Value)
+{
+	(*(float*)&Data.Push()) = Value;
+}
+
+void FDna::Pack()
+{
+	Data.Prealocate(Data.Count());
+}
+
+FDna* FDna::Clone()
+{
+	FDna* Cloned = new FDna();
+	Cloned->Peek(0);
+	Cloned->Data = Data;
+	return Cloned;
+}
+
+void FDna::CloneTo(FDna& Target)
+{
+	Target.Peek(0);
+	Target.Data = Data;
 }
 
 

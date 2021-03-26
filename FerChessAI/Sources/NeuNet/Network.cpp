@@ -8,13 +8,41 @@
 
 void FNetwork::FromDna(FDna& Dna)
 {
+	Dna.Peek(0);
 
+	Inputs = Dna.ReadInt();
+	Outputs = Dna.ReadInt();
+	RecurrentPerLevel.Prealocate(Dna.ReadInt());
+	TotalRecurrent = 0;
+	for (int Level = 0; Level < RecurrentPerLevel.Count(); ++Level)
+	{
+		RecurrentPerLevel.Push() = Dna.ReadInt();
+		TotalRecurrent = RecurrentPerLevel[Level];
+	}
+
+	const int MiddleNodes = Dna.ReadInt();
+	const int TotalNodes = Inputs + TotalRecurrent + MiddleNodes + Outputs + TotalRecurrent;
+	const int FirstMiddleNode = Inputs + TotalRecurrent;
+	FirstOutput = Inputs + TotalRecurrent + MiddleNodes;
+
+	Nodes.Prealocate(TotalNodes);
+	for (int Node = Inputs; Inputs < TotalNodes; ++Node)
+	{
+		const float Bias = Dna.ReadFloat();
+		const int Links = Node < TotalRecurrent ? 0 : Dna.ReadInt();
+		Nodes.Push() = FNode(Links, Bias);
+
+		for (int Link = 0; Link < Links; ++Link)
+		{
+			Nodes[Node].AddLink(&Nodes[Dna.ReadInt()], Dna.ReadFloat());
+		}
+	}
 }
 
-void FNetwork::ToDna(FDna& Dna)
+/*void FNetwork::ToDna(FDna& Dna)
 {
 
-}
+}*/
 
 void FNetwork::SetInput(int Index, float Value)
 {

@@ -22,10 +22,17 @@ MinMaxAI::MinMaxAI()
 {
 }
 
-void MinMaxAI::PlayMove(DoubleBoard& Board)
+bool MinMaxAI::PlayMove(DoubleBoard& Board)
 {
 	float Evaluation = MinMax(Board, -100.0f, -100.0f, 0, false);
 	Board.Move(LastPlayedMove.RowFrom, LastPlayedMove.FileFrom, LastPlayedMove.RowTo, LastPlayedMove.FileTo);
+	return true;
+}
+
+void MinMaxAI::SetDepths(int Normal, int Volatile)
+{
+	MaxDepth = Normal;
+	MaxVolatileDepth = Volatile;
 }
 
 float MinMaxAI::Evaluate(DoubleBoard& Board)

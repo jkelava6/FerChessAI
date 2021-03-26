@@ -3,6 +3,7 @@
 #include <StdH.h>
 #include <JavaIO/JavaTokenIO.h>
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 #include <cassert>
 #include <cstdio>
@@ -14,9 +15,9 @@ const int STEP_TOKEN_WAIT = 10;
 
 extern void ReadJavaToken(const char* Token, char* OutMessage)
 {
-	const int TokenLength = strlen(Token);
+	const int TokenLength = (int)strlen(Token);
 	const char* EndSequence = "</>";
-	const int EndSeqLen = strlen(EndSequence);
+	const int EndSeqLen = (int)strlen(EndSequence);
 
 	int TokenProgress = 0;
 	int EndProgress = 0;
@@ -81,7 +82,7 @@ extern void WriteJavaToken(const char* Token, const char* Message)
 extern void ReadJavaTokenAny(char* OutToken, char* OutMessage)
 {
 	const char* EndSequence = "</>";
-	const int EndSeqLen = strlen(EndSequence);
+	const int EndSeqLen = (int)strlen(EndSequence);
 
 	int TokenLength = -1;
 	bool bTokenEnded = false;

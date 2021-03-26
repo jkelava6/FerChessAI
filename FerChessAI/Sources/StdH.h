@@ -2,7 +2,7 @@
 
 
 
-
+typedef unsigned int uint;
 
 #define ARRAY_SIZE(Array) (sizeof(Array) / sizeof(*Array))
 #define ARRAY_MATCH(RefArray, OtherArray) static_assert(ARRAY_SIZE(RefArray) == ARRAY_SIZE(OtherArray), "Array size mismatch!")
@@ -14,6 +14,11 @@ ClassName(const ClassName&) = delete
 ClassName operator= (ClassName&&) = delete; \
 ClassName(ClassName&&) = delete
 
-#define _CRT_SECURE_NO_WARNINGS
+template <class Type>
+Type&& Move(Type& LValue)
+{
+    return static_cast<Type&&>(LValue);
+}
+
 
 
