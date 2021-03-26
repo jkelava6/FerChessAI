@@ -5,6 +5,7 @@
 
 #include <Math.h>
 #include <MinMaxAI.h>
+#include <JavaIO/JavaTokenIO.h>
 
 
 FRevertSquare::FRevertSquare() = default;
@@ -16,7 +17,6 @@ FRevertSquare::FRevertSquare(int ChangedRank, int ChangedFile, EChessPiece OldPi
 {
 }
 
-#include <JavaIO/JavaTokenIO.h>
 void FRevertSquare::Restore(FChessBoard& Board)
 {
 	if (Piece < EChessPiece::BlackKing || Piece > EChessPiece::WhiteKing)
@@ -26,7 +26,10 @@ void FRevertSquare::Restore(FChessBoard& Board)
 	Board(Rank, File) = Piece;
 }
 
-FRevertMove::FRevertMove() = default;
+FRevertMove::FRevertMove() :
+	ChangedInOrder(4)
+{
+}
 
 void FRevertMove::Change(FChessBoard& Board, int Rank, int File, EChessPiece Piece)
 {
@@ -55,6 +58,25 @@ void FRevertMove::SaveEnPassant(int Rank, int File)
 {
 	EnPassantRank = Rank;
 	EnPassantFile = File;
+}
+
+FRevertMove&& FRevertMove::Flipped()
+{
+	FRevertMove FlipMove;
+	const int NumOfChanges = ChangedInOrder.Count();
+	for (int Change = 0; Change < NumOfChanges; ++Change)
+	{
+		FRevertSquare& Turned = FlipMove.ChangedInOrder.Push();
+		FRevertSquare& Own = ChangedInOrder[Change];
+		Turned.Rank = 7 - Own.Rank;
+		Turned.File = Own.File;
+		Turned.Piece = Own.Piece;
+	}
+	FlipMove.EnPassantRank = EnPassantRank;
+	FlipMove.EnPassantFile = EnPassantFile;
+	FlipMove.MovedMask = FChessBoard::FlipMovedMask(FlipMove.MovedMask);
+
+	return Move(FlipMove);
 }
 
 FChessBoard::FChessBoard()
@@ -328,6 +350,20 @@ void FChessBoard::CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<in
 	}
 }
 
+__int64 FChessBoard::FlipMovedMask(__int64 OgMask)
+{
+	__int64 FlippedMask = 0;
+	__int64 Bit = 1;
+	for (int Square = 0; Square < 64; ++Square)
+	{
+		if (OgMask & (Bit << Square))
+		{
+			FlippedMask |= (Bit << (63 - Square));
+		}
+	}
+	return FlippedMask;
+}
+
 bool FChessBoard::AreCoordsValid(int Rank, int File)
 {
 	return 0 <= Rank && Rank < 8 && 0 <= File && File < 8;
@@ -457,31 +493,48 @@ void FChessBoard::SetEnPassant(int Rank, int File)
 	EnPassantFile = File;
 }
 
-void FChessBoard::CopyPositionFrom(FChessBoard& Board)
+void FChessBoard::CopyPositionFrom(FChessBoard& Board, bool bFlipSides/* = false*/)
 {
 	for (int Rank = 0; Rank < 8; ++Rank)
 	{
 		for (int File = 0; File < 8; ++File)
 		{
-			Square(Rank, File) = Board(Rank, File);
+			Square(Rank, File) = !bFlipSides ? Board(Rank, File) : Board(7 - Rank, File);
 		}
 	}
 
-	SetMoved(Board.MovedMask);
-	SetEnPassant(Board.EnPassantRank, Board.EnPassantFile);
-	MoveStack = Board.MoveStack;
+	if (!bFlipSides)
+	{
+		SetMoved(Board.MovedMask);
+		SetEnPassant(Board.EnPassantRank, Board.EnPassantFile);
+		MoveStack = Board.MoveStack;
+	}
+	else
+	{
+		SetMoved(FChessBoard::FlipMovedMask(Board.MovedMask));
+		SetEnPassant(7 - Board.EnPassantRank, Board.EnPassantFile);
+		MoveStack.PopAll();
+		const int NumOfMoves = Board.MoveStack.Count();
+		MoveStack.Prealocate(NumOfMoves);
+		for (int Move = 0; Move < NumOfMoves; ++Move)
+		{
+			MoveStack.Push() = Board.MoveStack[Move].Flipped();
+		}
+	}
 }
 
 FDoubleBoard::FDoubleBoard() = default;
 
 void FDoubleBoard::EmptyBoard()
 {
+	bFlipped = false;
 	WhiteBoard.EmptyBoard();
 	BlackBoard.EmptyBoard();
 }
 
 void FDoubleBoard::DefaultBoard()
 {
+	bFlipped = false;
 	WhiteBoard.DefaultBoard();
 	BlackBoard.DefaultBoard();
 }
@@ -560,6 +613,20 @@ void FDoubleBoard::CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<i
 	{
 		BlackBoard.CollectMoves(Rank, File, Ranks, Files);
 	}
+}
+
+void FDoubleBoard::CopyPositionFrom(FChessBoard& Board)
+{
+	bFlipped = false;
+	WhiteBoard.CopyPositionFrom(Board);
+	BlackBoard.CopyPositionFrom(Board, false);
+}
+
+void FDoubleBoard::CopyPositionFrom(FDoubleBoard& Board)
+{
+	bFlipped = Board.bFlipped;
+	WhiteBoard.CopyPositionFrom(Board.WhiteBoard);
+	BlackBoard.CopyPositionFrom(Board.BlackBoard);
 }
 
 void FDoubleBoard::FlipBoard()

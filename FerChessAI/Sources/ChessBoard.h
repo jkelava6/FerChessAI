@@ -29,6 +29,7 @@ public:
 public:
 	void Restore(FChessBoard& Board);
 private:
+	friend class FRevertMove;
 	int Rank = -1;
 	int File = -1;
 	EChessPiece Piece = EChessPiece::None;
@@ -43,6 +44,8 @@ public:
 	void Revert(FChessBoard& Board);
 	void SaveMask(__int64 BitMask);
 	void SaveEnPassant(int Rank, int File);
+	
+	FRevertMove&& Flipped();
 private:
 	TArray<FRevertSquare> ChangedInOrder;
 	__int64 MovedMask = 0;
@@ -68,8 +71,10 @@ public:
 	void CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<int>& Files);
 	void SetMoved(__int64 BitMask);
 	void SetEnPassant(int Rank, int File);
-	void CopyPositionFrom(FChessBoard& Board);
+	void CopyPositionFrom(FChessBoard& Board, bool bFlipSides = false);
 	bool IsAttacked(int Rank, int File);
+
+	static __int64 FlipMovedMask(__int64 OgMask);
 private:
 	bool AreCoordsValid(int Rank, int File);
 	void CollectLineMovement(int Rank, int File, int DeltaRank, int DeltaFile, TArray<int>& Ranks, TArray<int>& Files);
@@ -108,6 +113,9 @@ public:
 	void Move(int RankFrom, int FileFrom, int RankTo, int FileTo);
 	void Undo();
 	void CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<int>& Files);
+
+	void CopyPositionFrom(FChessBoard& Board);
+	void CopyPositionFrom(FDoubleBoard& Board);
 
 	void FlipBoard();
 private:

@@ -73,6 +73,11 @@ public:
 
 	void Prealocate(int Size)
 	{
+		if (Size == AllocatedSize)
+		{
+			return;
+		}
+
 		Type* NewData = Size > 0 ? new Type[Size] : nullptr;
 		UsedSize = Min(Size, UsedSize);
 
