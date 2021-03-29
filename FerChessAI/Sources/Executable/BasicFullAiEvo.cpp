@@ -111,17 +111,6 @@ int main()
 				FDoubleBoard Board;
 				Board.CopyPositionFrom(GradingBoards[BoardIndex]);
 
-				for (int Rank = 0; Rank < 8; ++Rank)
-				{
-					for (int File = 0; File < 8; ++File)
-					{
-						if (Board(Rank, File) < EChessPiece::BlackKing || Board(Rank, File) > EChessPiece::WhiteKing)
-						{
-							continue;
-						}
-					}
-				}
-
 				NNAI.StartGame();
 				EGameState State = EGameState::ActiveWhite;
 				int GameMoves = 0;

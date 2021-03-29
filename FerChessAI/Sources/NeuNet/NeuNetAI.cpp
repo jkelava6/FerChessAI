@@ -55,18 +55,6 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 			const int RankTo = Values[2];
 			const int FileTo = Values[3];
 
-			if (RankFrom < 0)
-			{
-				for (int Node = 0; Node < Network.Nodes.Count(); ++Node)
-				{
-					const float Val = Network.Nodes[Node].GetState();
-					if (!(-1000.0f < Val && Val < 1000.0f))
-					{
-						continue;
-					}
-				}
-			}
-
 			TArray<int> Ranks(16);
 			TArray<int> Files(16);
 			Board.CollectMoves(RankFrom, RankTo, Ranks, Files);
