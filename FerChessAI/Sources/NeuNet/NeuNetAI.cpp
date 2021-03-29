@@ -26,6 +26,7 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 	{
 		Network.SetInput(64, (float)TicksRemaining);
 		Network.Update();
+		--TicksRemaining;
 
 		if (Network.GetOutput(0) > 0.0f)
 		{
@@ -54,6 +55,18 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 			const int RankTo = Values[2];
 			const int FileTo = Values[3];
 
+			if (RankFrom < 0)
+			{
+				for (int Node = 0; Node < Network.Nodes.Count(); ++Node)
+				{
+					const float Val = Network.Nodes[Node].GetState();
+					if (!(-1000.0f < Val && Val < 1000.0f))
+					{
+						continue;
+					}
+				}
+			}
+
 			TArray<int> Ranks(16);
 			TArray<int> Files(16);
 			Board.CollectMoves(RankFrom, RankTo, Ranks, Files);
@@ -63,7 +76,7 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 			{
 				if (RankTo == Ranks[Move] && FileTo == Files[Move])
 				{
-					Board.Move(RankFrom, FileFrom, RankTo, FileTo);
+					Board.MovePiece(RankFrom, FileFrom, RankTo, FileTo);
 					LastMoveVerdict = ELastMoveResult::Valid;
 					return true;
 				}
@@ -83,6 +96,11 @@ void FNeuNetFullAI::SetTimeControl(int InStartTicks, int InTicksPerMove, int InM
 	StartTicks = InStartTicks;
 	TicksPerMove = InTicksPerMove;
 	MaxTicks = InMaxTicks;
+}
+
+void FNeuNetFullAI::LoadDna(FDna& Dna)
+{
+	Network.FromDna(Dna);
 }
 
 void FNeuNetFullAI::StartGame()
@@ -115,10 +133,11 @@ FNeuNetFullMutator::FNeuNetFullMutator(
 {
 }
 
-FDna&& FNeuNetFullMutator::CreateDna()
+FDna* FNeuNetFullMutator::CreateDna()
 {
-	FDna Dna;
-	Dna.New(200);
+	FDna* NewDna = new FDna();
+	FDna& Dna = *NewDna;
+	Dna.New(800);
 
 	Dna.PushInt(Inputs);
 	Dna.PushInt(Outputs);
@@ -152,7 +171,7 @@ FDna&& FNeuNetFullMutator::CreateDna()
 	}
 
 	Dna.Pack();
-	return Move(Dna);
+	return NewDna;
 }
 
 void FNeuNetFullMutator::MutateDna(FDna& Dna)
@@ -162,6 +181,7 @@ void FNeuNetFullMutator::MutateDna(FDna& Dna)
 	++Index; // outputs known
 	++Index; // number of recurrent levels known
 	Index += 3; // numbers of nodes per recurrent levels known
+	++Index; // number of middle nodes known
 
 	const int TotalRecurrent = MoveRecurrent + GameRecurrent + LifeRecurrent;
 	const int FirstMiddleNode = Inputs + TotalRecurrent;
@@ -179,7 +199,7 @@ void FNeuNetFullMutator::MutateDna(FDna& Dna)
 
 		for (int Link = 0; Link < Links; ++Link)
 		{
-			if (RandomF() > LinkRedirectionChance)
+			if (RandomF() < LinkRedirectionChance)
 			{
 				Dna.AccesInt(Index) = (int)(RandomF() * Node);
 			}

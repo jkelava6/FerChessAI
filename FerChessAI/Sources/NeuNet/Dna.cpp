@@ -24,6 +24,7 @@ int* FDna::GetData(int& Length)
 		OutData[Index] = Data[Index];
 	}
 	NextIndex = 0;
+	return OutData;
 }
 
 void FDna::New(int Size)

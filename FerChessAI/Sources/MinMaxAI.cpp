@@ -32,7 +32,7 @@ float FMinMaxAI::Eval(FDoubleBoard& Board, int NormalDepth, int VolatileDepth)
 bool FMinMaxAI::PlayMove(FDoubleBoard& Board)
 {
 	float Evaluation = MinMax(Board, -100.0f, -100.0f, 0, false);
-	Board.Move(LastPlayedMove.RankFrom, LastPlayedMove.FileFrom, LastPlayedMove.RankTo, LastPlayedMove.FileTo);
+	Board.MovePiece(LastPlayedMove.RankFrom, LastPlayedMove.FileFrom, LastPlayedMove.RankTo, LastPlayedMove.FileTo);
 	return true;
 }
 
@@ -225,7 +225,7 @@ float FMinMaxAI::MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, 
 			for (int Move = 0; Move < MoveCount; ++Move)
 			{
 				bool bPieceTaken = Board(Ranks[Move], Files[Move]) < EChessPiece::None;
-				Board.Move(Rank, File, Ranks[Move], Files[Move]);
+				Board.MovePiece(Rank, File, Ranks[Move], Files[Move]);
 				Board.FlipBoard();
 				const float MoveEval = -MinMax(Board, Max(BestMove.Evaluation, Beta), Alfa, Depth + 1, bPieceTaken);
 				Board.FlipBoard();

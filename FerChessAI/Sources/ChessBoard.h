@@ -45,7 +45,7 @@ public:
 	void SaveMask(__int64 BitMask);
 	void SaveEnPassant(int Rank, int File);
 	
-	FRevertMove&& Flipped();
+	FRevertMove Flipped();
 private:
 	TArray<FRevertSquare> ChangedInOrder;
 	__int64 MovedMask = 0;
@@ -59,14 +59,15 @@ public:
 	FChessBoard();
 	~FChessBoard();
 	DECLARE_NOCOPY(FChessBoard);
-	DECLARE_NOMOVE(FChessBoard);
+	FChessBoard& operator= (FChessBoard&& Moved);
+	FChessBoard(FChessBoard&& Moved);
 public:
 	void EmptyBoard();
 	void DefaultBoard();
 	EChessPiece& operator()(int Rank, int File);
 	EChessPiece& Square(int Rank, int File);
 
-	void Move(int RankFrom, int FileFrom, int RankTo, int FileTo);
+	void MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo);
 	void Undo();
 	void CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<int>& Files);
 	void SetMoved(__int64 BitMask);
@@ -110,7 +111,7 @@ public:
 	const EChessPiece& Square(int Rank, int File);
 	EGameState GetGameState();
 
-	void Move(int RankFrom, int FileFrom, int RankTo, int FileTo);
+	void MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo);
 	void Undo();
 	void CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<int>& Files);
 

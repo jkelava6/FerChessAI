@@ -60,7 +60,7 @@ void FRevertMove::SaveEnPassant(int Rank, int File)
 	EnPassantFile = File;
 }
 
-FRevertMove&& FRevertMove::Flipped()
+FRevertMove FRevertMove::Flipped()
 {
 	FRevertMove FlipMove;
 	const int NumOfChanges = ChangedInOrder.Count();
@@ -87,6 +87,24 @@ FChessBoard::FChessBoard()
 FChessBoard::~FChessBoard()
 {
 	delete[] Pieces;
+}
+
+FChessBoard& FChessBoard::operator= (FChessBoard&& Moved)
+{
+	EChessPiece* MyPieces = Pieces;
+	Pieces = Moved.Pieces;
+	Moved.Pieces = MyPieces;
+
+	MoveStack = Move(Moved.MoveStack);
+	MovedMask = Moved.MovedMask;
+	SetEnPassant(Moved.EnPassantRank, Moved.EnPassantFile);
+
+	return *this;
+}
+
+FChessBoard::FChessBoard(FChessBoard&& Moved)
+{
+	*this = Move(Moved);
 }
 
 void FChessBoard::EmptyBoard()
@@ -149,7 +167,7 @@ EChessPiece& FChessBoard::Square(int Rank, int File)
 	return Pieces[8 * Rank + File];
 }
 
-void FChessBoard::Move(int RankFrom, int FileFrom, int RankTo, int FileTo)
+void FChessBoard::MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo)
 {
 	FRevertMove& MoveLog = MoveStack.Push();
 	EChessPiece MovedPiece = Square(RankFrom, FileFrom);
@@ -583,17 +601,17 @@ EGameState FDoubleBoard::GetGameState()
 	return EGameState::OverDraw;
 }
 
-void FDoubleBoard::Move(int RankFrom, int FileFrom, int RankTo, int FileTo)
+void FDoubleBoard::MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo)
 {
 	if (!bFlipped)
 	{
-		WhiteBoard.Move(RankFrom, FileFrom, RankTo, FileTo);
-		BlackBoard.Move(7 - RankFrom, FileFrom, 7 - RankTo, FileTo);
+		WhiteBoard.MovePiece(RankFrom, FileFrom, RankTo, FileTo);
+		BlackBoard.MovePiece(7 - RankFrom, FileFrom, 7 - RankTo, FileTo);
 	}
 	else
 	{
-		WhiteBoard.Move(7 - RankFrom, FileFrom, 7 - RankTo, FileTo);
-		BlackBoard.Move(RankFrom, FileFrom, RankTo, FileTo);
+		WhiteBoard.MovePiece(7 - RankFrom, FileFrom, 7 - RankTo, FileTo);
+		BlackBoard.MovePiece(RankFrom, FileFrom, RankTo, FileTo);
 	}
 }
 

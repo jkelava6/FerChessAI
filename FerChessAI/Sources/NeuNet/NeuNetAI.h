@@ -18,6 +18,7 @@ public:
 public:
 	virtual bool PlayMove(FDoubleBoard& Board) override;
 	void SetTimeControl(int InStartTicks, int InTicksPerMove, int InMaxTicks);
+	void LoadDna(FDna& Dna);
 
 	void StartGame();
 public:
@@ -40,7 +41,7 @@ public:
 		float InLinkChangeChance, float InLinkChangeRatio, int InLinkChangeResilience,
 		float InLinkRedirectChance);
 public:
-	FDna&& CreateDna();
+	FDna* CreateDna();
 	void MutateDna(FDna& Dna);
 private:
 	void MutateF(float& Val, float Chance, float Ratio, int Resilience, float MaxVal);

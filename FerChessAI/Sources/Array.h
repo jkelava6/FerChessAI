@@ -2,6 +2,9 @@
 
 #include <Math.h>
 
+#ifdef _DEBUG
+#include <cassert>
+#endif
 
 template <class Type> class TArray
 {
@@ -68,7 +71,7 @@ public:
 
 	TArray(TArray<Type>&& Moved)
 	{
-		*this = Moved;
+		*this = Move(Moved);
 	}
 
 	void Prealocate(int Size)
@@ -83,7 +86,7 @@ public:
 
 		for (int Index = 0; Index < UsedSize; ++Index)
 		{
-			NewData[Index] = Data[Index];
+			NewData[Index] = Move(Data[Index]);
 		}
 		if (Data)
 		{
@@ -115,6 +118,9 @@ public:
 
 	Type& operator[] (int Index)
 	{
+#ifdef _DEBUG
+		assert(0 <= Index && Index < UsedSize);
+#endif
 		return Data[Index];
 	}
 

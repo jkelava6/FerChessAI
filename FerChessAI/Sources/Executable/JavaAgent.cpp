@@ -72,7 +72,7 @@ int main()
 			{
 				if (Ranks[Move] == RankTo && Files[Move] == FileTo)
 				{
-					Board.Move(RankFrom, FileFrom, RankTo, FileTo);
+					Board.MovePiece(RankFrom, FileFrom, RankTo, FileTo);
 					bMoveValid = true;
 					break;
 				}

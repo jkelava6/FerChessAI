@@ -19,6 +19,7 @@ private:
 	int Inputs = 0;
 	int Outputs = 0;
 	TArray<int> RecurrentPerLevel;
+public: // TODO: Remove this public marker. Only here for debug purposes.
 	TArray<FNode> Nodes;
 
 	int FirstOutput = 0;

@@ -13,12 +13,13 @@ void FNetwork::FromDna(FDna& Dna)
 	Inputs = Dna.ReadInt();
 	Outputs = Dna.ReadInt();
 	RecurrentPerLevel.PopAll();
-	RecurrentPerLevel.Prealocate(Dna.ReadInt());
+	const int RecurrentLevels = Dna.ReadInt();
+	RecurrentPerLevel.Prealocate(RecurrentLevels);
 	TotalRecurrent = 0;
-	for (int Level = 0; Level < RecurrentPerLevel.Count(); ++Level)
+	for (int Level = 0; Level < RecurrentLevels; ++Level)
 	{
 		RecurrentPerLevel.Push() = Dna.ReadInt();
-		TotalRecurrent = RecurrentPerLevel[Level];
+		TotalRecurrent += RecurrentPerLevel[Level];
 	}
 
 	const int MiddleNodes = Dna.ReadInt();
@@ -28,15 +29,21 @@ void FNetwork::FromDna(FDna& Dna)
 
 	Nodes.PopAll();
 	Nodes.Prealocate(TotalNodes);
-	for (int Node = Inputs; Inputs < TotalNodes; ++Node)
+	for (int Node = 0; Node < Inputs; ++Node)
+	{
+		Nodes.Push();
+	}
+	for (int Node = Inputs; Node < TotalNodes; ++Node)
 	{
 		const float Bias = Dna.ReadFloat();
-		const int Links = Node < TotalRecurrent ? 0 : Dna.ReadInt();
+		const int Links = Node < Inputs + TotalRecurrent ? 0 : Dna.ReadInt();
 		Nodes.Push() = FNode(Links, Bias);
 
 		for (int Link = 0; Link < Links; ++Link)
 		{
-			Nodes[Node].AddLink(&Nodes[Dna.ReadInt()], Dna.ReadFloat());
+			const int SourceNode = Dna.ReadInt();
+			const float SourceStrength = Dna.ReadFloat();
+			Nodes[Node].AddLink(&Nodes[SourceNode], SourceStrength);
 		}
 	}
 }
