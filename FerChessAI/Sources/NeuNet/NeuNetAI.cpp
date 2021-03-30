@@ -34,7 +34,7 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 			for (int Output = 0; Output < 4; ++Output)
 			{
 				const float OutputVal = Network.GetOutput(Output + 1);
-				if (OutputVal < 0 || OutputVal >= SigmoidFunction(8))
+				if (OutputVal < 0 || OutputVal >= SigmoidFunction(0.8f))
 				{
 					LastMoveVerdict = ELastMoveResult::FailedInvalid;
 					return false;
@@ -42,7 +42,7 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 
 				for (int Coord = 0; Coord < 8; ++Coord)
 				{
-					if (OutputVal < SigmoidFunction((float)(Coord + 1)))
+					if (OutputVal < SigmoidFunction(0.1f * (Coord + 1)))
 					{
 						Values[Output] = Coord;
 						break;
