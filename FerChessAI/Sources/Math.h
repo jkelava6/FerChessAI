@@ -28,6 +28,11 @@ inline float ClampF(float Value, float MinVal, float MaxVal)
 	return Max(Min(Value, MaxVal), MinVal);
 }
 
+inline float SquareF(float Squared)
+{
+	return Squared * Squared;
+}
+
 // Taylor series e^x implementation, taken from:
 // https://www.geeksforgeeks.org/program-to-efficiently-calculate-ex/
 inline float PowerNat(float Exp, int Precision = 20)

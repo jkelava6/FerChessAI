@@ -3,16 +3,15 @@
 #include <GenericAI.h>
 #include <NeuNet/Network.h>
 
-enum class ELastMoveResult : __int8
-{
-	None,
-	Valid,
-	FailedTimeOut,
-	FailedInvalid
-};
-
 class FNeuNetFullAI : public IChessAI
 {
+	enum class ELastMoveResult : __int8
+	{
+		None,
+		Valid,
+		FailedTimeOut,
+		FailedInvalid
+	};
 public:
 	FNeuNetFullAI();
 public:

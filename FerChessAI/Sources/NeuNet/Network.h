@@ -7,6 +7,13 @@ class FNode;
 
 class FNetwork
 {
+	enum class EReinforcementType : int
+	{
+		Full,
+		//RandomLines,
+		RandomChance,
+		//RandomNumber,
+	};
 public:
 	void FromDna(FDna& Dna);
 	//void ToDna(FDna& Dna);
@@ -15,6 +22,12 @@ public:
 
 	void Update();
 	void ResetRecurrent(int Level);
+
+	void ReinforceOutput(int OutputIndex, int OutputValue, bool bAffectLeftRecurrent,
+		float BiasStep, float MaxBias, float LinkStep, float MaxLink,
+		EReinforcementType Type, float RandomTypeParam = 0.0f);
+private:
+	float SigmaDerivative(const FNode& Node);
 private:
 	int Inputs = 0;
 	int Outputs = 0;

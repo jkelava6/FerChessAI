@@ -25,10 +25,11 @@ public:
 	FNode(int InputCount = 0, float InBias = 0.0f);
 public:
 	void SetState(float InState);
-	float GetState();
+	float GetState() const;
 	void AddLink(FNode* Node, float Strength);
 	void Update();
 private:
+	friend class FNetwork;
 	float Bias;
 	float State;
 	TArray<FNodeInput> Inputs;

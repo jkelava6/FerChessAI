@@ -22,7 +22,7 @@ void FNode::SetState(float InState)
 	State = InState;
 }
 
-float FNode::GetState()
+float FNode::GetState() const
 {
 	return State;
 }

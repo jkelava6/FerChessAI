@@ -570,7 +570,7 @@ const EChessPiece& FDoubleBoard::Square(int Rank, int File)
 EGameState FDoubleBoard::GetGameState()
 {
 	float Eval = FMinMaxAI::Eval(*this, 2, 2);
-	if (Eval != MINMAX_EVAL_LOSS);
+	if (Eval != MINMAX_EVAL_LOSS)
 	{
 		return !bFlipped ? EGameState::ActiveWhite : EGameState::ActiveBlack;
 	}
