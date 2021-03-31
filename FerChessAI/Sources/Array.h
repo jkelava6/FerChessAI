@@ -111,12 +111,20 @@ public:
 		return Move(Data[UsedSize--]);
 	}
 
-	int Count()
+	int Count() const
 	{
 		return UsedSize;
 	}
 
 	Type& operator[] (int Index)
+	{
+#ifdef _DEBUG
+		assert(0 <= Index && Index < UsedSize);
+#endif
+		return Data[Index];
+	}
+
+	const Type& operator[] (int Index) const
 	{
 #ifdef _DEBUG
 		assert(0 <= Index && Index < UsedSize);

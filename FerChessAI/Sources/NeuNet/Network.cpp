@@ -49,10 +49,43 @@ void FNetwork::FromDna(FDna& Dna)
 	}
 }
 
-/*void FNetwork::ToDna(FDna& Dna)
+void FNetwork::ToDna(FDna& Dna)
 {
+	Dna.New(800);
+	Dna.PushInt(Inputs);
+	Dna.PushInt(Outputs);
+	Dna.PushInt(RecurrentPerLevel.Count());
+	for (int Level = 0; Level < RecurrentPerLevel.Count(); ++Level)
+	{
+		Dna.PushInt(RecurrentPerLevel[Level]);
+	}
 
-}*/
+	const int TotalNodes = Nodes.Count();
+	const int MiddleNodes = TotalNodes - (Inputs + TotalRecurrent + Outputs + TotalRecurrent);
+	Dna.PushInt(MiddleNodes);
+	const int FirstMiddleNode = Inputs + TotalRecurrent;
+	FirstOutput = Inputs + TotalRecurrent + MiddleNodes;
+
+	const FNode* FirstNode = &Nodes[0];
+	for (int Index = Inputs; Index < TotalNodes; ++Index)
+	{
+		const FNode& Node = Nodes[Index];
+		Dna.PushFloat(Node.Bias);
+		if (Index < FirstMiddleNode)
+		{
+			continue;
+		}
+		const int LinkCount = Node.Inputs.Count();
+		Dna.PushInt(LinkCount);
+
+		for (int Link = 0; Link < LinkCount; ++Link)
+		{
+			const FNodeInput& Source = Node.Inputs[Link];
+			Dna.PushInt(Source.HarvestNode - FirstNode);
+			Dna.PushFloat(Source.LinkStrength);
+		}
+	}
+}
 
 void FNetwork::SetInput(int Index, float Value)
 {

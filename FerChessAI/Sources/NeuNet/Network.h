@@ -16,7 +16,7 @@ class FNetwork
 	};
 public:
 	void FromDna(FDna& Dna);
-	//void ToDna(FDna& Dna);
+	void ToDna(FDna& Dna);
 	void SetInput(int Index, float Value);
 	float GetOutput(int Index);
 
