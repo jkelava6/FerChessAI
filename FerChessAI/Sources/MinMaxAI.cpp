@@ -29,6 +29,12 @@ float FMinMaxAI::Eval(FDoubleBoard& Board, int NormalDepth, int VolatileDepth)
 	return AI.MinMax(Board, -100.0f, -100.0f, 0, false);
 }
 
+FEvaluatedMove FMinMaxAI::ChooseMove(FDoubleBoard& Board)
+{
+	MinMax(Board, -100.0f, -100.0f, 0, false);
+	return LastPlayedMove;
+}
+
 bool FMinMaxAI::PlayMove(FDoubleBoard& Board)
 {
 	float Evaluation = MinMax(Board, -100.0f, -100.0f, 0, false);

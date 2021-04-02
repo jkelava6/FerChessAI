@@ -15,6 +15,7 @@ class FNeuNetFullAI : public IChessAI
 public:
 	FNeuNetFullAI();
 public:
+	virtual FEvaluatedMove ChooseMove(FDoubleBoard& Board) override;
 	virtual bool PlayMove(FDoubleBoard& Board) override;
 	void SetTimeControl(int InStartTicks, int InTicksPerMove, int InMaxTicks);
 	void LoadDna(FDna& Dna);

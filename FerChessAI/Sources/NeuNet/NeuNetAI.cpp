@@ -9,7 +9,7 @@
 
 FNeuNetFullAI::FNeuNetFullAI() = default;
 
-bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
+FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 {
 	LastMoveVerdict = ELastMoveResult::None;
 
@@ -37,7 +37,7 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 				if (OutputVal < 0 || OutputVal >= SigmoidFunction(0.8f))
 				{
 					LastMoveVerdict = ELastMoveResult::FailedInvalid;
-					return false;
+					return FEvaluatedMove();
 				}
 
 				for (int Coord = 0; Coord < 8; ++Coord)
@@ -64,19 +64,30 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 			{
 				if (RankTo == Ranks[Move] && FileTo == Files[Move])
 				{
-					Board.MovePiece(RankFrom, FileFrom, RankTo, FileTo);
 					LastMoveVerdict = ELastMoveResult::Valid;
-					return true;
+					return FEvaluatedMove(RankFrom, FileFrom, RankTo, FileTo);
 				}
 			}
 
 			LastMoveVerdict = ELastMoveResult::FailedInvalid;
-			return false;
+			return FEvaluatedMove();
 		}
 	}
 
 	LastMoveVerdict = ELastMoveResult::FailedTimeOut;
-	return false;
+	return FEvaluatedMove();
+}
+
+bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
+{
+	FEvaluatedMove Move = ChooseMove(Board);
+	if (Move.RankFrom == -1)
+	{
+		return false;
+	}
+
+	Board.MovePiece(Move.RankFrom, Move.FileFrom, Move.RankTo, Move.FileTo);
+	return true;
 }
 
 void FNeuNetFullAI::SetTimeControl(int InStartTicks, int InTicksPerMove, int InMaxTicks)
