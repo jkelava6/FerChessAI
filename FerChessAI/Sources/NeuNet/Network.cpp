@@ -81,7 +81,7 @@ void FNetwork::ToDna(FDna& Dna)
 		for (int Link = 0; Link < LinkCount; ++Link)
 		{
 			const FNodeInput& Source = Node.Inputs[Link];
-			Dna.PushInt(Source.HarvestNode - FirstNode);
+			Dna.PushInt((int)(Source.HarvestNode - FirstNode));
 			Dna.PushFloat(Source.LinkStrength);
 		}
 	}
@@ -123,11 +123,10 @@ void FNetwork::ResetRecurrent(int Level)
 
 void FNetwork::ReinforceOutput(int OutputIndex, int OutputValue, bool bAffectLeftRecurrent,
 	float BiasStep, float MaxBias, float LinkStep, float MaxLink,
-	EReinforcementType Type, float RandomTypeParam/* = 0.0f*/)
+	int RecurrentDepth, EReinforcementType Type, float RandomTypeParam/* = 0.0f*/)
 {
 	const int TargetIndex = FirstOutput + OutputIndex;
 	FNode& TargetNode = Nodes[TargetIndex];
-	//const bool bLines = Type == EReinforcementType::RandomLines;
 
 	const int NodeCount = Nodes.Count();
 	TArray<float> Feedback(NodeCount);
@@ -135,38 +134,48 @@ void FNetwork::ReinforceOutput(int OutputIndex, int OutputValue, bool bAffectLef
 	{
 		Feedback.Push() = 0.0f;
 	}
-	/*TArray<int> Lines(bLines ? NodeCount : 0);
-	if (bLines)
-	{
-		for (int Node = 0; Node < NodeCount; ++Node)
-		{
-			Lines.Push() = Node;
-		}
-		Lines[TargetIndex] = NumberOfLines;
-	}*/
 
-	Feedback[TargetIndex] = TargetNode.GetState() < OutputValue ? RandomTypeParam : -RandomTypeParam;
-	const int Leftmost = bAffectLeftRecurrent ? Inputs + TotalRecurrent : Inputs;
-	FNode* FirstNode = &Nodes[0];
-	for (int Index = TargetIndex; Index >= Leftmost; --Index)
+	for (int Iteration = 0; Iteration <= RecurrentDepth; ++Iteration)
 	{
-		if (AbsF(Feedback[Index]) < 1e-3f)
+		if (Iteration == 0)
 		{
-			continue;
+			Feedback[TargetIndex] = TargetNode.GetState() < OutputValue ? 1.0f : -1.0f;
+		}
+		else
+		{
+			const int FirstOutRecurrent = FirstOutput + Outputs;
+			for (int Node = 0; Node < TotalRecurrent; ++Node)
+			{
+				Feedback[FirstOutRecurrent + Node] = Feedback[Inputs + Node];
+			}
+			for (int Node = Inputs; Node < FirstOutRecurrent; ++Node)
+			{
+				Feedback[Node] = 0.0f;
+			}
 		}
 
-		FNode& Node = Nodes[Index];
-		const float BackProp = SigmaDerivative(Node) * Feedback[Index];
-		for (int Link = 0; Link < Node.Inputs.Count(); ++Link)
+		FNode* FirstNode = &Nodes[0];
+		for (int Index = TargetIndex; Index >= Inputs; --Index)
 		{
-			const FNodeInput& Input = Node.Inputs[Link];
-			Feedback[Input.HarvestNode - FirstNode] += Input.LinkStrength * BackProp;
+			if (AbsF(Feedback[Index]) < 1e-3f)
+			{
+				continue;
+			}
+
+			FNode& Node = Nodes[Index];
+			const float BackProp = SigmaDerivative(Node) * Feedback[Index];
+			for (int Link = 0; Link < Node.Inputs.Count(); ++Link)
+			{
+				const FNodeInput& Input = Node.Inputs[Link];
+				Feedback[(int)(Input.HarvestNode - FirstNode)] += Input.LinkStrength * BackProp;
+			}
 		}
 	}
 
 	if (Type == EReinforcementType::Full || Type == EReinforcementType::RandomChance)
 	{
 		const float Chance = Type == EReinforcementType::Full ? 1.0f : RandomTypeParam;
+		const int Leftmost = bAffectLeftRecurrent ? Inputs + TotalRecurrent : Inputs;
 		for (int Index = Leftmost; Index < TargetIndex; ++Index)
 		{
 			if (AbsF(Feedback[Index]) < 1e-3f || RandomF() >= Chance)

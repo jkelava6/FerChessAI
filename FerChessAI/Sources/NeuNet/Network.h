@@ -25,7 +25,7 @@ public:
 
 	void ReinforceOutput(int OutputIndex, int OutputValue, bool bAffectLeftRecurrent,
 		float BiasStep, float MaxBias, float LinkStep, float MaxLink,
-		EReinforcementType Type, float RandomTypeParam = 0.0f);
+		int RecurrentDepth, EReinforcementType Type, float RandomTypeParam = 0.0f);
 private:
 	float SigmaDerivative(const FNode& Node);
 private:
