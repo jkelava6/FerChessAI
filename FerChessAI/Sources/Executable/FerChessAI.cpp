@@ -6,8 +6,9 @@
 
 #include <StdH.h>
 #include <ChessBoard.h>
-#include <FMinMaxAI.h>
+#include <MinMaxAI.h>
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
 
 using namespace std;
@@ -18,7 +19,7 @@ int GetNumber(char Base)
     char Input = 0;
     do
     {
-        int Ignore = scanf("%c", &Input);
+        int Ignore = scanf_s("%c", &Input);
     } while (Input < Base || Input >= Base + 8);
     return Input - Base;
 }
@@ -32,40 +33,40 @@ void DebugBoard(FDoubleBoard& Board)
             char Piece = ' ';
             switch (Board(Rank, File))
             {
-            case ChessPiece::WhitePawn:
+            case EChessPiece::WhitePawn:
                 Piece = 'P';
                 break;
-            case ChessPiece::WhiteKnight:
+            case EChessPiece::WhiteKnight:
                 Piece = 'N';
                 break;
-            case ChessPiece::WhiteBishop:
+            case EChessPiece::WhiteBishop:
                 Piece = 'B';
                 break;
-            case ChessPiece::WhiteRook:
+            case EChessPiece::WhiteRook:
                 Piece = 'R';
                 break;
-            case ChessPiece::WhiteQueen:
+            case EChessPiece::WhiteQueen:
                 Piece = 'Q';
                 break;
-            case ChessPiece::WhiteKing:
+            case EChessPiece::WhiteKing:
                 Piece = 'K';
                 break;
-            case ChessPiece::BlackPawn:
+            case EChessPiece::BlackPawn:
                 Piece = 'p';
                 break;
-            case ChessPiece::BlackKnight:
+            case EChessPiece::BlackKnight:
                 Piece = 'n';
                 break;
-            case ChessPiece::BlackBishop:
+            case EChessPiece::BlackBishop:
                 Piece = 'b';
                 break;
-            case ChessPiece::BlackRook:
+            case EChessPiece::BlackRook:
                 Piece = 'r';
                 break;
-            case ChessPiece::BlackQueen:
+            case EChessPiece::BlackQueen:
                 Piece = 'q';
                 break;
-            case ChessPiece::BlackKing:
+            case EChessPiece::BlackKing:
                 Piece = 'k';
                 break;
             default:
@@ -86,7 +87,7 @@ int main()
 
     printf("Do you want to play as white? ");
     int PlayAsWhite;
-    int Ignore = scanf("%d", &PlayAsWhite);
+    int Ignore = scanf_s("%d", &PlayAsWhite);
     bool bPlayersTurn = PlayAsWhite;
 
     while (true)
@@ -105,8 +106,8 @@ int main()
             FileTo = GetNumber('a');
             RankTo = GetNumber('1');
 
-            Array<int> PossibleRanks;
-            Array<int> PossibleFiles;
+            TArray<int> PossibleRanks;
+            TArray<int> PossibleFiles;
             Board.CollectMoves(RankFrom, FileFrom, PossibleRanks, PossibleFiles);
             bool bMoveValid = false;
             const int PossibleMoves = PossibleRanks.Count();
@@ -121,7 +122,7 @@ int main()
 
             if (bMoveValid)
             {
-                Board.Move(RankFrom, FileFrom, RankTo, FileTo);
+                Board.MovePiece(RankFrom, FileFrom, RankTo, FileTo);
                 DebugBoard(Board);
                 Board.FlipBoard();
                 bPlayersTurn = false;

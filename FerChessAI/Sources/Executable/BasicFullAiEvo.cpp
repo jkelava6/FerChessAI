@@ -132,12 +132,12 @@ int main()
 					State = Board.GetGameState();
 				}
 
-				if (NNAI.LastMoveVerdict == ELastMoveResult::FailedTimeOut)
+				if (NNAI.LastMoveVerdict == FNeuNetFullAI::ELastMoveResult::FailedTimeOut)
 				{
 					continue;
 				}
 				Score += 100.0f;
-				if (NNAI.LastMoveVerdict == ELastMoveResult::FailedInvalid)
+				if (NNAI.LastMoveVerdict == FNeuNetFullAI::ELastMoveResult::FailedInvalid)
 				{
 					continue;
 				}

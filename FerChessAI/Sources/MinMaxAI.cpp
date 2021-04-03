@@ -213,6 +213,7 @@ float FMinMaxAI::MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, 
 	}
 
 	FEvaluatedMove BestMove;
+	BestMove.Evaluation = 2.0f * MINMAX_EVAL_LOSS;
 
 	for (int Rank = 7; Rank >= 0; --Rank)
 	{

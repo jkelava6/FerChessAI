@@ -5,6 +5,7 @@
 
 class FNeuNetFullAI : public IChessAI
 {
+public:
 	enum class ELastMoveResult : __int8
 	{
 		None,
