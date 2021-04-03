@@ -47,6 +47,7 @@ void FRevertMove::Revert(FChessBoard& Board)
 	}
 
 	Board.SetMoved(MovedMask);
+	Board.SetEnPassant(EnPassantRank, EnPassantFile);
 }
 
 void FRevertMove::SaveMask(__int64 BitMask)
