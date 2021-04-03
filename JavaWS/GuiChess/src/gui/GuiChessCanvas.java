@@ -141,7 +141,7 @@ public class GuiChessCanvas extends GuiElement {
 	@Override
 	public void HandleAction(ActionData action)
 	{
-		if (action.type == ActionType.MOUSE && action.pressType == ActionButtonPressType.PRESS)
+		if (action.type == ActionType.MOUSE && action.pressType == ActionButtonPressType.DOWN)
 		{
 			CppInterface cpp = rootOwner.cppInterface;
 			MouseActionData mouse = (MouseActionData)action;
