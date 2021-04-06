@@ -37,7 +37,7 @@ void FNetwork::FromDna(FDna& Dna)
 	for (int Node = Inputs; Node < TotalNodes; ++Node)
 	{
 		const float Bias = Dna.ReadFloat();
-		const int Links = Node < Inputs + TotalRecurrent ? 0 : Dna.ReadInt();
+		const int Links = Node < FirstMiddleNode ? 0 : Dna.ReadInt();
 		Nodes.Push() = FNode(Links, Bias);
 
 		for (int Link = 0; Link < Links; ++Link)
@@ -134,6 +134,7 @@ void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectL
 	{
 		Feedback.Push() = 0.0f;
 	}
+	const int Rightmost = RecurrentDepth == 0 ? TargetIndex : NodeCount - 1;
 
 	for (int Iteration = 0; Iteration <= RecurrentDepth; ++Iteration)
 	{
@@ -155,7 +156,7 @@ void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectL
 		}
 
 		FNode* FirstNode = &Nodes[0];
-		for (int Index = TargetIndex; Index >= Inputs; --Index)
+		for (int Index = Rightmost; Index >= Inputs; --Index)
 		{
 			if (AbsF(Feedback[Index]) < 1e-3f)
 			{
@@ -170,28 +171,28 @@ void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectL
 				Feedback[(int)(Input.HarvestNode - FirstNode)] += Input.LinkStrength * BackProp;
 			}
 		}
-	}
 
-	if (Type == EReinforcementType::Full || Type == EReinforcementType::RandomChance)
-	{
-		const float Chance = Type == EReinforcementType::Full ? 1.0f : RandomTypeParam;
-		const int Leftmost = bAffectLeftRecurrent ? Inputs + TotalRecurrent : Inputs;
-		for (int Index = Leftmost; Index < TargetIndex; ++Index)
+		if (Type == EReinforcementType::Full || Type == EReinforcementType::RandomChance)
 		{
-			if (AbsF(Feedback[Index]) < 1e-3f || RandomF() >= Chance)
+			const float Chance = Type == EReinforcementType::Full ? 1.0f : RandomTypeParam;
+			const int Leftmost = bAffectLeftRecurrent ? Inputs + TotalRecurrent : Inputs;
+			for (int Index = Leftmost; Index <= Rightmost; ++Index)
 			{
-				continue;
-			}
+				if (AbsF(Feedback[Index]) < 1e-3f || RandomF() >= Chance)
+				{
+					continue;
+				}
 
-			FNode& Node = Nodes[Index];
-			const float NodeSign = Feedback[Index] > 0.0f ? 1.0f : -1.0f;
-			Node.Bias = ClampF(Node.Bias + NodeSign * BiasStep, -MaxBias, MaxBias);
+				FNode& Node = Nodes[Index];
+				const float NodeSign = Feedback[Index] > 0.0f ? 1.0f : -1.0f;
+				Node.Bias = ClampF(Node.Bias + NodeSign * BiasStep, -MaxBias, MaxBias);
 
-			for (int Link = 0; Link < Node.Inputs.Count(); ++Link)
-			{
-				FNodeInput& Input = Node.Inputs[Link];
-				const float LinkSign = Input.HarvestNode->GetState() > 0.0f ? NodeSign : -NodeSign;
-				Input.LinkStrength = ClampF(Input.LinkStrength + LinkSign * LinkStep, -MaxLink, MaxLink);
+				for (int Link = 0; Link < Node.Inputs.Count(); ++Link)
+				{
+					FNodeInput& Input = Node.Inputs[Link];
+					const float LinkSign = Input.HarvestNode->GetState() > 0.0f ? NodeSign : -NodeSign;
+					Input.LinkStrength = ClampF(Input.LinkStrength + LinkSign * LinkStep, -MaxLink, MaxLink);
+				}
 			}
 		}
 	}
