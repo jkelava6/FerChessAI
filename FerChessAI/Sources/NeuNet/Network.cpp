@@ -121,7 +121,7 @@ void FNetwork::ResetRecurrent(int Level)
 	}
 }
 
-void FNetwork::ReinforceOutput(int OutputIndex, int OutputValue, bool bAffectLeftRecurrent,
+void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectLeftRecurrent,
 	float BiasStep, float MaxBias, float LinkStep, float MaxLink,
 	int RecurrentDepth, EReinforcementType Type, float RandomTypeParam/* = 0.0f*/)
 {

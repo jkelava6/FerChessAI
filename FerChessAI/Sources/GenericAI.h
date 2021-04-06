@@ -14,6 +14,10 @@ public:
 	int FileFrom;
 	int RankTo;
 	int FileTo;
+
+public:
+	bool operator== (const FEvaluatedMove& Other) const;
+	bool operator!= (const FEvaluatedMove& Other) const;
 };
 
 class IChessAI

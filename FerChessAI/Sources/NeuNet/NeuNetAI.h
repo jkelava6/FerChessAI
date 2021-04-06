@@ -18,6 +18,9 @@ public:
 public:
 	virtual FEvaluatedMove ChooseMove(FDoubleBoard& Board) override;
 	virtual bool PlayMove(FDoubleBoard& Board) override;
+	/** MUST be called AFTER ChooseMove() or PlayMove() */
+	void ReinforceMove(FEvaluatedMove Move, float TimeOutBiasStep, float TimeOutLinkStep,
+		float MoveBiasStep, float MoveLinkStep, float MaxBias, float MaxLink);
 	void SetTimeControl(int InStartTicks, int InTicksPerMove, int InMaxTicks);
 	void LoadDna(FDna& Dna);
 
@@ -30,6 +33,8 @@ private:
 	int StartTicks = 5;
 	int TicksPerMove = 5;
 	int MaxTicks = 5;
+
+	int LastMoveIterations = -1;
 };
 
 class FNeuNetFullMutator

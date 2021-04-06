@@ -22,11 +22,14 @@ FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 	}
 	Network.ResetRecurrent(0);
 
+	LastMoveIterations = 0;
+	TicksRemaining = Max(TicksRemaining + TicksPerMove, MaxTicks);
 	while (TicksRemaining > 0)
 	{
 		Network.SetInput(64, (float)TicksRemaining);
 		Network.Update();
 		--TicksRemaining;
+		++LastMoveIterations;
 
 		if (Network.GetOutput(0) > 0.0f)
 		{
@@ -88,6 +91,25 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 
 	Board.MovePiece(Move.RankFrom, Move.FileFrom, Move.RankTo, Move.FileTo);
 	return true;
+}
+
+void FNeuNetFullAI::ReinforceMove(FEvaluatedMove Move, float TimeOutBiasStep, float TimeOutLinkStep,
+	float MoveBiasStep, float MoveLinkStep, float MaxBias, float MaxLink)
+{
+	if (LastMoveVerdict == ELastMoveResult::FailedTimeOut)
+	{
+		Network.ReinforceOutput(0, 1.0f, true, TimeOutBiasStep, MaxBias, TimeOutLinkStep, MaxLink,
+			LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
+	}
+
+	Network.ReinforceOutput(1, SigmoidFunction(Move.RankFrom + 0.5f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
+		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
+	Network.ReinforceOutput(2, SigmoidFunction(Move.FileFrom + 0.5f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
+		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
+	Network.ReinforceOutput(3, SigmoidFunction(Move.RankTo + 0.5f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
+		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
+	Network.ReinforceOutput(4, SigmoidFunction(Move.FileTo + 0.5f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
+		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
 }
 
 void FNeuNetFullAI::SetTimeControl(int InStartTicks, int InTicksPerMove, int InMaxTicks)
