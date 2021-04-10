@@ -38,7 +38,7 @@ int main()
 			while (NNAI.ChooseMove(Board) != PlayedMove)
 			{
 				++Reinforcements;
-				NNAI.ReinforceMove(PlayedMove, 0.005f, 0.05f, 0.001f, 0.001f, 2.0f, 2.0f);
+				NNAI.ReinforceMove(PlayedMove, 0.05f, 0.05f, 0.01f, 0.01f, 2.0f, 2.0f);
 			}
 
 			Board.MovePiece(PlayedMove.RankFrom, PlayedMove.FileFrom, PlayedMove.RankTo, PlayedMove.FileTo);

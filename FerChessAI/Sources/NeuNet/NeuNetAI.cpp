@@ -60,7 +60,7 @@ FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 
 			TArray<int> Ranks(16);
 			TArray<int> Files(16);
-			Board.CollectMoves(RankFrom, RankTo, Ranks, Files);
+			Board.CollectMoves(RankFrom, FileFrom, Ranks, Files);
 
 			const int NumOfMoves = Ranks.Count();
 			for (int Move = 0; Move < NumOfMoves; ++Move)
@@ -102,13 +102,13 @@ void FNeuNetFullAI::ReinforceMove(FEvaluatedMove Move, float TimeOutBiasStep, fl
 			LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
 	}
 
-	Network.ReinforceOutput(1, SigmoidFunction(Move.RankFrom + 0.5f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
+	Network.ReinforceOutput(1, SigmoidFunction(Move.RankFrom * 0.1f + 0.05f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
 		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
-	Network.ReinforceOutput(2, SigmoidFunction(Move.FileFrom + 0.5f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
+	Network.ReinforceOutput(2, SigmoidFunction(Move.FileFrom * 0.1f + 0.05f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
 		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
-	Network.ReinforceOutput(3, SigmoidFunction(Move.RankTo + 0.5f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
+	Network.ReinforceOutput(3, SigmoidFunction(Move.RankTo * 0.1f + 0.05f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
 		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
-	Network.ReinforceOutput(4, SigmoidFunction(Move.FileTo + 0.5f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
+	Network.ReinforceOutput(4, SigmoidFunction(Move.FileTo * 0.1f + 0.05f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
 		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
 }
 
