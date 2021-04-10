@@ -83,8 +83,8 @@ int main()
 
 		for (int Test = 0; Test < TestCount; ++Test)
 		{
-			Net.SetInput(0, TestIn1[0]);
-			Net.SetInput(1, TestIn2[0]);
+			Net.SetInput(0, TestIn1[Test]);
+			Net.SetInput(1, TestIn2[Test]);
 			if (bWithRecurrent)
 			{
 				Net.ResetRecurrent(0);
@@ -98,7 +98,7 @@ int main()
 			while (AbsF(SigmoidFunction(TestOut[Test]) - Net.GetOutput(0)) > Epsilon)
 			{
 				Net.ReinforceOutput(0, SigmoidFunction(TestOut[Test]), true, 0.1f, 1.0f, 0.1f, 2.0f,
-					bWithRecurrent ? 1 : 0, FNetwork::EReinforcementType::Full);
+					bWithRecurrent ? 1 : 0, FNetwork::EReinforcementType::Full, 1.0f);
 				++ReinforcementCounts[Test];
 
 				if (bWithRecurrent)

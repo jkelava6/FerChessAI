@@ -6,6 +6,9 @@
 #include <NeuNet/Dna.h>
 #include <NeuNet/Node.h>
 
+FNetwork::FNetwork() = default;
+
+FNetwork::~FNetwork() = default;
 
 void FNetwork::FromDna(FDna& Dna)
 {
@@ -123,7 +126,7 @@ void FNetwork::ResetRecurrent(int Level)
 
 void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectLeftRecurrent,
 	float BiasStep, float MaxBias, float LinkStep, float MaxLink,
-	int RecurrentDepth, EReinforcementType Type, float RandomTypeParam/* = 0.0f*/)
+	int RecurrentDepth, EReinforcementType Type, float RandomTypeParam/* = 1.0f*/)
 {
 	const int TargetIndex = FirstOutput + OutputIndex;
 	FNode& TargetNode = Nodes[TargetIndex];
@@ -185,13 +188,16 @@ void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectL
 
 				FNode& Node = Nodes[Index];
 				const float NodeSign = Feedback[Index] > 0.0f ? 1.0f : -1.0f;
-				Node.Bias = ClampF(Node.Bias + NodeSign * BiasStep, -MaxBias, MaxBias);
+				const float MaxStepDrop = Type == EReinforcementType::Full ? RandomTypeParam : 0.0f;
+				const float RndBiasStep = BiasStep * (1 - MaxStepDrop * RandomF());
+				Node.Bias = ClampF(Node.Bias + NodeSign * RndBiasStep, -MaxBias, MaxBias);
 
 				for (int Link = 0; Link < Node.Inputs.Count(); ++Link)
 				{
 					FNodeInput& Input = Node.Inputs[Link];
 					const float LinkSign = Input.HarvestNode->GetState() > 0.0f ? NodeSign : -NodeSign;
-					Input.LinkStrength = ClampF(Input.LinkStrength + LinkSign * LinkStep, -MaxLink, MaxLink);
+					const float RndLinkStep = BiasStep * (1 - MaxStepDrop * RandomF());
+					Input.LinkStrength = ClampF(Input.LinkStrength + LinkSign * RndLinkStep, -MaxLink, MaxLink);
 				}
 			}
 		}

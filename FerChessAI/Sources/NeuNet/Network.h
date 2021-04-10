@@ -16,6 +16,9 @@ public:
 		//RandomNumber,
 	};
 public:
+	FNetwork();
+	~FNetwork();
+public:
 	void FromDna(FDna& Dna);
 	void ToDna(FDna& Dna);
 	void SetInput(int Index, float Value);
@@ -26,7 +29,7 @@ public:
 
 	void ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectLeftRecurrent,
 		float BiasStep, float MaxBias, float LinkStep, float MaxLink,
-		int RecurrentDepth, EReinforcementType Type, float RandomTypeParam = 0.0f);
+		int RecurrentDepth, EReinforcementType Type, float RandomTypeParam = 1.0f);
 private:
 	float SigmaDerivative(const FNode& Node);
 private:
