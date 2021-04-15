@@ -147,6 +147,8 @@
     <ClCompile Include="Sources\Array.cpp" />
     <ClCompile Include="Sources\ChessBoard.cpp" />
     <ClCompile Include="Sources\Executable\BasicFullAiEvo.cpp" />
+    <ClCompile Include="Sources\Executable\BoardLib.cpp" />
+    <ClCompile Include="Sources\Executable\DebugUtils.cpp" />
     <ClCompile Include="Sources\Executable\FerChessAI.cpp" />
     <ClCompile Include="Sources\Executable\JavaAgent.cpp" />
     <ClCompile Include="Sources\Executable\ReinforcementEvo.cpp" />
@@ -162,6 +164,8 @@
   <ItemGroup>
     <ClInclude Include="Sources\Array.h" />
     <ClInclude Include="Sources\ChessBoard.h" />
+    <ClInclude Include="Sources\Executable\BoardLib.h" />
+    <ClInclude Include="Sources\Executable\DebugUtils.h" />
     <ClInclude Include="Sources\Executable\MainSwitch.h" />
     <ClInclude Include="Sources\GenericAI.h" />
     <ClInclude Include="Sources\JavaIO\JavaTokenIO.h" />

@@ -7,6 +7,7 @@
 #include <StdH.h>
 #include <ChessBoard.h>
 #include <MinMaxAI.h>
+#include <Executable/DebugUtils.h>
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
@@ -22,61 +23,6 @@ int GetNumber(char Base)
         int Ignore = scanf_s("%c", &Input);
     } while (Input < Base || Input >= Base + 8);
     return Input - Base;
-}
-
-void DebugBoard(FDoubleBoard& Board)
-{
-    for (int Rank = 7; Rank >= 0; --Rank)
-    {
-        for (int File = 0; File < 8; ++File)
-        {
-            char Piece = ' ';
-            switch (Board(Rank, File))
-            {
-            case EChessPiece::WhitePawn:
-                Piece = 'P';
-                break;
-            case EChessPiece::WhiteKnight:
-                Piece = 'N';
-                break;
-            case EChessPiece::WhiteBishop:
-                Piece = 'B';
-                break;
-            case EChessPiece::WhiteRook:
-                Piece = 'R';
-                break;
-            case EChessPiece::WhiteQueen:
-                Piece = 'Q';
-                break;
-            case EChessPiece::WhiteKing:
-                Piece = 'K';
-                break;
-            case EChessPiece::BlackPawn:
-                Piece = 'p';
-                break;
-            case EChessPiece::BlackKnight:
-                Piece = 'n';
-                break;
-            case EChessPiece::BlackBishop:
-                Piece = 'b';
-                break;
-            case EChessPiece::BlackRook:
-                Piece = 'r';
-                break;
-            case EChessPiece::BlackQueen:
-                Piece = 'q';
-                break;
-            case EChessPiece::BlackKing:
-                Piece = 'k';
-                break;
-            default:
-                break;
-            }
-            printf("%c", Piece);
-        }
-        printf("\n");
-    }
-    printf("\n\n");
 }
 
 int main()

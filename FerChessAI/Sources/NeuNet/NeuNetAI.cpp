@@ -23,7 +23,7 @@ FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 	Network.ResetRecurrent(0);
 
 	LastMoveIterations = 0;
-	TicksRemaining = Max(TicksRemaining + TicksPerMove, MaxTicks);
+	TicksRemaining = Min(TicksRemaining + TicksPerMove, MaxTicks);
 	while (TicksRemaining > 0)
 	{
 		Network.SetInput(64, (float)TicksRemaining);
