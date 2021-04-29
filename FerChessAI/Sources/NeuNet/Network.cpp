@@ -124,11 +124,35 @@ void FNetwork::ResetRecurrent(int Level)
 	}
 }
 
-void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectLeftRecurrent,
-	float BiasStep, float MaxBias, float LinkStep, float MaxLink,
-	int RecurrentDepth, EReinforcementType Type, float RandomTypeParam/* = 1.0f*/)
+void FNetwork::InitiateReinforcement()
 {
-	const int TargetIndex = FirstOutput + OutputIndex;
+	bTrackReinforcement = true;
+	ReinforcementStates.Clear();
+
+	BiasReinforcements.Clear();
+	const int NodeCount = Nodes.Count();
+	BiasReinforcements.Prealocate(NodeCount);
+	for (int NodeIndex = 0; NodeIndex < NodeCount; ++NodeIndex)
+	{
+		BiasReinforcements[NodeIndex] = 0.0f;
+	}
+
+	LinkReinforcements.Clear();
+	LinkReinforcements.Prealocate(NodeCount);
+	for (int NodeIndex = 0; NodeIndex < NodeCount; ++NodeIndex)
+	{
+		const int LinkCount = Nodes[NodeIndex].Inputs.Count();
+		LinkReinforcements[NodeIndex].Prealocate(LinkCount);
+		for (int LinkIndex = 0; LinkIndex < LinkCount; ++LinkIndex)
+		{
+			LinkReinforcements[NodeIndex][LinkIndex] = 0.0f;
+		}
+	}
+}
+
+void FNetwork::SeedReinforcement(int Output, float Target, float FeedbackAmount, EReinforcementType Type, float TypeValue/* = 0.0f*/)
+{
+	const int TargetIndex = FirstOutput + Output;
 	FNode& TargetNode = Nodes[TargetIndex];
 
 	const int NodeCount = Nodes.Count();
@@ -137,13 +161,14 @@ void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectL
 	{
 		Feedback.Push() = 0.0f;
 	}
-	const int Rightmost = RecurrentDepth == 0 ? TargetIndex : NodeCount - 1;
 
-	for (int Iteration = 0; Iteration <= RecurrentDepth; ++Iteration)
+	for (int Iteration = ReinforcementStates.Count(); Iteration >= 0; --Iteration)
 	{
+		TArray<float>& StoredStates = ReinforcementStates[Iteration];
+
 		if (Iteration == 0)
 		{
-			Feedback[TargetIndex] = TargetNode.GetState() < OutputValue ? 1.0f : -1.0f;
+			Feedback[TargetIndex] = TargetNode.GetState() < Target ? 1.0f : -1.0f;
 		}
 		else
 		{
@@ -159,7 +184,7 @@ void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectL
 		}
 
 		FNode* FirstNode = &Nodes[0];
-		for (int Index = Rightmost; Index >= Inputs; --Index)
+		for (int Index = NodeCount; Index >= Inputs; --Index)
 		{
 			if (AbsF(Feedback[Index]) < 1e-3f)
 			{
@@ -173,35 +198,61 @@ void FNetwork::ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectL
 				const FNodeInput& Input = Node.Inputs[Link];
 				Feedback[(int)(Input.HarvestNode - FirstNode)] += Input.LinkStrength * BackProp;
 			}
-		}
 
-		if (Type == EReinforcementType::Full || Type == EReinforcementType::RandomChance)
-		{
-			const float Chance = Type == EReinforcementType::Full ? 1.0f : RandomTypeParam;
-			const int Leftmost = bAffectLeftRecurrent ? Inputs + TotalRecurrent : Inputs;
-			for (int Index = Leftmost; Index <= Rightmost; ++Index)
+			if (Iteration > 0 && Index > Inputs + TotalRecurrent)
 			{
-				if (AbsF(Feedback[Index]) < 1e-3f || RandomF() >= Chance)
-				{
-					continue;
-				}
+				continue;
+			}
 
-				FNode& Node = Nodes[Index];
-				const float NodeSign = Feedback[Index] > 0.0f ? 1.0f : -1.0f;
-				const float MaxStepDrop = Type == EReinforcementType::Full ? RandomTypeParam : 0.0f;
-				const float RndBiasStep = BiasStep * (1 - MaxStepDrop * RandomF());
-				Node.Bias = ClampF(Node.Bias + NodeSign * RndBiasStep, -MaxBias, MaxBias);
-
-				for (int Link = 0; Link < Node.Inputs.Count(); ++Link)
+			if (Type == EReinforcementType::Full || (Type == EReinforcementType::RandomChance && RandomF() < TypeValue))
+			{
+				BiasReinforcements[Index] += Feedback[Index];
+				for (int LinkIndex = 0; LinkIndex < Node.Inputs.Count(); ++LinkIndex)
 				{
-					FNodeInput& Input = Node.Inputs[Link];
-					const float LinkSign = Input.HarvestNode->GetState() > 0.0f ? NodeSign : -NodeSign;
-					const float RndLinkStep = BiasStep * (1 - MaxStepDrop * RandomF());
-					Input.LinkStrength = ClampF(Input.LinkStrength + LinkSign * RndLinkStep, -MaxLink, MaxLink);
+					LinkReinforcements[Index][LinkIndex] += SignF(Node.Inputs[LinkIndex].HarvestNode->GetState()) * Feedback[Index];
 				}
 			}
 		}
 	}
+}
+
+void FNetwork::ClearReinforcementStates()
+{
+	ReinforcementStates.PopAll();
+}
+
+void FNetwork::ExecuteReinforcement(float MinBiasStep, float MaxBiasStep, float MaxBiasValue,
+	float MinLinkStep, float MaxLinkStep, float MaxLinkValue)
+{
+	const int TotalNodes = Nodes.Count();
+	for (int NodeIndex = 0; NodeIndex < TotalNodes; ++NodeIndex)
+	{
+		FNode& Node = Nodes[NodeIndex];
+		const int LinkCount = Node.Inputs.Count();
+		for (int LinkIndex = 0; LinkIndex < LinkCount; ++LinkIndex)
+		{
+			const float Feedback = LinkReinforcements[NodeIndex][LinkIndex];
+			if (AbsF(Feedback) < 1e-3f)
+			{
+				continue;
+			}
+
+			float& Strength = Node.Inputs[LinkIndex].LinkStrength;
+			const float Change = SignF(Feedback) * (MinLinkStep + RandomF() * (MaxLinkStep - MinLinkStep));
+			Strength = ClampF(Strength + Change, -MaxLinkValue, MaxLinkValue);
+		}
+
+		const float Feedback = BiasReinforcements[NodeIndex];
+		if (AbsF(Feedback) < 1e-3f)
+		{
+			continue;
+		}
+
+		const float Change = SignF(Feedback) * (MinLinkStep + RandomF() * (MaxLinkStep - MinLinkStep));
+		Node.Bias = ClampF(Node.Bias + Change, -MaxLinkValue, MaxLinkValue);
+	}
+
+	bTrackReinforcement = false;
 }
 
 // Based on Wolfram Alpha:

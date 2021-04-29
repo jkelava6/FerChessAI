@@ -33,6 +33,19 @@ inline float SquareF(float Squared)
 	return Squared * Squared;
 }
 
+inline float SignF(float Value)
+{
+	if (Value < 0.0f)
+	{
+		return -1.0f;
+	}
+	if (Value > 0.0f)
+	{
+		return 1.0f;
+	}
+	return 0.0;
+}
+
 // Taylor series e^x implementation, taken from:
 // https://www.geeksforgeeks.org/program-to-efficiently-calculate-ex/
 inline float PowerNat(float Exp, int Precision = 20)

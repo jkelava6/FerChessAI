@@ -22,21 +22,17 @@ FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 	}
 	Network.ResetRecurrent(0);
 
-	LastMoveIterations = 0;
-	TicksRemaining = Min(TicksRemaining + TicksPerMove, MaxTicks);
-	while (TicksRemaining > 0)
+	for (int Iteration = 0; Iteration < Iterations; ++Iteration)
 	{
-		Network.SetInput(64, (float)TicksRemaining);
+		Network.SetInput(64, Iterations - Iteration - 1);
 		Network.Update();
-		--TicksRemaining;
-		++LastMoveIterations;
 
 		if (Network.GetOutput(0) > 0.0f)
 		{
 			int Values[4];
 			for (int Output = 0; Output < 4; ++Output)
 			{
-				const float OutputVal = Network.GetOutput(Output + 1);
+				const float OutputVal = Network.GetOutput(Output);
 				if (OutputVal < 0 || OutputVal >= SigmoidFunction(0.8f))
 				{
 					LastMoveVerdict = ELastMoveResult::FailedInvalid;
@@ -93,30 +89,27 @@ bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
 	return true;
 }
 
-void FNeuNetFullAI::ReinforceMove(FEvaluatedMove Move, float TimeOutBiasStep, float TimeOutLinkStep,
-	float MoveBiasStep, float MoveLinkStep, float MaxBias, float MaxLink)
+void FNeuNetFullAI::InitiateFeedback()
 {
-	if (LastMoveVerdict == ELastMoveResult::FailedTimeOut)
-	{
-		Network.ReinforceOutput(0, 1.0f, true, TimeOutBiasStep, MaxBias, TimeOutLinkStep, MaxLink,
-			LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
-	}
-
-	Network.ReinforceOutput(1, SigmoidFunction(Move.RankFrom * 0.1f + 0.05f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
-		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
-	Network.ReinforceOutput(2, SigmoidFunction(Move.FileFrom * 0.1f + 0.05f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
-		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
-	Network.ReinforceOutput(3, SigmoidFunction(Move.RankTo * 0.1f + 0.05f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
-		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
-	Network.ReinforceOutput(4, SigmoidFunction(Move.FileTo * 0.1f + 0.05f), true, MoveBiasStep, MaxBias, MoveLinkStep, MaxLink,
-		LastMoveIterations - 1, FNetwork::EReinforcementType::Full);
+	Network.InitiateReinforcement();
 }
 
-void FNeuNetFullAI::SetTimeControl(int InStartTicks, int InTicksPerMove, int InMaxTicks)
+void FNeuNetFullAI::ReinforceMove(FEvaluatedMove Move, float Feedback)
 {
-	StartTicks = InStartTicks;
-	TicksPerMove = InTicksPerMove;
-	MaxTicks = InMaxTicks;
+	Network.SeedReinforcement(0, SigmoidFunction(Move.RankFrom * 0.1f + 0.05f), 1.0f, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(1, SigmoidFunction(Move.FileFrom * 0.1f + 0.05f), 1.0f, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(2, SigmoidFunction(Move.RankTo * 0.1f + 0.05f), 1.0f, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(3, SigmoidFunction(Move.FileTo * 0.1f + 0.05f), 1.0f, FNetwork::EReinforcementType::Full);
+}
+
+void FNeuNetFullAI::ClearNetworkStateMemory()
+{
+	Network.ClearReinforcementStates();
+}
+
+void FNeuNetFullAI::EvaluateFeedback(float BiasStep, float BiasMax, float LinkStep, float LinkMax)
+{
+	Network.ExecuteReinforcement(0, BiasStep, BiasMax, 0, LinkStep, LinkMax);
 }
 
 void FNeuNetFullAI::LoadDna(FDna& Dna)
@@ -126,7 +119,6 @@ void FNeuNetFullAI::LoadDna(FDna& Dna)
 
 void FNeuNetFullAI::StartGame()
 {
-	TicksRemaining = StartTicks;
 	Network.ResetRecurrent(1);
 }
 

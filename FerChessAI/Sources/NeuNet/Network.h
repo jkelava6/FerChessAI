@@ -27,9 +27,12 @@ public:
 	void Update();
 	void ResetRecurrent(int Level);
 
-	void ReinforceOutput(int OutputIndex, float OutputValue, bool bAffectLeftRecurrent,
-		float BiasStep, float MaxBias, float LinkStep, float MaxLink,
-		int RecurrentDepth, EReinforcementType Type, float RandomTypeParam = 1.0f);
+	void InitiateReinforcement();
+	void SeedReinforcement(int Output, float Target, float FeedbackAmount, EReinforcementType Type, float TypeValue = 0.0f);
+	void ClearReinforcementStates();
+	void ExecuteReinforcement(float MinBiasStep, float MaxBiasStep, float MaxBiasValue,
+		float MinLinkStep, float MaxLinkStep, float MaxLinkValue);
+
 private:
 	float SigmaDerivative(const FNode& Node);
 private:
@@ -40,6 +43,11 @@ private:
 
 	int FirstOutput = 0;
 	int TotalRecurrent = 0;
+
+	bool bTrackReinforcement = false;
+	TArray<TArray<float>> ReinforcementStates;
+	TArray<float> BiasReinforcements;
+	TArray<TArray<float>> LinkReinforcements;
 };
 
 
