@@ -14,14 +14,14 @@
 
 void WriteBoard(FDoubleBoard& Board, char* Target)
 {
-	for (int Rank = 0; Rank < 8; ++Rank)
+	for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
-		for (int File = 0; File < 8; ++File)
+		for (int File = 0; File < FILES; ++File)
 		{
-			Target[8 * Rank + File] = 'a' + (char)((int)Board(Rank, File) - (int)EChessPiece::BlackKing);
+			Target[FILES * Rank + File] = 'a' + (char)((int)Board(Rank, File) - (int)EChessPiece::BlackKing);
 		}
 	}
-	Target[64] = '\0';
+	Target[RANKS * FILES] = '\0';
 }
 
 void SendBoard(FDoubleBoard& Board)

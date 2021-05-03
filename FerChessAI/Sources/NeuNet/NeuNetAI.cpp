@@ -13,18 +13,18 @@ FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 {
 	LastMoveVerdict = ELastMoveResult::None;
 
-	for (int Rank = 0; Rank < 8; ++Rank)
+	for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
-		for (int File = 0; File < 8; ++File)
+		for (int File = 0; File < FILES; ++File)
 		{
-			Network.SetInput(Rank * 8 + File, (float)Board(Rank, File));
+			Network.SetInput(Rank * FILES + File, (float)Board(Rank, File));
 		}
 	}
 	Network.ResetRecurrent(0);
 
 	for (int Iteration = 0; Iteration < Iterations; ++Iteration)
 	{
-		Network.SetInput(64, Iterations - Iteration - 1);
+		Network.SetInput(RANKS * FILES, Iterations - Iteration - 1);
 		Network.Update();
 
 		if (Network.GetOutput(0) > 0.0f)
@@ -32,14 +32,15 @@ FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 			int Values[4];
 			for (int Output = 0; Output < 4; ++Output)
 			{
+				const int MaxCoord = (Output & 1) ? FILES : RANKS;
 				const float OutputVal = Network.GetOutput(Output);
-				if (OutputVal < 0 || OutputVal >= SigmoidFunction(0.8f))
+				if (OutputVal < 0 || OutputVal >= SigmoidFunction(0.1f * MaxCoord))
 				{
 					LastMoveVerdict = ELastMoveResult::FailedInvalid;
 					return FEvaluatedMove();
 				}
 
-				for (int Coord = 0; Coord < 8; ++Coord)
+				for (int Coord = 0; Coord < MaxCoord; ++Coord)
 				{
 					if (OutputVal < SigmoidFunction(0.1f * (Coord + 1)))
 					{

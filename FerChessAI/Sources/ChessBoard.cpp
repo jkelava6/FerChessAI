@@ -69,7 +69,7 @@ FRevertMove FRevertMove::Flipped()
 	{
 		FRevertSquare& Turned = FlipMove.ChangedInOrder.Push();
 		FRevertSquare& Own = ChangedInOrder[Change];
-		Turned.Rank = 7 - Own.Rank;
+		Turned.Rank = RANKS - 1 - Own.Rank;
 		Turned.File = Own.File;
 		Turned.Piece = Own.Piece;
 	}
@@ -82,7 +82,7 @@ FRevertMove FRevertMove::Flipped()
 
 FChessBoard::FChessBoard()
 {
-	Pieces = new EChessPiece[64];
+	Pieces = new EChessPiece[RANKS * FILES];
 }
 
 FChessBoard::~FChessBoard()
@@ -110,9 +110,9 @@ FChessBoard::FChessBoard(FChessBoard&& Moved)
 
 void FChessBoard::EmptyBoard()
 {
-	for (int Rank = 0; Rank < 8; ++Rank)
+	for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
-		for (int File = 0; File < 8; ++File)
+		for (int File = 0; File < FILES; ++File)
 		{
 			Square(Rank, File) = EChessPiece::None;
 		}
@@ -121,6 +121,7 @@ void FChessBoard::EmptyBoard()
 
 void FChessBoard::DefaultBoard()
 {
+#if DEFAULT_BOARD
 	// empty space
 	for (int Rank = 2; Rank < 6; ++Rank)
 	{
@@ -156,23 +157,28 @@ void FChessBoard::DefaultBoard()
 	Square(7, 5) = EChessPiece::BlackBishop;
 	Square(7, 6) = EChessPiece::BlackKnight;
 	Square(7, 7) = EChessPiece::BlackRook;
+#else
+	EmptyBoard();
+	Square(0, 0) = EChessPiece::WhiteKing;
+	Square(RANKS - 1, FILES - 1) = EChessPiece::WhiteKing;
+#endif
 }
 
 EChessPiece& FChessBoard::operator()(int Rank, int File)
 {
-	return Pieces[8 * Rank + File];
+	return Pieces[FILES * Rank + File];
 }
 
 EChessPiece& FChessBoard::Square(int Rank, int File)
 {
-	return Pieces[8 * Rank + File];
+	return Pieces[FILES * Rank + File];
 }
 
 void FChessBoard::MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo)
 {
 	FRevertMove& MoveLog = MoveStack.Push();
 	EChessPiece MovedPiece = Square(RankFrom, FileFrom);
-	if (MovedPiece == EChessPiece::WhitePawn && RankTo == 7)
+	if (MovedPiece == EChessPiece::WhitePawn && RankTo == RANKS - 1)
 	{
 		MoveLog.Change(*this, RankTo, FileTo, EChessPiece::WhiteQueen);
 	}
@@ -206,6 +212,7 @@ void FChessBoard::MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo)
 	MoveLog.SaveMask(MovedMask);
 	LogMoved(RankTo, FileTo);
 
+#if DEFAULT_BOARD
 	// castling
 	if (MovedPiece == EChessPiece::WhiteKing && AbsI(FileTo - FileFrom) == 2)
 	{
@@ -241,6 +248,7 @@ void FChessBoard::MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo)
 			MoveLog.Change(*this, 7, 0, EChessPiece::None);
 		}
 	}
+#endif
 }
 
 void FChessBoard::Undo()
@@ -344,6 +352,7 @@ void FChessBoard::CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<in
 				Files.Push() = NewFile;
 			}
 		}
+#if DEFAULT_BOARD
 		// castling
 		if (!IsMoved(Rank, File) && !IsAttacked(Rank, File))
 		{
@@ -360,6 +369,7 @@ void FChessBoard::CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<in
 				Files.Push() = 6;
 			}
 		}
+#endif
 		break;
 	}
 	default:
@@ -373,11 +383,11 @@ __int64 FChessBoard::FlipMovedMask(__int64 OgMask)
 {
 	__int64 FlippedMask = 0;
 	__int64 Bit = 1;
-	for (int Square = 0; Square < 64; ++Square)
+	for (int Square = 0; Square < RANKS * FILES; ++Square)
 	{
 		if (OgMask & (Bit << Square))
 		{
-			FlippedMask |= (Bit << (63 - Square));
+			FlippedMask |= (Bit << (RANKS * FILES - 1 - Square));
 		}
 	}
 	return FlippedMask;
@@ -385,7 +395,7 @@ __int64 FChessBoard::FlipMovedMask(__int64 OgMask)
 
 bool FChessBoard::AreCoordsValid(int Rank, int File)
 {
-	return 0 <= Rank && Rank < 8 && 0 <= File && File < 8;
+	return 0 <= Rank && Rank < RANKS && 0 <= File && File < FILES;
 }
 
 void FChessBoard::CollectLineMovement(int Rank, int File, int DeltaRank, int DeltaFile, TArray<int>& Ranks, TArray<int>& Files)
@@ -410,12 +420,12 @@ void FChessBoard::CollectLineMovement(int Rank, int File, int DeltaRank, int Del
 
 bool FChessBoard::IsMoved(int Rank, int File)
 {
-	return MovedMask & ((__int64)1 << (8 * Rank + File));
+	return MovedMask & ((__int64)1 << (FILES * Rank + File));
 }
 
 void FChessBoard::LogMoved(int Rank, int File)
 {
-	MovedMask |= ((__int64)1 << (8 * Rank + File));
+	MovedMask |= ((__int64)1 << (FILES * Rank + File));
 }
 
 void FChessBoard::SetMoved(__int64 BitMask)
@@ -514,9 +524,9 @@ void FChessBoard::SetEnPassant(int Rank, int File)
 
 void FChessBoard::CopyPositionFrom(FChessBoard& Board, bool bFlipSides/* = false*/)
 {
-	for (int Rank = 0; Rank < 8; ++Rank)
+	for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
-		for (int File = 0; File < 8; ++File)
+		for (int File = 0; File < FILES; ++File)
 		{
 			Square(Rank, File) = !bFlipSides ? Board(Rank, File) : Board(7 - Rank, File);
 		}
@@ -578,9 +588,9 @@ EGameState FDoubleBoard::GetGameState()
 
 	int KingRank = -1;
 	int KingFile = -1;
-	for (int Rank = 0; Rank < 8; ++Rank)
+	for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
-		for (int File = 0; File < 8; ++File)
+		for (int File = 0; File < FILES; ++File)
 		{
 			if (Square(Rank, File) == EChessPiece::WhiteKing)
 			{
@@ -607,11 +617,11 @@ void FDoubleBoard::MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo)
 	if (!bFlipped)
 	{
 		WhiteBoard.MovePiece(RankFrom, FileFrom, RankTo, FileTo);
-		BlackBoard.MovePiece(7 - RankFrom, FileFrom, 7 - RankTo, FileTo);
+		BlackBoard.MovePiece(RANKS - 1 - RankFrom, FileFrom, RANKS - 1 - RankTo, FileTo);
 	}
 	else
 	{
-		WhiteBoard.MovePiece(7 - RankFrom, FileFrom, 7 - RankTo, FileTo);
+		WhiteBoard.MovePiece(RANKS - 1 - RankFrom, FileFrom, RANKS - 1 - RankTo, FileTo);
 		BlackBoard.MovePiece(RankFrom, FileFrom, RankTo, FileTo);
 	}
 }

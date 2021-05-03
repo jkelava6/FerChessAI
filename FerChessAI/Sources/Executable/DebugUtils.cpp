@@ -8,9 +8,9 @@
 
 extern void DebugBoard(FDoubleBoard& Board)
 {
-    for (int Rank = 7; Rank >= 0; --Rank)
+    for (int Rank = RANKS - 1; Rank >= 0; --Rank)
     {
-        for (int File = 0; File < 8; ++File)
+        for (int File = 0; File < FILES; ++File)
         {
             char Piece = ' ';
             switch (Board(Rank, File))
