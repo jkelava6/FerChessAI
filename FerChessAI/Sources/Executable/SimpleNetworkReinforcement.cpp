@@ -75,14 +75,17 @@ int main()
 	const int TestCount = ARRAY_SIZE(TestIn1);
 	ARRAY_MATCH(TestIn1, TestIn2);
 	ARRAY_MATCH(TestIn1, TestOut);
-	float Epsilon = 0.05f;
+	const float Epsilon = 0.05f;
 
-	while (true)
+	typedef long long ll;
+	for (ll Iteration = 0; ; ++Iteration)
 	{
-		int ReinforcementCounts[TestCount] = { 0 };
+		Net.InitiateReinforcement();
 
 		for (int Test = 0; Test < TestCount; ++Test)
 		{
+			Net.ClearReinforcementStates();
+
 			Net.SetInput(0, TestIn1[Test]);
 			Net.SetInput(1, TestIn2[Test]);
 			if (bWithRecurrent)
@@ -95,9 +98,15 @@ int main()
 				Net.Update();
 			}
 
-			while (AbsF(SigmoidFunction(TestOut[Test]) - Net.GetOutput(0)) > Epsilon)
+			const float TargetOutput = SigmoidFunction(TestOut[Test]);
+			const float CurrentOutput = Net.GetOutput(0);
+			const float CurrentError = AbsF(TargetOutput - CurrentOutput);
+			Net.SeedReinforcement(0, TargetOutput, CurrentError, FNetwork::EReinforcementType::Full);
+			printf("%f ", CurrentError);
+
+			/*while (AbsF(SigmoidFunction(TestOut[Test]) - Net.GetOutput(0)) > Epsilon)
 			{
-				Net.ReinforceOutput(0, SigmoidFunction(TestOut[Test]), true, 0.1f, 1.0f, 0.1f, 2.0f,
+				Net.(0, SigmoidFunction(TestOut[Test]), true, 0.1f, 1.0f, 0.1f, 2.0f,
 					bWithRecurrent ? 1 : 0, FNetwork::EReinforcementType::Full, 1.0f);
 				++ReinforcementCounts[Test];
 
@@ -110,18 +119,11 @@ int main()
 				{
 					Net.Update();
 				}
-			}
-		}
-
-		for (int Test = 0; Test < TestCount; ++Test)
-		{
-			if (Test > 0)
-			{
-				printf(" | ");
-			}
-			printf("%d", ReinforcementCounts[Test]);
+			}*/
 		}
 		printf("\n");
+
+		Net.ExecuteReinforcement(0.0f, 0.01f, 2.0f, 0.0f, 0.01f, 2.0f);
 	}
 
 	return 0;

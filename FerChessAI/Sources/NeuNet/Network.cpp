@@ -168,7 +168,7 @@ void FNetwork::SeedReinforcement(int Output, float Target, float FeedbackAmount,
 
 		if (Iteration == 0)
 		{
-			Feedback[TargetIndex] = TargetNode.GetState() < Target ? 1.0f : -1.0f;
+			Feedback[TargetIndex] = TargetNode.GetState() < Target ? FeedbackAmount : -FeedbackAmount;
 		}
 		else
 		{
