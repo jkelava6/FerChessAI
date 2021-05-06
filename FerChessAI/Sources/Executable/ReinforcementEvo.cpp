@@ -20,7 +20,6 @@ int main()
 	FMinMaxAI MMAI;
 	MMAI.SetDepths(2, 6);
 	FNeuNetFullAI NNAI;
-	NNAI.SetTimeControl(5, 5, 5);
 	FNeuNetFullMutator Mutator(200, 0, 0, 1001, 1, 3, 2.0f, 2.0f, 0.1f, 0.1f, 3, 0.1f, 0.1f, 3, 0.001f);
 
 	TArray<FChessBoard> TestBoards;
@@ -34,6 +33,10 @@ int main()
 	const bool AllowedBoards[] = { 0, 0, 1, 0 };
 	while (true)
 	{
+		int CorrectMoves = 0;
+		int TotalMoves = 0;
+		NNAI.InitiateFeedback();
+
 		for (int BoardIndex = 0; BoardIndex < UsedBoards; ++BoardIndex)
 		{
 			if (!AllowedBoards[BoardIndex])
@@ -42,10 +45,7 @@ int main()
 			}
 			Board.CopyPositionFrom(TestBoards[BoardIndex]);
 
-			int Move;
-			int Reinforcements = 0;
-			int CorrectMoves = 0;
-			for (Move = 0; Move < 20; ++Move)
+			for (int Move = 0; Move < 2; ++Move)
 			{
 				FEvaluatedMove PlayedMove = MMAI.ChooseMove(Board);
 
@@ -56,14 +56,21 @@ int main()
 					bDebugBoard = false;
 				}
 
-				int ThisMoveReinf = 0;
-				while (NNAI.ChooseMove(Board) != PlayedMove)
+				FEvaluatedMove NeuMove = NNAI.ChooseMove(Board);
+				const bool bNeuNetCorrect = (NeuMove == PlayedMove);
+				NNAI.ReinforceMove(PlayedMove, bNeuNetCorrect ? 0.1f : 1.0f);
+				CorrectMoves += bNeuNetCorrect;
+				TotalMoves += 1;
+				printf(bNeuNetCorrect ? "X" : ".");
+
+				//int ThisMoveReinf = 0;
+				/*while (NNAI.ChooseMove(Board) != PlayedMove)
 				{
 					++ThisMoveReinf;
 					++Reinforcements;
 					NNAI.ReinforceMove(PlayedMove, 0.01f, 0.01f, 0.001f, 0.001f, 2.0f, 2.0f);
-				}
-				if (ThisMoveReinf)
+				}*/
+				/*if (ThisMoveReinf)
 				{
 					// if we didn't get the move immediately, reinforcements were needed - and got us barely into the move
 					// a few more iterations should make the network a bit more resistant from mutating out
@@ -79,7 +86,7 @@ int main()
 				{
 					++CorrectMoves;
 					printf(".");
-				}
+				}*/
 
 				Board.MovePiece(PlayedMove.RankFrom, PlayedMove.FileFrom, PlayedMove.RankTo, PlayedMove.FileTo);
 				if (Board.GetGameState() > EGameState::ActiveBlack)
@@ -96,8 +103,11 @@ int main()
 				}
 			}
 
-			printf("\nMoves %d | Correct %d | Reinforcements: %d\n", Move, CorrectMoves, Reinforcements);
+			printf("\n");
 		}
+
+		NNAI.EvaluateFeedback(0.001f, 2.0f, 0.001f, 2.0f);
+		printf("Correct: %d/%d (%f\%)\n", CorrectMoves, TotalMoves, (100.0f * CorrectMoves) / TotalMoves);
 	}
 
 	return 0;

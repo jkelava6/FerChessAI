@@ -11,6 +11,8 @@ FNeuNetFullAI::FNeuNetFullAI() = default;
 
 FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 {
+	ClearNetworkStateMemory();
+
 	LastMoveVerdict = ELastMoveResult::None;
 
 	for (int Rank = 0; Rank < RANKS; ++Rank)
@@ -97,10 +99,10 @@ void FNeuNetFullAI::InitiateFeedback()
 
 void FNeuNetFullAI::ReinforceMove(FEvaluatedMove Move, float Feedback)
 {
-	Network.SeedReinforcement(0, SigmoidFunction(Move.RankFrom * 0.1f + 0.05f), 1.0f, FNetwork::EReinforcementType::Full);
-	Network.SeedReinforcement(1, SigmoidFunction(Move.FileFrom * 0.1f + 0.05f), 1.0f, FNetwork::EReinforcementType::Full);
-	Network.SeedReinforcement(2, SigmoidFunction(Move.RankTo * 0.1f + 0.05f), 1.0f, FNetwork::EReinforcementType::Full);
-	Network.SeedReinforcement(3, SigmoidFunction(Move.FileTo * 0.1f + 0.05f), 1.0f, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(0, SigmoidFunction(Move.RankFrom * 0.1f + 0.05f), Feedback, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(1, SigmoidFunction(Move.FileFrom * 0.1f + 0.05f), Feedback, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(2, SigmoidFunction(Move.RankTo * 0.1f + 0.05f), Feedback, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(3, SigmoidFunction(Move.FileTo * 0.1f + 0.05f), Feedback, FNetwork::EReinforcementType::Full);
 }
 
 void FNeuNetFullAI::ClearNetworkStateMemory()

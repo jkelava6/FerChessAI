@@ -108,6 +108,15 @@ void FNetwork::Update()
 		Nodes[Index].Update();
 	}
 
+	if (bTrackReinforcement)
+	{
+		TArray<float>& SaveStates = ReinforcementStates.Push();
+		for (int NodeIndex = 0; NodeIndex < TotalNodes; ++NodeIndex)
+		{
+			SaveStates.Push() = Nodes[NodeIndex].GetState();
+		}
+	}
+
 	const int FirstRecurrent = FirstOutput + Outputs;
 	for (int Index = 0; Index < TotalRecurrent; ++Index)
 	{
@@ -134,18 +143,19 @@ void FNetwork::InitiateReinforcement()
 	BiasReinforcements.Prealocate(NodeCount);
 	for (int NodeIndex = 0; NodeIndex < NodeCount; ++NodeIndex)
 	{
-		BiasReinforcements[NodeIndex] = 0.0f;
+		BiasReinforcements.Push() = 0.0f;
 	}
 
 	LinkReinforcements.Clear();
 	LinkReinforcements.Prealocate(NodeCount);
 	for (int NodeIndex = 0; NodeIndex < NodeCount; ++NodeIndex)
 	{
+		LinkReinforcements.Push();
 		const int LinkCount = Nodes[NodeIndex].Inputs.Count();
 		LinkReinforcements[NodeIndex].Prealocate(LinkCount);
 		for (int LinkIndex = 0; LinkIndex < LinkCount; ++LinkIndex)
 		{
-			LinkReinforcements[NodeIndex][LinkIndex] = 0.0f;
+			LinkReinforcements[NodeIndex].Push() = 0.0f;
 		}
 	}
 }
@@ -162,7 +172,7 @@ void FNetwork::SeedReinforcement(int Output, float Target, float FeedbackAmount,
 		Feedback.Push() = 0.0f;
 	}
 
-	for (int Iteration = ReinforcementStates.Count(); Iteration >= 0; --Iteration)
+	for (int Iteration = ReinforcementStates.Count() - 1; Iteration >= 0; --Iteration)
 	{
 		TArray<float>& StoredStates = ReinforcementStates[Iteration];
 
@@ -184,7 +194,7 @@ void FNetwork::SeedReinforcement(int Output, float Target, float FeedbackAmount,
 		}
 
 		FNode* FirstNode = &Nodes[0];
-		for (int Index = NodeCount; Index >= Inputs; --Index)
+		for (int Index = NodeCount - 1; Index >= Inputs; --Index)
 		{
 			if (AbsF(Feedback[Index]) < 1e-3f)
 			{
