@@ -23,6 +23,7 @@ public:
 	void InitiateFeedback();
 	/** MUST be called AFTER ChooseMove() or PlayMove() */
 	void ReinforceMove(FEvaluatedMove Move, float Feedback);
+	void ReinforceByDistance(FEvaluatedMove Move, FEvaluatedMove CurrentMove, float BaseFeedback, float ScalingFeedback);
 	void ClearNetworkStateMemory();
 	void EvaluateFeedback(float BiasStep, float BiasMax, float LinkStep, float LinkMax);
 

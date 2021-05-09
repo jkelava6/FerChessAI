@@ -45,7 +45,7 @@ int main()
 			}
 			Board.CopyPositionFrom(TestBoards[BoardIndex]);
 
-			for (int Move = 0; Move < 2; ++Move)
+			for (int Move = 0; Move < 20; ++Move)
 			{
 				FEvaluatedMove PlayedMove = MMAI.ChooseMove(Board);
 
@@ -58,7 +58,8 @@ int main()
 
 				FEvaluatedMove NeuMove = NNAI.ChooseMove(Board);
 				const bool bNeuNetCorrect = (NeuMove == PlayedMove);
-				NNAI.ReinforceMove(PlayedMove, bNeuNetCorrect ? 0.1f : 1.0f);
+				NNAI.ReinforceByDistance(PlayedMove, NeuMove, 0.1f, 1.0f);
+				//NNAI.ReinforceMove(PlayedMove, 0.1f);
 				CorrectMoves += bNeuNetCorrect;
 				TotalMoves += 1;
 				printf(bNeuNetCorrect ? "X" : ".");
@@ -106,8 +107,8 @@ int main()
 			printf("\n");
 		}
 
-		NNAI.EvaluateFeedback(0.001f, 2.0f, 0.001f, 2.0f);
-		printf("Correct: %d/%d (%f\%)\n", CorrectMoves, TotalMoves, (100.0f * CorrectMoves) / TotalMoves);
+		NNAI.EvaluateFeedback(0.001f, 2.0f, 0.01f, 2.0f);
+		printf("Correct: %d/%d (%fp)\n", CorrectMoves, TotalMoves, (100.0f * CorrectMoves) / TotalMoves);
 	}
 
 	return 0;

@@ -5,6 +5,8 @@
 class FDna;
 class FNode;
 
+extern float NetworkDerivativeEpsilon;
+
 class FNetwork
 {
 public:

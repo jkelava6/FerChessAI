@@ -28,56 +28,63 @@ FEvaluatedMove FNeuNetFullAI::ChooseMove(FDoubleBoard& Board)
 	{
 		Network.SetInput(RANKS * FILES, Iterations - Iteration - 1);
 		Network.Update();
+	}
 
-		if (Network.GetOutput(0) > 0.0f)
+	int Values[4];
+	bool bInvalid = false;
+	for (int Output = 0; Output < 4; ++Output)
+	{
+		const int MaxCoord = (Output & 1) ? FILES : RANKS;
+		const float OutputVal = Network.GetOutput(Output);
+		if (OutputVal < 0)
 		{
-			int Values[4];
-			for (int Output = 0; Output < 4; ++Output)
+			bInvalid = true;
+			Values[Output] = -1;
+		}
+		if (OutputVal >= SigmoidFunction(0.1f * MaxCoord))
+		{
+			bInvalid = true;
+			Values[Output] = MaxCoord;
+		}
+
+		for (int Coord = 0; Coord < MaxCoord; ++Coord)
+		{
+			if (OutputVal < SigmoidFunction(0.1f * (Coord + 1)))
 			{
-				const int MaxCoord = (Output & 1) ? FILES : RANKS;
-				const float OutputVal = Network.GetOutput(Output);
-				if (OutputVal < 0 || OutputVal >= SigmoidFunction(0.1f * MaxCoord))
-				{
-					LastMoveVerdict = ELastMoveResult::FailedInvalid;
-					return FEvaluatedMove();
-				}
-
-				for (int Coord = 0; Coord < MaxCoord; ++Coord)
-				{
-					if (OutputVal < SigmoidFunction(0.1f * (Coord + 1)))
-					{
-						Values[Output] = Coord;
-						break;
-					}
-				}
+				Values[Output] = Coord;
+				break;
 			}
-
-			const int RankFrom = Values[0];
-			const int FileFrom = Values[1];
-			const int RankTo = Values[2];
-			const int FileTo = Values[3];
-
-			TArray<int> Ranks(16);
-			TArray<int> Files(16);
-			Board.CollectMoves(RankFrom, FileFrom, Ranks, Files);
-
-			const int NumOfMoves = Ranks.Count();
-			for (int Move = 0; Move < NumOfMoves; ++Move)
-			{
-				if (RankTo == Ranks[Move] && FileTo == Files[Move])
-				{
-					LastMoveVerdict = ELastMoveResult::Valid;
-					return FEvaluatedMove(RankFrom, FileFrom, RankTo, FileTo);
-				}
-			}
-
-			LastMoveVerdict = ELastMoveResult::FailedInvalid;
-			return FEvaluatedMove();
 		}
 	}
 
-	LastMoveVerdict = ELastMoveResult::FailedTimeOut;
-	return FEvaluatedMove();
+	const int RankFrom = Values[0];
+	const int FileFrom = Values[1];
+	const int RankTo = Values[2];
+	const int FileTo = Values[3];
+	FEvaluatedMove ChosenMove(RankFrom, FileFrom, RankTo, FileTo);
+
+	if (bInvalid)
+	{
+		LastMoveVerdict = ELastMoveResult::FailedInvalid;
+		return ChosenMove;
+	}
+
+	TArray<int> Ranks(16);
+	TArray<int> Files(16);
+	Board.CollectMoves(RankFrom, FileFrom, Ranks, Files);
+
+	const int NumOfMoves = Ranks.Count();
+	for (int Move = 0; Move < NumOfMoves; ++Move)
+	{
+		if (RankTo == Ranks[Move] && FileTo == Files[Move])
+		{
+			LastMoveVerdict = ELastMoveResult::Valid;
+			return ChosenMove;
+		}
+	}
+
+	LastMoveVerdict = ELastMoveResult::FailedInvalid;
+	return ChosenMove;
 }
 
 bool FNeuNetFullAI::PlayMove(FDoubleBoard& Board)
@@ -103,6 +110,18 @@ void FNeuNetFullAI::ReinforceMove(FEvaluatedMove Move, float Feedback)
 	Network.SeedReinforcement(1, SigmoidFunction(Move.FileFrom * 0.1f + 0.05f), Feedback, FNetwork::EReinforcementType::Full);
 	Network.SeedReinforcement(2, SigmoidFunction(Move.RankTo * 0.1f + 0.05f), Feedback, FNetwork::EReinforcementType::Full);
 	Network.SeedReinforcement(3, SigmoidFunction(Move.FileTo * 0.1f + 0.05f), Feedback, FNetwork::EReinforcementType::Full);
+}
+
+void FNeuNetFullAI::ReinforceByDistance(FEvaluatedMove Move, FEvaluatedMove CurrentMove, float BaseFeedback, float ScalingFeedback)
+{
+	Network.SeedReinforcement(0, SigmoidFunction(Move.RankFrom * 0.1f + 0.05f),
+		BaseFeedback + AbsI(Move.RankFrom - CurrentMove.RankFrom) * ScalingFeedback, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(1, SigmoidFunction(Move.FileFrom * 0.1f + 0.05f),
+		BaseFeedback + AbsI(Move.FileFrom - CurrentMove.FileFrom) * ScalingFeedback, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(2, SigmoidFunction(Move.RankTo * 0.1f + 0.05f),
+		BaseFeedback + AbsI(Move.RankTo - CurrentMove.RankTo) * ScalingFeedback, FNetwork::EReinforcementType::Full);
+	Network.SeedReinforcement(3, SigmoidFunction(Move.FileTo * 0.1f + 0.05f),
+		BaseFeedback + AbsI(Move.FileTo - CurrentMove.FileTo) * ScalingFeedback, FNetwork::EReinforcementType::Full);
 }
 
 void FNeuNetFullAI::ClearNetworkStateMemory()

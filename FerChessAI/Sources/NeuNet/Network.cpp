@@ -6,6 +6,8 @@
 #include <NeuNet/Dna.h>
 #include <NeuNet/Node.h>
 
+extern float NetworkDerivativeEpsilon = 1e-6f;
+
 FNetwork::FNetwork() = default;
 
 FNetwork::~FNetwork() = default;
@@ -242,7 +244,7 @@ void FNetwork::ExecuteReinforcement(float MinBiasStep, float MaxBiasStep, float 
 		for (int LinkIndex = 0; LinkIndex < LinkCount; ++LinkIndex)
 		{
 			const float Feedback = LinkReinforcements[NodeIndex][LinkIndex];
-			if (AbsF(Feedback) < 1e-3f)
+			if (AbsF(Feedback) < 1e-12f)
 			{
 				continue;
 			}
