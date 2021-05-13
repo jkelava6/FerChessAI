@@ -82,7 +82,7 @@ private:
 	bool IsMoved(int Rank, int File);
 	void LogMoved(int Rank, int File);
 private:
-	EChessPiece* Pieces = nullptr;
+	TArray<EChessPiece> Pieces;
 	TArray<FRevertMove> MoveStack;
 	__int64 MovedMask = 0;
 	int EnPassantRank = -1;

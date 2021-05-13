@@ -26,7 +26,7 @@ void WriteBoard(FDoubleBoard& Board, char* Target)
 
 void SendBoard(FDoubleBoard& Board)
 {
-	char BoardString[65];
+	char BoardString[RANKS * FILES + 1];
 	WriteBoard(Board, BoardString);
 	WriteJavaToken("board", BoardString);
 }

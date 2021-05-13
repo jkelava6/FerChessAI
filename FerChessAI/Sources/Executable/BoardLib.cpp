@@ -5,6 +5,10 @@
 #include <Array.h>
 #include <ChessBoard.h>
 
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 extern void GenerateGradingSet(TArray<FChessBoard>& GradingBoards)
 {
 	GradingBoards.Prealocate(4);
@@ -12,8 +16,18 @@ extern void GenerateGradingSet(TArray<FChessBoard>& GradingBoards)
 	{
 		FChessBoard& Board = GradingBoards.Push();
 		Board.DefaultBoard();
+#if _DEBUG
+		for (int Rank = 0; Rank < RANKS; ++Rank)
+		{
+			for (int File = 0; File < FILES; ++File)
+			{
+				assert(EChessPiece::BlackKing <= Board(Rank, File) && Board(Rank, File) <= EChessPiece::WhiteKing);
+			}
+		}
+#endif
 	}
-
+	
+#if DEFAULT_BOARD
 	{
 		FChessBoard& Board = GradingBoards.Push();
 		Board.EmptyBoard();
@@ -63,4 +77,5 @@ extern void GenerateGradingSet(TArray<FChessBoard>& GradingBoards)
 		Board(7, 3) = EChessPiece::BlackRook;
 		Board(5, 4) = EChessPiece::BlackKing;
 	}
+#endif
 }

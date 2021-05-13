@@ -7,6 +7,10 @@
 #include <MinMaxAI.h>
 #include <JavaIO/JavaTokenIO.h>
 
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 
 FRevertSquare::FRevertSquare() = default;
 
@@ -19,10 +23,9 @@ FRevertSquare::FRevertSquare(int ChangedRank, int ChangedFile, EChessPiece OldPi
 
 void FRevertSquare::Restore(FChessBoard& Board)
 {
-	if (Piece < EChessPiece::BlackKing || Piece > EChessPiece::WhiteKing)
-	{
-		WriteJavaToken("error", "invalid piece");
-	}
+#ifdef _DEBUG
+	assert(EChessPiece::BlackKing <= Piece && Piece <= EChessPiece::WhiteKing);
+#endif
 	Board(Rank, File) = Piece;
 }
 
@@ -39,7 +42,6 @@ void FRevertMove::Change(FChessBoard& Board, int Rank, int File, EChessPiece Pie
 
 void FRevertMove::Revert(FChessBoard& Board)
 {
-	bool bCastle = ChangedInOrder.Count() == 4;
 	for (; ChangedInOrder.Count() > 0;)
 	{
 		ChangedInOrder.Top().Restore(Board);
@@ -82,19 +84,23 @@ FRevertMove FRevertMove::Flipped()
 
 FChessBoard::FChessBoard()
 {
-	Pieces = new EChessPiece[RANKS * FILES];
+	const int NumOfSquares = RANKS * FILES;
+	Pieces.Prealocate(NumOfSquares);
+	for (int Square = 0; Square < NumOfSquares; ++Square)
+	{
+		Pieces.Push() = EChessPiece::None;
+	}
 }
 
 FChessBoard::~FChessBoard()
 {
-	delete[] Pieces;
 }
 
 FChessBoard& FChessBoard::operator= (FChessBoard&& Moved)
 {
-	EChessPiece* MyPieces = Pieces;
-	Pieces = Moved.Pieces;
-	Moved.Pieces = MyPieces;
+	TArray<EChessPiece> MyPieces = Move(Pieces);
+	Pieces = Move(Moved.Pieces);
+	Moved.Pieces = Move(MyPieces);
 
 	MoveStack = Move(Moved.MoveStack);
 	MovedMask = Moved.MovedMask;
@@ -157,10 +163,42 @@ void FChessBoard::DefaultBoard()
 	Square(7, 5) = EChessPiece::BlackBishop;
 	Square(7, 6) = EChessPiece::BlackKnight;
 	Square(7, 7) = EChessPiece::BlackRook;
+#elif RANKS == 6 && FILES == 6
+	// empty space
+	for (int Rank = 2; Rank < 4; ++Rank)
+	{
+		for (int File = 0; File < 6; ++File)
+		{
+			Square(Rank, File) = EChessPiece::None;
+}
+	}
+
+	// pawns
+	for (int File = 0; File < 6; ++File)
+	{
+		Square(1, File) = EChessPiece::WhitePawn;
+		Square(4, File) = EChessPiece::BlackPawn;
+	}
+
+	// white pieces
+	Square(0, 0) = EChessPiece::WhiteRook;
+	Square(0, 1) = EChessPiece::WhiteKnight;
+	Square(0, 2) = EChessPiece::None;
+	Square(0, 3) = EChessPiece::WhiteKing;
+	Square(0, 4) = EChessPiece::WhiteKnight;
+	Square(0, 5) = EChessPiece::WhiteRook;
+
+	// black pieces
+	Square(5, 0) = EChessPiece::BlackRook;
+	Square(5, 1) = EChessPiece::BlackKnight;
+	Square(5, 2) = EChessPiece::None;
+	Square(5, 3) = EChessPiece::BlackKing;
+	Square(5, 4) = EChessPiece::BlackKnight;
+	Square(5, 5) = EChessPiece::BlackRook;
 #else
 	EmptyBoard();
 	Square(0, 0) = EChessPiece::WhiteKing;
-	Square(RANKS - 1, FILES - 1) = EChessPiece::WhiteKing;
+	Square(RANKS - 1, FILES - 1) = EChessPiece::BlackKing;
 #endif
 }
 
@@ -279,7 +317,7 @@ void FChessBoard::CollectMoves(int Rank, int File, TArray<int>& Ranks, TArray<in
 			Ranks.Push() = Rank + 1;
 			Files.Push() = File - 1;
 		}
-		if (File < 7 && Square(Rank + 1, File + 1) < EChessPiece::None
+		if (File < RANKS - 1 && Square(Rank + 1, File + 1) < EChessPiece::None
 			|| Rank + 1 == EnPassantRank && File + 1 == EnPassantFile)
 		{
 			Ranks.Push() = Rank + 1;
@@ -383,11 +421,16 @@ __int64 FChessBoard::FlipMovedMask(__int64 OgMask)
 {
 	__int64 FlippedMask = 0;
 	__int64 Bit = 1;
-	for (int Square = 0; Square < RANKS * FILES; ++Square)
+	for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
-		if (OgMask & (Bit << Square))
+		for (int File = 0; File < FILES; ++File)
 		{
-			FlippedMask |= (Bit << (RANKS * FILES - 1 - Square));
+			int Square = Rank * FILES + File;
+			int RevSquare = (FILES - 1 - Rank) * FILES + File;
+			if (OgMask & (Bit << Square))
+			{
+				FlippedMask |= (Bit << (RANKS * FILES - 1 - Square));
+			}
 		}
 	}
 	return FlippedMask;
@@ -541,7 +584,7 @@ void FChessBoard::CopyPositionFrom(FChessBoard& Board, bool bFlipSides/* = false
 	else
 	{
 		SetMoved(FChessBoard::FlipMovedMask(Board.MovedMask));
-		SetEnPassant(7 - Board.EnPassantRank, Board.EnPassantFile);
+		SetEnPassant(FILES - 1 - Board.EnPassantRank, Board.EnPassantFile);
 		MoveStack.PopAll();
 		const int NumOfMoves = Board.MoveStack.Count();
 		MoveStack.Prealocate(NumOfMoves);
@@ -597,7 +640,7 @@ EGameState FDoubleBoard::GetGameState()
 				KingRank = Rank;
 				KingFile = File;
 				
-				Rank = 8;
+				Rank = RANKS;
 				break;
 			}
 		}

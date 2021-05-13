@@ -30,7 +30,7 @@ int main()
 	delete DnaPtr;
 
 	const int UsedBoards = TestBoards.Count();
-	const bool AllowedBoards[] = { 0, 0, 1, 0 };
+	const bool AllowedBoards[] = { 1, 1, 1, 1 };
 	while (true)
 	{
 		int CorrectMoves = 0;

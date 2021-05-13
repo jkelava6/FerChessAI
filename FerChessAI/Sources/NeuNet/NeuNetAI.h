@@ -50,8 +50,8 @@ public:
 private:
 	void MutateF(float& Val, float Chance, float Ratio, int Resilience, float MaxVal);
 private:
-	int Inputs = 65;
-	int Outputs = 5;
+	int Inputs = RANKS * FILES;
+	int Outputs = 4;
 	int MoveRecurrent;
 	int GameRecurrent;
 	int LifeRecurrent;
