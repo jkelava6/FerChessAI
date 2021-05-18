@@ -18,8 +18,9 @@ public:
 	virtual FEvaluatedMove ChooseMove(FDoubleBoard& Board) override;
 	virtual bool PlayMove(FDoubleBoard& Board) override;
 	void SetDepths(int Normal, int Volatile);
+protected:
+	virtual float Evaluate(FDoubleBoard& Board);
 private:
-	float Evaluate(FDoubleBoard& Board);
 	float MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, bool bVolatile);
 public:
 	FEvaluatedMove LastPlayedMove;

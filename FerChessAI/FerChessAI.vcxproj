@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Array.cpp" />
+    <ClCompile Include="Sources\Assisted\NetEvalMinMax.cpp" />
     <ClCompile Include="Sources\ChessBoard.cpp" />
     <ClCompile Include="Sources\Executable\BasicFullAiEvo.cpp" />
     <ClCompile Include="Sources\Executable\BoardLib.cpp" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Array.h" />
+    <ClInclude Include="Sources\Assisted\NetEvalMinMax.h" />
     <ClInclude Include="Sources\ChessBoard.h" />
     <ClInclude Include="Sources\Executable\BoardLib.h" />
     <ClInclude Include="Sources\Executable\DebugUtils.h" />

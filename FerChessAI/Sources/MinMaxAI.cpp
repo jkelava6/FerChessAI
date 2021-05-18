@@ -86,7 +86,7 @@ float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 			{
 				MaterialScore += 1.0f;
 				const float CentralizedScore = (FileCenter - AbsF(FileCenter - File)) / 3.0f;
-				const float AdvancedScore = (Rank - 1.0f) / (RANKS - 3);
+				const float AdvancedScore = (Rank - 1) / (RANKS - 3.0f);
 				PositionalScore += 1.5f * (CentralizedScore + AdvancedScore + CentralizedScore * 3 * AdvancedScore) / 5.0f;
 				if (WhitePawns[File])
 				{
@@ -137,7 +137,7 @@ float FMinMaxAI::Evaluate(FDoubleBoard& Board)
 			{
 				MaterialScore -= 1.0f;
 				const float CentralizedScore = (FileCenter - AbsF(FileCenter - File)) / 3.0f;
-				const float AdvancedScore = (RANKS - 1 - Rank - 1) / (RANKS - 3);
+				const float AdvancedScore = (RANKS - 1 - Rank - 1) / (RANKS - 3.0f);
 				PositionalScore -= 1.5f * (CentralizedScore + AdvancedScore + CentralizedScore * 3 * AdvancedScore) / 5.0f;
 				if (BlackPawns[File])
 				{
