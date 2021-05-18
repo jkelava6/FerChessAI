@@ -156,6 +156,8 @@
     <ClCompile Include="Sources\Executable\SimpleNetworkReinforcement.cpp" />
     <ClCompile Include="Sources\GenericAI.cpp" />
     <ClCompile Include="Sources\JavaIO\JavaTokenIO.cpp" />
+    <ClCompile Include="Sources\League\League.cpp" />
+    <ClCompile Include="Sources\League\Population.cpp" />
     <ClCompile Include="Sources\MinMaxAI.cpp" />
     <ClCompile Include="Sources\NeuNet\Dna.cpp" />
     <ClCompile Include="Sources\NeuNet\Network.cpp" />
@@ -171,6 +173,8 @@
     <ClInclude Include="Sources\Executable\MainSwitch.h" />
     <ClInclude Include="Sources\GenericAI.h" />
     <ClInclude Include="Sources\JavaIO\JavaTokenIO.h" />
+    <ClInclude Include="Sources\League\League.h" />
+    <ClInclude Include="Sources\League\Population.h" />
     <ClInclude Include="Sources\Math.h" />
     <ClInclude Include="Sources\NeuNet\Dna.h" />
     <ClInclude Include="Sources\NeuNet\Network.h" />

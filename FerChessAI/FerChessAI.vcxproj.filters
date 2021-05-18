@@ -66,6 +66,12 @@
     <ClCompile Include="Sources\Assisted\NetEvalMinMax.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\League\Population.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\League\League.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\ChessBoard.h">
@@ -111,6 +117,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Assisted\NetEvalMinMax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\League\Population.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\League\League.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
