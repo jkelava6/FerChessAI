@@ -19,7 +19,7 @@ class FPopulation
 public:
 	void Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes);
 	void PlayInLeague(FLeague& League);
-	void NextGeneration();
+	void NextGeneration(FLeague& League);
 	void GradeMatch(int UnitId, EGameState WhiteResult, int WhiteMoves, EGameState BlackResult, int BlackMoves);
 	IChessAI& Representative();
 private:

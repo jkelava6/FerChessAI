@@ -15,7 +15,7 @@ void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentN
 	for (int Index = 0; Index < Size; ++Index)
 	{
 		FUnit& Unit = Units.Push();
-		GenerateDna(Unit.Dna, RandomF() * MaxMiddleNodes, RandomF() * MaxRecurrentNodes);
+		GenerateDna(Unit.Dna, (int)(RandomF() * MaxMiddleNodes), (int)(RandomF() * MaxRecurrentNodes));
 	}
 
 	BestInPop.AccesNetwork().FromDna(Units[0].Dna);
@@ -31,7 +31,7 @@ void FPopulation::PlayInLeague(FLeague& League)
 	}
 }
 
-void FPopulation::NextGeneration()
+void FPopulation::NextGeneration(FLeague& League)
 {
 	float BestFitness = -1.0f;
 	int BestIndex = -1;
@@ -71,6 +71,11 @@ void FPopulation::NextGeneration()
 
 		FUnit& Mutated = NextGen.Push();
 		MutateDna(Units[Index].Dna, Mutated.Dna);
+	}
+
+	if (BestIndex != 0)
+	{
+		League.LogSwap(this);
 	}
 
 	BestIndexInPop = BestIndex;
@@ -163,11 +168,11 @@ extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes)
 	for (int Index = 0; Index < MiddleNodes + 1 + RecurrentNodes; ++Index)
 	{
 		Dna.PushFloat(-MaxBias + 2.0f * MaxBias * RandomF());
-		const int LinkCount = MinLinks + RandomF() * (MaxLinks - MinLinks + 1);
+		const int LinkCount = MinLinks + (int)(RandomF() * (MaxLinks - MinLinks + 1));
 		Dna.PushInt(LinkCount);
 		for (int Link = 0; Link < LinkCount; ++Link)
 		{
-			Dna.PushInt(RandomF() * (Inputs + Index));
+			Dna.PushInt((int)(RandomF() * (Inputs + Index)));
 			Dna.PushFloat(-MaxLinkStrength + RandomF() * 2.0f * MaxLinkStrength);
 		}
 	}
