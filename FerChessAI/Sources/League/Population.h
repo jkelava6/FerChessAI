@@ -29,6 +29,7 @@ private:
 	TArray<FUnit> Units;
 	int MaxMiddleNodes;
 	int MaxRecurrentNodes;
+	int BestIndexInPop = -1;
 };
 
 extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes);

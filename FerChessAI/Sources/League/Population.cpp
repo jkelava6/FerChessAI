@@ -27,7 +27,7 @@ void FPopulation::PlayInLeague(FLeague& League)
 	for (int Index = 0; Index < Units.Count(); ++Index)
 	{
 		AI.AccesNetwork().FromDna(Units[Index].Dna);
-		League.PlayAI(AI, this, Index);
+		League.PlayAI(AI, this, Index, Index == BestIndexInPop);
 	}
 }
 
@@ -72,6 +72,8 @@ void FPopulation::NextGeneration()
 		FUnit& Mutated = NextGen.Push();
 		MutateDna(Units[Index].Dna, Mutated.Dna);
 	}
+
+	BestIndexInPop = BestIndex;
 }
 
 void FPopulation::GradeMatch(int UnitId, EGameState WhiteResult, int WhiteMoves, EGameState BlackResult, int BlackMoves)

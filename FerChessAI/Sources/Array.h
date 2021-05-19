@@ -160,5 +160,14 @@ public:
 		AllocatedSize = 0;
 	}
 
+	int IndexOf(Type* Pointer)
+	{
+		const int Index = (int)(Pointer - Data);
+#if _DEBUG
+		assert(0 <= Index && Index < UsedSize);
+#endif
+		return Index;
+	}
+
 };
 

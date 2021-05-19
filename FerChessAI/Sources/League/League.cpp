@@ -8,10 +8,13 @@ void FLeague::Initialize(int PopCount, int PopSize, int MaxMiddleNodes, int MaxR
 {
 	Populations.Clear();
 	Populations.Prealocate(PopCount);
+	Ratings.Clear();
+	Ratings.Prealocate(PopCount);
 	for (int Index = 0; Index < PopCount; ++Index)
 	{
 		FPopulation& Pop = Populations.Push();
 		Pop.Initialize(PopSize, MaxMiddleNodes, MaxRecurrentNodes);
+		Ratings.Push() = 1000.0f;
 	}
 }
 
@@ -28,16 +31,29 @@ void FLeague::Iterate()
 	}
 }
 
-void FLeague::PlayAI(IChessAI& Challenger, FPopulation* Population, int UnitId)
+void FLeague::PlayAI(IChessAI& Challenger, FPopulation* Population, int UnitId, bool bRated)
 {
+	const int ChallengingPop = Populations.IndexOf(Population);
+
 	FDoubleBoard Board;
 	for (int Index = 0; Index < Populations.Count(); ++Index)
 	{
+		if (Index == ChallengingPop)
+		{
+			continue;
+		}
+
 		IChessAI& Representative = Populations[Index].Representative();
 		int WhiteMoves;
 		EGameState WhiteResult = PlayGame(Board, Challenger, Representative, WhiteMoves);
 		int BlackMoves;
 		EGameState BlackResult = PlayGame(Board, Representative, Challenger, BlackMoves);
+
+		if (bRated)
+		{
+			RateGame(WhiteResult, ChallengingPop, Index);
+			RateGame(BlackResult, Index, ChallengingPop);
+		}
 
 		Population->GradeMatch(UnitId, WhiteResult, WhiteMoves, BlackResult, BlackMoves);
 	}
@@ -64,4 +80,55 @@ EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Bla
 
 	--MoveCount;
 	return Board.GetGameState();
+}
+
+int FLeague::GameScore(EGameState FinishingState)
+{
+	if (GameResults[NextGameResult] == EGameState::OverWhite)
+	{
+		return 1;
+	}
+	if (GameResults[NextGameResult] == EGameState::OverBlack)
+	{
+		return -1;
+	}
+	return 0;
+}
+
+void FLeague::RateGame(EGameState FinishingState, int White, int Black)
+{
+	const bool bIsPoolFull = GameResults.Count() == PoolSize;
+
+	if (bIsPoolFull)
+	{
+		GlobalScore -= GameScore(GameResults[NextGameResult]);
+	}
+
+	if (NextGameResult >= GameResults.Count())
+	{
+		if (bIsPoolFull)
+		{
+			NextGameResult = 0;
+		}
+		else
+		{
+			GameResults.Push();
+		}
+	}
+
+	GlobalScore += GameScore(FinishingState);
+	GameResults[NextGameResult++] = FinishingState;
+
+	if (bIsPoolFull)
+	{
+		const float WeightedGlobalScore = GlobalScore / (float)PoolSize;
+		const int RatingDiff = Ratings[White] - Ratings[Black];
+		const float WeightedDiff = SigmoidFunction((float)RatingDiff);
+		const float ScoreOffset = -0.5f * (WeightedDiff + WeightedGlobalScore);
+		const float FinalScore = (float)GameScore(FinishingState) + ScoreOffset;
+
+		const int RatingChange = (int)(20.0f * FinalScore);
+		Ratings[White] += RatingChange;
+		Ratings[Black] -= RatingChange;
+	}
 }
