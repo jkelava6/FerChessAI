@@ -38,6 +38,7 @@ int main()
 				printf("%d ", League.BestSwaps[Index]);
 				League.BestSwaps[Index] = 0;
 			}
+			printf("\n");
 		}
 
 		if (Generation % BenchmarkPeriod == 0)

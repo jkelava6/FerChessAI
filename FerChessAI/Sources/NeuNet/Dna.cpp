@@ -6,6 +6,33 @@
 #include <NeuNet/Node.h>
 
 
+FDna::FDna() = default;
+FDna::~FDna() = default;
+
+FDna& FDna::operator= (FDna&& Moved) noexcept
+{
+	NextIndex = Moved.NextIndex;
+	Data = Move(Moved.Data);
+	return *this;
+}
+
+FDna::FDna(FDna&& Moved) noexcept
+{
+	*this = Move(Moved);
+}
+
+FDna& FDna::operator= (const FDna& Copied)
+{
+	NextIndex = Copied.NextIndex;
+	Data = Copied.Data;
+	return *this;
+}
+
+FDna::FDna(const FDna& Copied)
+{
+	*this = Copied;
+}
+
 void FDna::SetData(const int* InData, int Length)
 {
 	Data.Prealocate(Length);

@@ -5,6 +5,34 @@
 #include <League/League.h>
 #include <NeuNet/Node.h>
 
+FUnit::FUnit() = default;
+FUnit::~FUnit() = default;
+
+FUnit& FUnit::operator= (const FUnit& Copied)
+{
+	Dna = Copied.Dna;
+	Fitness = Copied.Fitness;
+	return *this;
+}
+
+FUnit::FUnit(const FUnit& Copied)
+{
+	*this = Copied;
+}
+
+FUnit& FUnit::operator= (FUnit&& Moved) noexcept
+{
+	Dna = Move(Moved.Dna);
+	Fitness = Moved.Fitness;
+	Moved.Fitness = 0.0f;
+	return *this;
+}
+
+FUnit::FUnit(FUnit&& Moved) noexcept
+{
+	*this = Move(Moved);
+}
+
 void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes)
 {
 	MaxMiddleNodes = InMaxMiddleNodes;
@@ -80,7 +108,8 @@ void FPopulation::NextGeneration(FLeague& League)
 		League.LogSwap(this);
 	}
 
-	BestIndexInPop = BestIndex;
+	Units = Move(NextGen);
+	BestIndexInPop = BestIndex - (WorstIndex < BestIndex);
 }
 
 void FPopulation::GradeMatch(int UnitId, EGameState WhiteResult, int WhiteMoves, EGameState BlackResult, int BlackMoves)

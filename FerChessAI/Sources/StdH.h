@@ -18,15 +18,15 @@ ClassName(ClassName&&) = delete
 ClassName& operator= (const ClassName&); \
 ClassName(const ClassName&)
 #define DECLARE_MOVE(ClassName) \
-ClassName& operator= (ClassName&&); \
-ClassName(ClassName&&)
+ClassName& operator= (ClassName&&) noexcept; \
+ClassName(ClassName&&) noexcept
 
 #define IMPLEMENT_COPY(ClassName) \
 ClassName& ClassName::operator= (const ClassName&) = default; \
 ClassName::ClassName(const ClassName&) = default
 #define IMPLEMENT_MOVE(ClassName) \
-ClassName& ClassName::operator= (ClassName&&) = default; \
-ClassName::ClassName(ClassName&&) = default
+ClassName& ClassName::operator= (ClassName&&) noexcept = default; \
+ClassName::ClassName(ClassName&&) noexcept = default
 
 template <class Type>
 Type&& Move(Type& Moved) noexcept

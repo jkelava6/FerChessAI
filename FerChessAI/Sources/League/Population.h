@@ -12,6 +12,11 @@ class FUnit
 public:
 	FDna Dna;
 	float Fitness = 0.0f;
+
+	FUnit();
+	~FUnit();
+	DECLARE_MOVE(FUnit);
+	DECLARE_COPY(FUnit);
 };
 
 class FPopulation

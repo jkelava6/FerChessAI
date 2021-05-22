@@ -5,6 +5,11 @@
 class FDna
 {
 public:
+	FDna();
+	~FDna();
+	DECLARE_MOVE(FDna);
+	DECLARE_COPY(FDna);
+
 	void SetData(const int* InData, int Length);
 	int* GetData(int& Length);
 	void New(int Size);

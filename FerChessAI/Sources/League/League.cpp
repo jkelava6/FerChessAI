@@ -117,11 +117,6 @@ void FLeague::RateGame(EGameState FinishingState, int White, int Black)
 {
 	const bool bIsPoolFull = GameResults.Count() == PoolSize;
 
-	if (bIsPoolFull)
-	{
-		GlobalScore -= GameScore(GameResults[NextGameResult]);
-	}
-
 	if (NextGameResult >= GameResults.Count())
 	{
 		if (bIsPoolFull)
@@ -132,6 +127,11 @@ void FLeague::RateGame(EGameState FinishingState, int White, int Black)
 		{
 			GameResults.Push();
 		}
+	}
+
+	if (bIsPoolFull)
+	{
+		GlobalScore -= GameScore(GameResults[NextGameResult]);
 	}
 
 	GlobalScore += GameScore(FinishingState);
