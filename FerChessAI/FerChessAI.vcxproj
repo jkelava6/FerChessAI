@@ -152,6 +152,7 @@
     <ClCompile Include="Sources\Executable\DebugUtils.cpp" />
     <ClCompile Include="Sources\Executable\FerChessAI.cpp" />
     <ClCompile Include="Sources\Executable\JavaAgent.cpp" />
+    <ClCompile Include="Sources\Executable\LeaguePlay.cpp" />
     <ClCompile Include="Sources\Executable\ReinforcementEvo.cpp" />
     <ClCompile Include="Sources\Executable\SimpleNetworkReinforcement.cpp" />
     <ClCompile Include="Sources\GenericAI.cpp" />

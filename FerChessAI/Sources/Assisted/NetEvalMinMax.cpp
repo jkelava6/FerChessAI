@@ -10,7 +10,8 @@ FNetwork& FNetEvalMinMax::AccesNetwork()
 
 float FNetEvalMinMax::Evaluate(FDoubleBoard& Board)
 {
-	for (int Rank = 0; Rank < RANKS; ++Rank)
+	return FMinMaxAI::Evaluate(Board);
+	/*for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
 		for (int File = 0; File < FILES; ++File)
 		{
@@ -23,5 +24,5 @@ float FNetEvalMinMax::Evaluate(FDoubleBoard& Board)
 	{
 		Network.Update();
 	}
-	return Network.GetOutput(0);
+	return Network.GetOutput(0);*/
 }

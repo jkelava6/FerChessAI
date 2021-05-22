@@ -20,6 +20,8 @@ public:
 public:
 	FNetwork();
 	~FNetwork();
+	DECLARE_COPY(FNetwork);
+	DECLARE_MOVE(FNetwork);
 public:
 	void FromDna(FDna& Dna);
 	void ToDna(FDna& Dna);

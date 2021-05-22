@@ -16,7 +16,7 @@ void FLeague::Initialize(int PopCount, int PopSize, int MaxMiddleNodes, int MaxR
 	{
 		FPopulation& Pop = Populations.Push();
 		Pop.Initialize(PopSize, MaxMiddleNodes, MaxRecurrentNodes);
-		Ratings.Push() = 1000.0f;
+		Ratings.Push() = 1000;
 		BestSwaps.Push() = 0;
 	}
 }
@@ -67,8 +67,18 @@ void FLeague::LogSwap(FPopulation* Population)
 	++BestSwaps[Populations.IndexOf(Population)];
 }
 
+void FLeague::GetAIs(TArray<IChessAI*> OutTempAIs)
+{
+	for (int Index = 0; Index < Populations.Count(); ++Index)
+	{
+		OutTempAIs.Push() = &Populations[Index].Representative();
+	}
+}
+
 EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount)
 {
+	Board.DefaultBoard();
+
 	for (MoveCount = 1; MoveCount <= 60; ++MoveCount)
 	{
 		White.PlayMove(Board);

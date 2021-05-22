@@ -12,6 +12,9 @@ FNetwork::FNetwork() = default;
 
 FNetwork::~FNetwork() = default;
 
+IMPLEMENT_COPY(FNetwork);
+IMPLEMENT_MOVE(FNetwork);
+
 void FNetwork::FromDna(FDna& Dna)
 {
 	Dna.Peek(0);
