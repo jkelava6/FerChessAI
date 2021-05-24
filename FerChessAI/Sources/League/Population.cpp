@@ -37,7 +37,7 @@ void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentN
 {
 	MaxMiddleNodes = InMaxMiddleNodes;
 	MaxRecurrentNodes = InMaxRecurrentNodes;
-	BestInPop.SetDepths(NormalDepth, VolatileDepth);
+	RepAI.SetDepths(NormalDepth, VolatileDepth);
 
 	Units.Clear();
 	Units.Prealocate(Size);
@@ -47,7 +47,7 @@ void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentN
 		GenerateDna(Unit.Dna, (int)(RandomF() * MaxMiddleNodes), (int)(RandomF() * MaxRecurrentNodes));
 	}
 
-	BestInPop.AccesNetwork().FromDna(Units[0].Dna);
+	RepAI.AccesNetwork().FromDna(Units[0].Dna);
 }
 
 void FPopulation::PlayInLeague(FLeague& League)
@@ -57,7 +57,7 @@ void FPopulation::PlayInLeague(FLeague& League)
 	for (int Index = 0; Index < Units.Count(); ++Index)
 	{
 		AI.AccesNetwork().FromDna(Units[Index].Dna);
-		League.PlayAI(AI, this, Index, Index == BestIndexInPop);
+		League.PlayAI(AI, this, Index, Index == 0);
 	}
 }
 
@@ -112,14 +112,14 @@ void FPopulation::GradeMatch(int UnitId, EGameState WhiteResult, int WhiteMoves,
 
 IChessAI& FPopulation::Representative()
 {
-	return BestInPop;
+	return RepAI;
 }
 
 void FPopulation::SetDepths(int InNormalDepth, int InVolatileDepth)
 {
 	NormalDepth = InNormalDepth;
 	VolatileDepth = InVolatileDepth;
-	BestInPop.SetDepths(NormalDepth, VolatileDepth);
+	RepAI.SetDepths(NormalDepth, VolatileDepth);
 }
 
 void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)

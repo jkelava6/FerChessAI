@@ -10,14 +10,11 @@ void FLeague::Initialize(int PopCount, int PopSize, int MaxMiddleNodes, int MaxR
 	Populations.Prealocate(PopCount);
 	Ratings.Clear();
 	Ratings.Prealocate(PopCount);
-	BestSwaps.Clear();
-	BestSwaps.Prealocate(PopCount);
 	for (int Index = 0; Index < PopCount; ++Index)
 	{
 		FPopulation& Pop = Populations.Push();
 		Pop.Initialize(PopSize, MaxMiddleNodes, MaxRecurrentNodes);
 		Ratings.Push() = 1000;
-		BestSwaps.Push() = 0;
 	}
 }
 
@@ -60,11 +57,6 @@ void FLeague::PlayAI(IChessAI& Challenger, FPopulation* Population, int UnitId, 
 
 		Population->GradeMatch(UnitId, WhiteResult, WhiteMoves, BlackResult, BlackMoves);
 	}
-}
-
-void FLeague::LogSwap(FPopulation* Population)
-{
-	++BestSwaps[Populations.IndexOf(Population)];
 }
 
 void FLeague::GetAIs(TArray<IChessAI*>& OutTempAIs)

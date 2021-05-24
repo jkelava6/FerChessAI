@@ -21,7 +21,6 @@ int main()
 		BenchmarkAIs->SetDepths(Index + 1, 2 * (Index + 1));
 	}
 
-	const int SwapCountPeriod = 10;
 	const int RatingsPeriod = 10;
 	const int BenchmarkPeriod = 45;
 	TArray<IChessAI*> LeagueAIs;
@@ -31,17 +30,6 @@ int main()
 	for (int Generation = 1; ; Generation++)
 	{
 		League.Iterate();
-
-		if (Generation % SwapCountPeriod == 0)
-		{
-			printf("Swaps: ");
-			for (int Index = 0; Index < League.BestSwaps.Count(); ++Index)
-			{
-				printf("%d ", League.BestSwaps[Index]);
-				League.BestSwaps[Index] = 0;
-			}
-			printf("\n");
-		}
 
 		if (Generation % RatingsPeriod == 0)
 		{

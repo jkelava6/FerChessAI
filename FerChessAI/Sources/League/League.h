@@ -12,7 +12,6 @@ public:
 	void Initialize(int PopCount, int PopSize, int MaxMiddleNodes, int MaxRecurrentNodes);
 	void Iterate();
 	void PlayAI(IChessAI& Challenger, FPopulation* Population, int UnitId, bool bRated);
-	void LogSwap(FPopulation* Population);
 	/** Generated pointers lose validity when this objects is destroyed, or Initialize() is called. */
 	void GetAIs(TArray<IChessAI*>& OutTempAIs);
 private:
@@ -20,7 +19,6 @@ private:
 	int GameScore(EGameState FinishingState);
 	void RateGame(EGameState FinishingState, int White, int Black);
 public:
-	TArray<int> BestSwaps;
 	TArray<int> Ratings;
 private:
 	TArray<FPopulation> Populations;

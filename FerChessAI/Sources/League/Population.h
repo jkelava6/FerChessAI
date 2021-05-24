@@ -31,11 +31,10 @@ public:
 private:
 	void MutateDna(FDna& InDna, FDna& OutDna);
 private:
-	FNetEvalMinMax BestInPop;
+	FNetEvalMinMax RepAI;
 	TArray<FUnit> Units;
 	int MaxMiddleNodes;
 	int MaxRecurrentNodes;
-	int BestIndexInPop = 0;
 
 	int NormalDepth = 2;
 	int VolatileDepth = 4;
