@@ -67,7 +67,7 @@ void FLeague::LogSwap(FPopulation* Population)
 	++BestSwaps[Populations.IndexOf(Population)];
 }
 
-void FLeague::GetAIs(TArray<IChessAI*> OutTempAIs)
+void FLeague::GetAIs(TArray<IChessAI*>& OutTempAIs)
 {
 	for (int Index = 0; Index < Populations.Count(); ++Index)
 	{

@@ -14,7 +14,7 @@ public:
 	void PlayAI(IChessAI& Challenger, FPopulation* Population, int UnitId, bool bRated);
 	void LogSwap(FPopulation* Population);
 	/** Generated pointers lose validity when this objects is destroyed, or Initialize() is called. */
-	void GetAIs(TArray<IChessAI*> OutTempAIs);
+	void GetAIs(TArray<IChessAI*>& OutTempAIs);
 private:
 	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount);
 	int GameScore(EGameState FinishingState);

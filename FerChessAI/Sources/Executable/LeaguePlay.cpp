@@ -21,7 +21,8 @@ int main()
 		BenchmarkAIs->SetDepths(Index + 1, 2 * (Index + 1));
 	}
 
-	const int SwapCountPeriod = 1;
+	const int SwapCountPeriod = 10;
+	const int RatingsPeriod = 10;
 	const int BenchmarkPeriod = 45;
 	TArray<IChessAI*> LeagueAIs;
 	League.GetAIs(LeagueAIs);
@@ -33,6 +34,7 @@ int main()
 
 		if (Generation % SwapCountPeriod == 0)
 		{
+			printf("Swaps: ");
 			for (int Index = 0; Index < League.BestSwaps.Count(); ++Index)
 			{
 				printf("%d ", League.BestSwaps[Index]);
@@ -41,16 +43,26 @@ int main()
 			printf("\n");
 		}
 
+		if (Generation % RatingsPeriod == 0)
+		{
+			printf("Ratings: ");
+			for (int Index = 0; Index < League.Ratings.Count(); ++Index)
+			{
+				printf("%d ", League.Ratings[Index]);
+			}
+			printf("\n");
+		}
+
 		if (Generation % BenchmarkPeriod == 0)
 		{
-			for (int PopIndex = 0; PopIndex < League.Ratings.Count(); ++PopIndex)
+			for (int PopIndex = 0; PopIndex < LeagueAIs.Count(); ++PopIndex)
 			{
 				printf("(%d) Rating: %d\n", PopIndex, League.Ratings[PopIndex]);
 				for (int BMIndex = 0; BMIndex < ARRAY_SIZE(BenchmarkAIs); ++BMIndex)
 				{
 					Board.DefaultBoard();
 					int Moves;
-					for (Moves = 0; Moves < 60; ++Moves)
+					for (Moves = 0; Moves < 120; ++Moves)
 					{
 						LeagueAIs[PopIndex]->PlayMove(Board);
 
