@@ -103,7 +103,7 @@ void FPopulation::NextGeneration(FLeague& League)
 		MutateDna(Units[Index].Dna, Mutated.Dna);
 	}
 
-	if (BestIndex != 0)
+	if (BestIndex != BestIndexInPop)
 	{
 		League.LogSwap(this);
 	}
@@ -167,12 +167,12 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 	for (int Index = 0; Index < RecurrentNodes; ++Index)
 	{
 		const float PrevBias = InDna.ReadFloat();
-		OutDna.PushFloat(ClampF(PrevBias - 0.001f + RandomF() * 0.002f, -MaxBias, MaxBias));
+		OutDna.PushFloat(ClampF(PrevBias - 0.01f + RandomF() * 0.02f, -MaxBias, MaxBias));
 	}
 	for (int Index = 0; Index < MiddleNodes + 1 + RecurrentNodes; ++Index)
 	{
 		const float PrevBias = InDna.ReadFloat();
-		OutDna.PushFloat(ClampF(PrevBias - 0.001f + RandomF() * 0.002f, -MaxBias, MaxBias));
+		OutDna.PushFloat(ClampF(PrevBias - 0.01f + RandomF() * 0.02f, -MaxBias, MaxBias));
 
 		const int LinkCount = InDna.ReadInt();
 		OutDna.PushInt(LinkCount);
@@ -180,7 +180,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		{
 			OutDna.PushInt(InDna.ReadInt());
 			const float PrevLink = InDna.ReadFloat();
-			OutDna.PushFloat(ClampF(PrevLink - 0.001f + RandomF() * 0.002f, -MaxLinkStrength, MaxLinkStrength));
+			OutDna.PushFloat(ClampF(PrevLink - 0.01f + RandomF() * 0.02f, -MaxLinkStrength, MaxLinkStrength));
 		}
 	}
 }
