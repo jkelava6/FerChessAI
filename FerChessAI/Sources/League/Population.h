@@ -35,7 +35,7 @@ private:
 	TArray<FUnit> Units;
 	int MaxMiddleNodes;
 	int MaxRecurrentNodes;
-	int BestIndexInPop = -1;
+	int BestIndexInPop = 0;
 
 	int NormalDepth = 2;
 	int VolatileDepth = 4;

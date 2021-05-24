@@ -63,53 +63,28 @@ void FPopulation::PlayInLeague(FLeague& League)
 
 void FPopulation::NextGeneration(FLeague& League)
 {
-	float BestFitness = -1.0f;
-	int BestIndex = -1;
-	float WorstFitness = 1e9f;
-	int WorstIndex = -1;
-
 	TArray<FUnit> NextGen;
 	NextGen.Prealocate(Units.Count());
 
-	for (int Index = 0; Index < Units.Count(); ++Index)
+	float TotalFitness = 0.0f;
+
+	for (int Iteration = 0; Iteration < Units.Count(); ++Iteration)
 	{
-		const float Fitness = Units[Index].Fitness;
-		if (Fitness > BestFitness)
+		float FitnessToGo = RandomF() * TotalFitness;
+
+		for (int Index = 0; Index < Units.Count(); ++Index)
 		{
-			BestFitness = Fitness;
-			BestIndex = Index;
-		}
-		if (Fitness < WorstFitness)
-		{
-			WorstFitness = Fitness;
-			WorstIndex = Index;
+			FitnessToGo -= Units[Index].Fitness;
+			if (FitnessToGo >= 0)
+			{
+				return;
+			}
+
+			FUnit& Mutated = NextGen.Push();
+			MutateDna(Units[Index].Dna, Mutated.Dna);
+			break;
 		}
 	}
-
-	for (int Index = 0; Index < Units.Count(); ++Index)
-	{
-		if (Index == BestIndex)
-		{
-			FUnit& Cloned = NextGen.Push();
-			Cloned.Dna = Move(Units[Index].Dna);
-		}
-
-		if (Index == WorstIndex)
-		{
-			continue;
-		}
-
-		FUnit& Mutated = NextGen.Push();
-		MutateDna(Units[Index].Dna, Mutated.Dna);
-	}
-
-	if (BestIndex != BestIndexInPop)
-	{
-		League.LogSwap(this);
-	}
-
-	Units = Move(NextGen);
-	BestIndexInPop = BestIndex - (WorstIndex < BestIndex);
 }
 
 void FPopulation::GradeMatch(int UnitId, EGameState WhiteResult, int WhiteMoves, EGameState BlackResult, int BlackMoves)
