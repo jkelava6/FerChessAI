@@ -94,11 +94,11 @@ EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Bla
 
 int FLeague::GameScore(EGameState FinishingState)
 {
-	if (GameResults[NextGameResult] == EGameState::OverWhite)
+	if (FinishingState == EGameState::OverWhite)
 	{
 		return 1;
 	}
-	if (GameResults[NextGameResult] == EGameState::OverBlack)
+	if (FinishingState == EGameState::OverBlack)
 	{
 		return -1;
 	}
