@@ -23,5 +23,5 @@ float FNetEvalMinMax::Evaluate(FDoubleBoard& Board)
 	{
 		Network.Update();
 	}
-	return FMinMaxAI::Evaluate(Board) + Network.GetOutput(0);
+	return FMinMaxAI::Evaluate(Board) + Network.GetOutput(0) * 10.0f;
 }
