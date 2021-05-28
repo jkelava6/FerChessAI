@@ -23,7 +23,7 @@ int main()
 	}
 
 	const int RatingsPeriod = 1;
-	const int BenchmarkPeriod = 1;
+	const int BenchmarkPeriod = 10;
 	TArray<IChessAI*> LeagueAIs;
 	League.GetAIs(LeagueAIs);
 	FDoubleBoard Board;
