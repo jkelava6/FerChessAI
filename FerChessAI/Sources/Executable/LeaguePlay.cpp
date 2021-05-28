@@ -5,6 +5,7 @@
 
 #include <ChessBoard.h>
 #include <Assisted/NetEvalMinMax.h>
+#include <Executable/DebugUtils.h>
 #include <League/League.h>
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -22,7 +23,7 @@ int main()
 	}
 
 	const int RatingsPeriod = 1;
-	const int BenchmarkPeriod = 10;
+	const int BenchmarkPeriod = 3;
 	TArray<IChessAI*> LeagueAIs;
 	League.GetAIs(LeagueAIs);
 	FDoubleBoard Board;
@@ -89,6 +90,7 @@ int main()
 					}
 
 					printf(" - vs MinMax(%d, %d) : [Result: %c] [Moves: %d]\n", BMIndex + 1, 2 * BMIndex + 2, Result, Moves);
+					DebugBoard(Board);
 				}
 			}
 		}
