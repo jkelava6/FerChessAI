@@ -23,10 +23,11 @@ int main()
 	}
 
 	const int RatingsPeriod = 1;
-	const int BenchmarkPeriod = 3;
+	const int BenchmarkPeriod = 1;
 	TArray<IChessAI*> LeagueAIs;
 	League.GetAIs(LeagueAIs);
 	FDoubleBoard Board;
+	TArray<char> BMResults;
 
 	for (int Generation = 1; ; Generation++)
 	{
@@ -44,6 +45,7 @@ int main()
 
 		if (Generation % BenchmarkPeriod == 0)
 		{
+			BMResults.Clear();
 			for (int PopIndex = 0; PopIndex < LeagueAIs.Count(); ++PopIndex)
 			{
 				printf("(%d) Rating: %d\n", PopIndex, League.Ratings[PopIndex]);
@@ -51,6 +53,7 @@ int main()
 				{
 					Board.DefaultBoard();
 					int Moves;
+					bool bFlippedOnEnd = false;
 					for (Moves = 0; Moves < 120; ++Moves)
 					{
 						LeagueAIs[PopIndex]->PlayMove(Board);
@@ -58,6 +61,7 @@ int main()
 
 						if (Board.GetGameState() > EGameState::ActiveBlack)
 						{
+							bFlippedOnEnd = true;
 							break;
 						}
 
@@ -71,7 +75,8 @@ int main()
 					}
 
 					char Result = ' ';
-					switch (Board.GetGameState())
+					EGameState EndState = Board.GetGameState();
+					switch (EndState)
 					{
 					case EGameState::ActiveWhite:
 						// fal through
@@ -92,9 +97,20 @@ int main()
 					}
 
 					printf(" - vs MinMax(%d, %d) : [Result: %c] [Moves: %d]\n", BMIndex + 1, 2 * BMIndex + 2, Result, Moves);
+					BMResults.Push() = Result;
+
+					if (bFlippedOnEnd)
+					{
+						Board.FlipBoard();
+					}
 					DebugBoard(Board);
 				}
 			}
+			for (int BMIndex = 0; BMIndex < BMResults.Count(); ++BMIndex)
+			{
+				printf("%c", BMResults[BMIndex]);
+			}
+			printf("\n");
 		}
 	}
 

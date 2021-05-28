@@ -623,7 +623,14 @@ const EChessPiece& FDoubleBoard::Square(int Rank, int File)
 
 EGameState FDoubleBoard::GetGameState()
 {
-	float Eval = FMinMaxAI::Eval(*this, 2, 2);
+#if !OPTIMIZED_GAME_STATE_CHECK
+	// This shouldn't happen in minmax AI play, unless 1-depth AI is used.
+	if (FMinMaxAI::Eval(*this, 1, 1) == MINMAX_EVAL_WIN)
+	{
+		return !bFlipped ? EGameState::OverWhite : EGameState::OverBlack;
+	}
+#endif
+	const float Eval = FMinMaxAI::Eval(*this, 2, 2);
 	if (Eval != MINMAX_EVAL_LOSS)
 	{
 		return !bFlipped ? EGameState::ActiveWhite : EGameState::ActiveBlack;
@@ -668,7 +675,7 @@ EGameState FDoubleBoard::GetGameState()
 	bool bMated = !bFlipped ? WhiteBoard.IsAttacked(KingRank, KingFile) : BlackBoard.IsAttacked(KingRank, KingFile);
 	if (bMated)
 	{
-		return !bFlipped ? EGameState::OverWhite : EGameState::OverBlack;
+		return bFlipped ? EGameState::OverWhite : EGameState::OverBlack;
 	}
 
 	return EGameState::OverDraw;
