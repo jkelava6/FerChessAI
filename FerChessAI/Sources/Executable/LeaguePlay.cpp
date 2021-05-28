@@ -19,7 +19,7 @@ int main()
 	FMinMaxAI BenchmarkAIs[4];
 	for (int Index = 0; Index < ARRAY_SIZE(BenchmarkAIs); ++Index)
 	{
-		BenchmarkAIs->SetDepths(Index + 1, 2 * (Index + 1));
+		BenchmarkAIs[Index].SetDepths(Index + 1, 2 * (Index + 1));
 	}
 
 	const int RatingsPeriod = 1;
