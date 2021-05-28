@@ -54,6 +54,7 @@ int main()
 					for (Moves = 0; Moves < 120; ++Moves)
 					{
 						LeagueAIs[PopIndex]->PlayMove(Board);
+						Board.FlipBoard();
 
 						if (Board.GetGameState() > EGameState::ActiveBlack)
 						{
@@ -61,6 +62,7 @@ int main()
 						}
 
 						BenchmarkAIs[BMIndex].PlayMove(Board);
+						Board.FlipBoard();
 
 						if (Board.GetGameState() > EGameState::ActiveBlack)
 						{
