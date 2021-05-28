@@ -14,15 +14,15 @@
 int main()
 {
 	FLeague League;
-	League.Initialize(8, 8, 160, 80);
+	League.Initialize(3, 4, 40, 10);
 	FMinMaxAI BenchmarkAIs[4];
 	for (int Index = 0; Index < ARRAY_SIZE(BenchmarkAIs); ++Index)
 	{
 		BenchmarkAIs->SetDepths(Index + 1, 2 * (Index + 1));
 	}
 
-	const int RatingsPeriod = 10;
-	const int BenchmarkPeriod = 45;
+	const int RatingsPeriod = 1;
+	const int BenchmarkPeriod = 10;
 	TArray<IChessAI*> LeagueAIs;
 	League.GetAIs(LeagueAIs);
 	FDoubleBoard Board;

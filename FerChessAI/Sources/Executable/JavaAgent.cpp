@@ -7,7 +7,9 @@
 
 #include <ChessBoard.h>
 #include <MinMaxAI.h>
+#include <Assisted/NetEvalMinMax.h>
 #include <JavaIO/JavaTokenIO.h>
+#include <League/League.h>
 
 #include <Windows.h>
 #include <cstring>
@@ -35,7 +37,11 @@ int main()
 {
 	FDoubleBoard Board;
 	Board.DefaultBoard();
-	FMinMaxAI AI;
+	FLeague League;
+	League.Initialize(1, 1, 80, 20);
+	TArray<IChessAI*> LeagueAIs;
+	League.GetAIs(LeagueAIs);
+	FNetEvalMinMax& AI = *(FNetEvalMinMax*)LeagueAIs[0];
 
 	const int BufferSize = 1000;
 	char MessageBuffer[BufferSize];

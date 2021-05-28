@@ -7,9 +7,10 @@ class FNetEvalMinMax : public FMinMaxAI
 {
 public:
 	FNetwork& AccesNetwork();
+	void SetIterationCount(int InIterationCount);
 protected:
 	virtual float Evaluate(FDoubleBoard& Board) override;
 private:
 	FNetwork Network;
-	int IterationCount;
+	int IterationCount = 5;
 };

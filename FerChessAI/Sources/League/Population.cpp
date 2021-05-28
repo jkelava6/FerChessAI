@@ -87,26 +87,34 @@ void FPopulation::NextGeneration(FLeague& League)
 	}
 }
 
-void FPopulation::GradeMatch(int UnitId, EGameState WhiteResult, int WhiteMoves, EGameState BlackResult, int BlackMoves)
+void FPopulation::GradeMatch(int UnitId, float WhiteScore, int WhiteMoves, float BlackScore, int BlackMoves)
 {
 	FUnit& Unit = Units[UnitId];
 
-	if (WhiteResult == EGameState::OverWhite)
+	if (WhiteScore == 1.0f)
 	{
 		Unit.Fitness += 1.0f - 0.01f * WhiteMoves;
 	}
-	else if (WhiteResult == EGameState::OverBlack)
+	else if (WhiteScore == 0.0f)
 	{
 		Unit.Fitness += 0.01f * WhiteMoves;
 	}
+	else
+	{
+		Unit.Fitness += WhiteScore;
+	}
 
-	if (BlackResult == EGameState::OverBlack)
+	if (BlackScore == 1.0f)
 	{
 		Unit.Fitness += 1.0f - 0.01f * BlackMoves;
 	}
-	else if (BlackResult == EGameState::OverWhite)
+	else if (BlackScore == 0.0f)
 	{
 		Unit.Fitness += 0.01f * BlackMoves;
+	}
+	else
+	{
+		Unit.Fitness += BlackScore;
 	}
 }
 

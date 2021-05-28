@@ -8,6 +8,11 @@ FNetwork& FNetEvalMinMax::AccesNetwork()
 	return Network;
 }
 
+void FNetEvalMinMax::SetIterationCount(int InIterationCount)
+{
+	IterationCount = InIterationCount;
+}
+
 float FNetEvalMinMax::Evaluate(FDoubleBoard& Board)
 {
 	for (int Rank = 0; Rank < RANKS; ++Rank)

@@ -631,6 +631,10 @@ EGameState FDoubleBoard::GetGameState()
 
 	int KingRank = -1;
 	int KingFile = -1;
+#ifdef _DEBUG
+	int BlackKingRank = -1;
+	int BlackKingFile = -1;
+#endif
 	for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
 		for (int File = 0; File < FILES; ++File)
@@ -640,11 +644,26 @@ EGameState FDoubleBoard::GetGameState()
 				KingRank = Rank;
 				KingFile = File;
 				
+#ifdef _DEBUG
+				continue;
+#else
 				Rank = RANKS;
 				break;
+#endif
 			}
+#ifdef _DEBUG
+			if (Square(Rank, File) == EChessPiece::BlackKing)
+			{
+				BlackKingRank = Rank;
+				BlackKingFile = File;
+			}
+#endif
 		}
 	}
+
+#ifdef _DEBUG
+	assert(KingRank != -1 && BlackKingRank != -1);
+#endif
 
 	bool bMated = !bFlipped ? WhiteBoard.IsAttacked(KingRank, KingFile) : BlackBoard.IsAttacked(KingRank, KingFile);
 	if (bMated)
@@ -654,6 +673,7 @@ EGameState FDoubleBoard::GetGameState()
 
 	return EGameState::OverDraw;
 }
+#undef _DEBUG
 
 void FDoubleBoard::MovePiece(int RankFrom, int FileFrom, int RankTo, int FileTo)
 {

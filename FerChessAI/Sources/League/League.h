@@ -16,16 +16,16 @@ public:
 	void GetAIs(TArray<IChessAI*>& OutTempAIs);
 private:
 	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount);
-	int GameScore(EGameState FinishingState);
-	void RateGame(EGameState FinishingState, int White, int Black);
+	float GameScore(FDoubleBoard& Board);
+	void RateGame(FDoubleBoard& Board, int White, int Black);
 public:
 	TArray<int> Ratings;
 private:
 	TArray<FPopulation> Populations;
 
-	TArray<EGameState> GameResults;
+	TArray<float> GameResults;
 	int NextGameResult = 0;
 	int PoolSize = 100;
-	int GlobalScore = 0;
+	float GlobalScore = 0.0f;
 
 };

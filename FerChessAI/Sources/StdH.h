@@ -34,8 +34,8 @@ Type&& Move(Type& Moved) noexcept
     return static_cast<Type&&>(Moved);
 }
 
-#define RANKS 6
-#define FILES 6
+#define RANKS 8
+#define FILES 8
 #define DEFAULT_BOARD (RANKS == 8 && FILES == 8)
 
 

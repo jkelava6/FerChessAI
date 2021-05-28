@@ -45,17 +45,19 @@ void FLeague::PlayAI(IChessAI& Challenger, FPopulation* Population, int UnitId, 
 
 		IChessAI& Representative = Populations[Index].Representative();
 		int WhiteMoves;
-		EGameState WhiteResult = PlayGame(Board, Challenger, Representative, WhiteMoves);
+		PlayGame(Board, Challenger, Representative, WhiteMoves);
+		const float WhiteScore = GameScore(Board);
 		int BlackMoves;
-		EGameState BlackResult = PlayGame(Board, Representative, Challenger, BlackMoves);
+		PlayGame(Board, Representative, Challenger, BlackMoves);
+		const float BlackScore = GameScore(Board);
 
 		if (bRated)
 		{
-			RateGame(WhiteResult, ChallengingPop, Index);
-			RateGame(BlackResult, Index, ChallengingPop);
+			RateGame(Board, ChallengingPop, Index);
+			RateGame(Board, Index, ChallengingPop);
 		}
 
-		Population->GradeMatch(UnitId, WhiteResult, WhiteMoves, BlackResult, BlackMoves);
+		Population->GradeMatch(UnitId, 0.5f * (1.0f + WhiteScore), WhiteMoves, 0.5f * (1.0f + BlackScore), BlackMoves);
 	}
 }
 
@@ -74,6 +76,7 @@ EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Bla
 	for (MoveCount = 1; MoveCount <= 60; ++MoveCount)
 	{
 		White.PlayMove(Board);
+		Board.FlipBoard();
 
 		if (Board.GetGameState() > EGameState::ActiveBlack)
 		{
@@ -81,6 +84,7 @@ EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Bla
 		}
 
 		Black.PlayMove(Board);
+		Board.FlipBoard();
 
 		if (Board.GetGameState() > EGameState::ActiveBlack)
 		{
@@ -92,20 +96,49 @@ EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Bla
 	return Board.GetGameState();
 }
 
-int FLeague::GameScore(EGameState FinishingState)
+float FLeague::GameScore(FDoubleBoard& Board)
 {
+	EGameState FinishingState = Board.GetGameState();
 	if (FinishingState == EGameState::OverWhite)
 	{
-		return 1;
+		return 1.0f;
 	}
 	if (FinishingState == EGameState::OverBlack)
 	{
-		return -1;
+		return -1.0f;
 	}
-	return 0;
+	if (FinishingState == EGameState::OverDraw)
+	{
+		return 0.0f;
+	}
+
+	bool bFlip = false;
+	if (FinishingState == EGameState::ActiveBlack)
+	{
+		bFlip = true;
+		Board.FlipBoard();
+	}
+	int Score = 0;
+	const int Values[] = { -1000, -9, -5, -3, -3, -1, 0, 1, 3, 3, 5, 9, 1000 };
+#if _DEBUG
+	const float _DebugDummyArray[(int)EChessPiece::WhiteKing + 1 - (int)EChessPiece::BlackKing] = {};
+	ARRAY_MATCH(Values, _DebugDummyArray);
+#endif
+	for (int Rank = 0; Rank < RANKS; ++Rank)
+	{
+		for (int File = 0; File < FILES; ++File)
+		{
+			Score += Values[(int)Board(Rank, File) - (int)EChessPiece::BlackKing];
+		}
+	}
+	if (bFlip)
+	{
+		Board.FlipBoard();
+	}
+	return 0.1f * SigmoidFunction((float)Score);
 }
 
-void FLeague::RateGame(EGameState FinishingState, int White, int Black)
+void FLeague::RateGame(FDoubleBoard& Board, int White, int Black)
 {
 	const bool bIsPoolFull = GameResults.Count() == PoolSize;
 
@@ -123,22 +156,21 @@ void FLeague::RateGame(EGameState FinishingState, int White, int Black)
 
 	if (bIsPoolFull)
 	{
-		GlobalScore -= GameScore(GameResults[NextGameResult]);
+		GlobalScore -= GameResults[NextGameResult];
 	}
 
-	GlobalScore += GameScore(FinishingState);
-	GameResults[NextGameResult++] = FinishingState;
+	const float BoardScore = GameScore(Board);
+	GlobalScore += BoardScore;
+	GameResults[NextGameResult++] = BoardScore;
 
-	if (bIsPoolFull)
-	{
-		const float WeightedGlobalScore = GlobalScore / (float)PoolSize;
-		const int RatingDiff = Ratings[White] - Ratings[Black];
-		const float WeightedDiff = SigmoidFunction((float)RatingDiff);
-		const float ScoreOffset = -0.5f * (WeightedDiff + WeightedGlobalScore);
-		const float FinalScore = (float)GameScore(FinishingState) + ScoreOffset;
+	const float WeightedGlobalScore = bIsPoolFull ? GlobalScore / (float)PoolSize : 0.0f;
 
-		const int RatingChange = (int)(20.0f * FinalScore);
-		Ratings[White] += RatingChange;
-		Ratings[Black] -= RatingChange;
-	}
+	const int RatingDiff = Ratings[White] - Ratings[Black];
+	const float WeightedDiff = SigmoidFunction((float)RatingDiff);
+	const float ScoreOffset = -0.5f * (WeightedDiff + WeightedGlobalScore);
+	const float FinalScore = BoardScore + ScoreOffset;
+
+	const int RatingChange = (int)(20.0f * FinalScore);
+	Ratings[White] += RatingChange;
+	Ratings[Black] -= RatingChange;
 }

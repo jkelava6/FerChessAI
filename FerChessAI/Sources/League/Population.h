@@ -25,7 +25,7 @@ public:
 	void Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes);
 	void PlayInLeague(FLeague& League);
 	void NextGeneration(FLeague& League);
-	void GradeMatch(int UnitId, EGameState WhiteResult, int WhiteMoves, EGameState BlackResult, int BlackMoves);
+	void GradeMatch(int UnitId, float WhiteScore, int WhiteMoves, float BlackScore, int BlackMoves);
 	IChessAI& Representative();
 	void SetDepths(int InNormalDepth, int InVolatileDepth);
 private:
