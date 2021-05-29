@@ -746,6 +746,11 @@ void FDoubleBoard::FlipBoard()
 	bFlipped = !bFlipped;
 }
 
+bool FDoubleBoard::IsFlipped()
+{
+	return bFlipped;
+}
+
 void FDoubleBoard::AllocateStack(int Size)
 {
 	WhiteBoard.AllocateStack(Size);

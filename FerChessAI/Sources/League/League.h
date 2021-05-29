@@ -2,12 +2,28 @@
 
 #include <Array.h>
 #include <League/Population.h>
+#include <ChessBoard.h>
 
 class IChessAI;
 enum class EGameState : int;
 class FDoubleBoard;
 class FPopulation;
-struct FThreadData;
+
+struct FThreadData
+{
+	FThreadData();
+	DECLARE_MOVE(FThreadData);
+	FLeague* League = nullptr;
+	int MaxMoves = 60;
+	FDoubleBoard Board;
+	int PopIndexWhite = -1;
+	int PopIndexBlack = -1;
+	int UnitIndexWhite = -1;
+	int UnitIndexBlack = -1;
+	int MoveCount = -1;
+	FNetEvalMinMax WhiteAI;
+	FNetEvalMinMax BlackAI;
+};
 
 class FLeague
 {
@@ -20,7 +36,7 @@ public:
 	void Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes);
 	void Iterate();
 	const FDna& GetDna(int PopulationIndex, int UnitIndex);
-	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount);
+	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves);
 private:
 	float GameScore(FDoubleBoard& Board);
 	void RateGame(FDoubleBoard& Board, int White, int Black);
@@ -39,3 +55,5 @@ private:
 	float GlobalScore = 0.0f;
 
 };
+
+extern void ExecPlay(void* Arg);

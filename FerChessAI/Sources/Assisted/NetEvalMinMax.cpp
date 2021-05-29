@@ -15,6 +15,11 @@ void FNetEvalMinMax::SetIterationCount(int InIterationCount)
 
 float FNetEvalMinMax::Evaluate(FDoubleBoard& Board)
 {
+	if (Network.GetInputCount() == 0)
+	{
+		return FMinMaxAI::Evaluate(Board);
+	}
+
 	for (int Rank = 0; Rank < RANKS; ++Rank)
 	{
 		for (int File = 0; File < FILES; ++File)

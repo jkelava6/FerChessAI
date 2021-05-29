@@ -22,16 +22,11 @@ int main()
 	FLeague League;
 	const int PopCount = 3;
 	const int PopSize = 4;
+	const int BMCount = 4;
 	League.Initialize(PopCount, PopSize, 40, 10);
-	FMinMaxAI BenchmarkAIs[4];
-	for (int Index = 0; Index < ARRAY_SIZE(BenchmarkAIs); ++Index)
-	{
-		BenchmarkAIs[Index].SetDepths(Index + 1, 2 * (Index + 1));
-	}
 
 	const int RatingsPeriod = 1;
 	const int BenchmarkPeriod = 10;
-	FDoubleBoard Board;
 	TArray<char> BMResults;
 
 	for (int Generation = 1; ; ++Generation)
@@ -50,42 +45,42 @@ int main()
 
 		if (Generation % BenchmarkPeriod == 0)
 		{
-			TArray<FNetEvalMinMax> LeagueAIs;
+			TArray<FThreadData> Games;
+
 			for (int PopIndex = 0; PopIndex < PopCount; ++PopIndex)
 			{
-				FNetEvalMinMax& AI = LeagueAIs.Push();
-				FDna DNA = League.GetDna(PopIndex, 0);
-				AI.AccesNetwork().FromDna(DNA);
+				for (int BMIndex = 0; BMIndex < BMCount; ++BMIndex)
+				{
+					FThreadData& Game = Games.Push();
+
+					Game.League = &League;
+					Game.Board.DefaultBoard();
+					Game.Board.AllocateStack(256);
+
+					FDna DNA = League.GetDna(PopIndex, 0);
+					Game.WhiteAI.AccesNetwork().FromDna(DNA);
+					Game.WhiteAI.SetDepths(2, 4);
+
+					Game.BlackAI.SetDepths(BMIndex + 1, BMIndex * 2 + 2);
+
+					Game.MaxMoves = 120;
+				}
 			}
 
+			for (int Index = 0; Index < Games.Count(); ++Index)
+			{
+				ChessThreads::QueueTaskBlocking(0, ExecPlay, &Games[Index]);
+			}
+			ChessThreads::WaitForAllTasks(0);
+
 			BMResults.Clear();
-			for (int PopIndex = 0; PopIndex < LeagueAIs.Count(); ++PopIndex)
+			for (int PopIndex = 0; PopIndex < PopCount; ++PopIndex)
 			{
 				printf("(%d) Rating: %d\n", PopIndex, League.Ratings[PopIndex]);
-				for (int BMIndex = 0; BMIndex < ARRAY_SIZE(BenchmarkAIs); ++BMIndex)
+				for (int BMIndex = 0; BMIndex < BMCount; ++BMIndex)
 				{
-					Board.DefaultBoard();
-					int Moves;
-					bool bFlippedOnEnd = false;
-					for (Moves = 0; Moves < 120; ++Moves)
-					{
-						LeagueAIs[PopIndex].PlayMove(Board);
-						Board.FlipBoard();
-
-						if (Board.GetGameState() > EGameState::ActiveBlack)
-						{
-							bFlippedOnEnd = true;
-							break;
-						}
-
-						BenchmarkAIs[BMIndex].PlayMove(Board);
-						Board.FlipBoard();
-
-						if (Board.GetGameState() > EGameState::ActiveBlack)
-						{
-							break;
-						}
-					}
+					FThreadData& Game = Games[PopIndex * BMCount + BMIndex];
+					FDoubleBoard& Board = Game.Board;
 
 					char Result = ' ';
 					EGameState EndState = Board.GetGameState();
@@ -109,10 +104,10 @@ int main()
 						break;
 					}
 
-					printf(" - vs MinMax(%d, %d) : [Result: %c] [Moves: %d]\n", BMIndex + 1, 2 * BMIndex + 2, Result, Moves);
+					printf(" - vs MinMax(%d, %d) : [Result: %c] [Moves: %d]\n", BMIndex + 1, 2 * BMIndex + 2, Result, Game.MoveCount);
 					BMResults.Push() = Result;
 
-					if (bFlippedOnEnd)
+					if (Board.IsFlipped())
 					{
 						Board.FlipBoard();
 					}

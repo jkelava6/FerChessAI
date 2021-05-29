@@ -270,6 +270,11 @@ void FNetwork::ExecuteReinforcement(float MinBiasStep, float MaxBiasStep, float 
 	bTrackReinforcement = false;
 }
 
+int FNetwork::GetInputCount()
+{
+	return Inputs;
+}
+
 // Based on Wolfram Alpha:
 // https://www.wolframalpha.com/input/?i=derivate+%28%28e%5Ex+-+e%5E-x%29+%2F+%28e%5Ex+%2B+e%5E-x%29%29
 // Query: derivate ((e^x - e^-x) / (e^x + e^-x))

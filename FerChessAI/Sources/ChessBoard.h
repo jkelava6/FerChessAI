@@ -120,6 +120,7 @@ public:
 	void CopyPositionFrom(FDoubleBoard& Board);
 
 	void FlipBoard();
+	bool IsFlipped();
 	void AllocateStack(int Size);
 private:
 	FChessBoard WhiteBoard;

@@ -5,30 +5,8 @@
 #include <NeuNet/Node.h>
 #include <Threading/ThreadingUtils.h>
 
-struct FThreadData
-{
-	FThreadData() = default;
-	DECLARE_MOVE(FThreadData);
-	FLeague* League = nullptr;
-	FDoubleBoard Board;
-	int PopIndexWhite = -1;
-	int PopIndexBlack = -1;
-	int UnitIndexWhite = -1;
-	int UnitIndexBlack = -1;
-	int MoveCount = -1;
-	FNetEvalMinMax WhiteAI;
-	FNetEvalMinMax BlackAI;
-};
+FThreadData::FThreadData() = default;
 IMPLEMENT_MOVE(FThreadData);
-
-static void ExecPlay(void* Arg)
-{
-	FThreadData& Data = *(FThreadData*)Arg;
-	FLeague* League = Data.League;
-
-	Data.MoveCount = 0;
-	League->PlayGame(Data.Board, Data.WhiteAI, Data.BlackAI, Data.MoveCount);
-}
 
 FLeague::FLeague() = default;
 FLeague::~FLeague() = default;
@@ -84,7 +62,10 @@ void FLeague::Iterate()
 	for (int Index = 0; Index < Games.Count(); ++Index)
 	{
 		FThreadData& Game = Games[Index];
-		RateGame(Game.Board, Game.PopIndexWhite, Game.PopIndexBlack);
+		if (Game.UnitIndexWhite == 0 && Game.UnitIndexBlack == 0)
+		{
+			RateGame(Game.Board, Game.PopIndexWhite, Game.PopIndexBlack);
+		}
 		const float BoardScore = GameScore(Game.Board);
 		Populations[Game.PopIndexWhite].GradeMatch(Game.UnitIndexWhite, BoardScore, Game.MoveCount);
 		Populations[Game.PopIndexBlack].GradeMatch(Game.UnitIndexBlack, BoardScore, Game.MoveCount);
@@ -101,9 +82,9 @@ const FDna& FLeague::GetDna(int PopulationIndex, int UnitIndex)
 	return Populations[PopulationIndex].GetDna(UnitIndex);
 }
 
-EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount)
+EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves)
 {
-	for (MoveCount = 1; MoveCount <= 60; ++MoveCount)
+	for (MoveCount = 1; MoveCount <= MaxMoves; ++MoveCount)
 	{
 		White.PlayMove(Board);
 		Board.FlipBoard();
@@ -227,4 +208,13 @@ void FLeague::SetupGame(TArray<FThreadData>& Games, int WhitePop, int WhiteUnit,
 	Black.SetDepths(NormalDepth, VolatileDepth);
 	FDna DnaBlack = GetDna(BlackPop, BlackUnit);
 	Black.AccesNetwork().FromDna(DnaBlack);
+}
+
+extern void ExecPlay(void* Arg)
+{
+	FThreadData& Data = *(FThreadData*)Arg;
+	FLeague* League = Data.League;
+
+	Data.MoveCount = 0;
+	League->PlayGame(Data.Board, Data.WhiteAI, Data.BlackAI, Data.MoveCount, Data.MaxMoves);
 }

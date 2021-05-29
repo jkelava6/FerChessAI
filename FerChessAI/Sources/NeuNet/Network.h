@@ -37,6 +37,8 @@ public:
 	void ExecuteReinforcement(float MinBiasStep, float MaxBiasStep, float MaxBiasValue,
 		float MinLinkStep, float MaxLinkStep, float MaxLinkValue);
 
+	int GetInputCount();
+
 private:
 	float SigmaDerivative(const FNode& Node);
 private:
