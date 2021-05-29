@@ -2,8 +2,7 @@
 
 #include <Array.h>
 
-#include <thread>
-typedef std::thread FCppThread;
+#include <ThreadInclude.h>
 
 class FThreadPool
 {
@@ -17,12 +16,11 @@ public:
 	void ResizeBlocking(int Size);
 	bool AllThreadsFree();
 	void WaitUntilDone();
-	int ExecuteTaskThreaded(FunctionPointer(void, Task, void*), void* Arg = nullptr);
+	int ExecuteTaskThreaded(FunctionPointer(void, Task, void*), void* Arg);
 
-private:
-	void ExecuteTaskWrapper(int Index, FunctionPointer(void, Task, void*), void* Arg);
+public:
+	TArray<bool> Busy;
 
 private:
 	TArray<FCppThread> Threads;
-	TArray<bool> Busy;
 };

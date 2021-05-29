@@ -140,5 +140,8 @@
     <ClInclude Include="Sources\ChessMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\ThreadInclude.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

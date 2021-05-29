@@ -123,6 +123,9 @@ void FChessBoard::EmptyBoard()
 			Square(Rank, File) = EChessPiece::None;
 		}
 	}
+	MoveStack.Clear();
+	EnPassantRank = -1;
+	SetMoved(0);
 }
 
 void FChessBoard::DefaultBoard()
@@ -200,6 +203,10 @@ void FChessBoard::DefaultBoard()
 	Square(0, 0) = EChessPiece::WhiteKing;
 	Square(RANKS - 1, FILES - 1) = EChessPiece::BlackKing;
 #endif
+
+	MoveStack.Clear();
+	EnPassantRank = -1;
+	SetMoved(0);
 }
 
 EChessPiece& FChessBoard::operator()(int Rank, int File)
@@ -559,6 +566,11 @@ bool FChessBoard::IsAttacked(int Rank, int File)
 	return false;
 }
 
+void FChessBoard::AllocateStack(int Size)
+{
+	MoveStack.Prealocate(Size);
+}
+
 void FChessBoard::SetEnPassant(int Rank, int File)
 {
 	EnPassantRank = Rank;
@@ -596,6 +608,7 @@ void FChessBoard::CopyPositionFrom(FChessBoard& Board, bool bFlipSides/* = false
 }
 
 FDoubleBoard::FDoubleBoard() = default;
+IMPLEMENT_MOVE(FDoubleBoard);
 
 void FDoubleBoard::EmptyBoard()
 {
@@ -731,5 +744,11 @@ void FDoubleBoard::CopyPositionFrom(FDoubleBoard& Board)
 void FDoubleBoard::FlipBoard()
 {
 	bFlipped = !bFlipped;
+}
+
+void FDoubleBoard::AllocateStack(int Size)
+{
+	WhiteBoard.AllocateStack(Size);
+	BlackBoard.AllocateStack(Size);
 }
 

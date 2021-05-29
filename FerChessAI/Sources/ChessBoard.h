@@ -74,6 +74,7 @@ public:
 	void SetEnPassant(int Rank, int File);
 	void CopyPositionFrom(FChessBoard& Board, bool bFlipSides = false);
 	bool IsAttacked(int Rank, int File);
+	void AllocateStack(int Size);
 
 	static __int64 FlipMovedMask(__int64 OgMask);
 private:
@@ -103,7 +104,7 @@ class FDoubleBoard
 public:
 	FDoubleBoard();
 	DECLARE_NOCOPY(FDoubleBoard);
-	DECLARE_NOMOVE(FDoubleBoard);
+	DECLARE_MOVE(FDoubleBoard);
 public:
 	void EmptyBoard();
 	void DefaultBoard();
@@ -119,6 +120,7 @@ public:
 	void CopyPositionFrom(FDoubleBoard& Board);
 
 	void FlipBoard();
+	void AllocateStack(int Size);
 private:
 	FChessBoard WhiteBoard;
 	FChessBoard BlackBoard;

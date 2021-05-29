@@ -37,7 +37,6 @@ void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentN
 {
 	MaxMiddleNodes = InMaxMiddleNodes;
 	MaxRecurrentNodes = InMaxRecurrentNodes;
-	RepAI.SetDepths(NormalDepth, VolatileDepth);
 
 	Units.Clear();
 	Units.Prealocate(Size);
@@ -45,19 +44,6 @@ void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentN
 	{
 		FUnit& Unit = Units.Push();
 		GenerateDna(Unit.Dna, (int)(RandomF() * MaxMiddleNodes), (int)(RandomF() * MaxRecurrentNodes));
-	}
-
-	RepAI.AccesNetwork().FromDna(Units[0].Dna);
-}
-
-void FPopulation::PlayInLeague(FLeague& League)
-{
-	FNetEvalMinMax AI;
-	AI.SetDepths(NormalDepth, VolatileDepth);
-	for (int Index = 0; Index < Units.Count(); ++Index)
-	{
-		AI.AccesNetwork().FromDna(Units[Index].Dna);
-		League.PlayAI(AI, this, Index, Index == 0);
 	}
 }
 
@@ -87,47 +73,27 @@ void FPopulation::NextGeneration(FLeague& League)
 	}
 }
 
-void FPopulation::GradeMatch(int UnitId, float WhiteScore, int WhiteMoves, float BlackScore, int BlackMoves)
+void FPopulation::GradeMatch(int UnitId, float Score, int Moves)
 {
 	FUnit& Unit = Units[UnitId];
 
-	if (WhiteScore == 1.0f)
+	if (Score == 1.0f)
 	{
-		Unit.Fitness += 1.0f - 0.01f * WhiteMoves;
+		Unit.Fitness += 1.0f - 0.01f * Moves;
 	}
-	else if (WhiteScore == 0.0f)
+	else if (Score == 0.0f)
 	{
-		Unit.Fitness += 0.01f * WhiteMoves;
-	}
-	else
-	{
-		Unit.Fitness += WhiteScore;
-	}
-
-	if (BlackScore == 1.0f)
-	{
-		Unit.Fitness += 1.0f - 0.01f * BlackMoves;
-	}
-	else if (BlackScore == 0.0f)
-	{
-		Unit.Fitness += 0.01f * BlackMoves;
+		Unit.Fitness += 0.01f * Moves;
 	}
 	else
 	{
-		Unit.Fitness += BlackScore;
+		Unit.Fitness += Score;
 	}
 }
 
-IChessAI& FPopulation::Representative()
+const FDna& FPopulation::GetDna(int UnitIndex)
 {
-	return RepAI;
-}
-
-void FPopulation::SetDepths(int InNormalDepth, int InVolatileDepth)
-{
-	NormalDepth = InNormalDepth;
-	VolatileDepth = InVolatileDepth;
-	RepAI.SetDepths(NormalDepth, VolatileDepth);
+	return Units[UnitIndex].Dna;
 }
 
 void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)

@@ -4,7 +4,7 @@
 #include <Array.h>
 #include <Threading/ThreadPool.h>
 
-#include <thread>
+#include <ThreadInclude.h>
 
 static TArray<FThreadPool> ThreadPools;
 
@@ -32,8 +32,9 @@ namespace ChessThreads
 		while (Index == -1)
 		{
 			Sleep(DefaultWaitTime);
-			int Index = Pool.ExecuteTaskThreaded(Task, Arg);
+			Index = Pool.ExecuteTaskThreaded(Task, Arg);
 		}
+		return Index;
 	}
 
 	extern bool AllTasksDone(int PoolId)

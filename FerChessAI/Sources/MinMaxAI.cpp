@@ -227,7 +227,11 @@ float FMinMaxAI::MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, 
 			}
 
 			TArray<int> Ranks;
+			int LendArrayRanks[32];
+			Ranks.LendData(LendArrayRanks, ARRAY_SIZE(LendArrayRanks), false);
 			TArray<int> Files;
+			int LendArrayFiles[32];
+			Files.LendData(LendArrayFiles, ARRAY_SIZE(LendArrayFiles), false);
 			Board.CollectMoves(Rank, File, Ranks, Files);
 
 			const int MoveCount = Ranks.Count();
@@ -254,10 +258,15 @@ float FMinMaxAI::MinMax(FDoubleBoard& Board, float Alfa, float Beta, int Depth, 
 						{
 							LastPlayedMove = BestMove;
 						}
+						Ranks.RemoveLend();
+						Files.RemoveLend();
 						return MoveEval;
 					}
 				}
 			}
+
+			Ranks.RemoveLend();
+			Files.RemoveLend();
 		}
 	}
 

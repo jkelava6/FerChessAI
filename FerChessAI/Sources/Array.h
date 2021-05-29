@@ -5,6 +5,11 @@
 #ifdef _DEBUG
 #include <cassert>
 #endif
+#include <ThreadInclude.h>
+
+extern FCppThread::id FirstThreadId;
+
+#define THREAD_GUARD() assert(FirstThreadId == FCppThread::id() || std::this_thread::get_id() == FirstThreadId)
 
 template <class Type> class TArray
 {
@@ -24,6 +29,7 @@ public:
 	{
 		if (Data)
 		{
+			THREAD_GUARD();
 			delete[] Data;
 		}
 	}
@@ -37,6 +43,7 @@ public:
 
 		AllocatedSize = Copied.AllocatedSize;
 		UsedSize = Copied.UsedSize;
+		THREAD_GUARD();
 		Data = new Type[AllocatedSize];
 		for (int Index = 0; Index < UsedSize; ++Index)
 		{
@@ -55,6 +62,7 @@ public:
 	{
 		if (Data)
 		{
+			THREAD_GUARD();
 			delete[] Data;
 		}
 
@@ -81,6 +89,7 @@ public:
 			return;
 		}
 
+		THREAD_GUARD();
 		Type* NewData = Size > 0 ? new Type[Size] : nullptr;
 		UsedSize = Min(Size, UsedSize);
 
@@ -167,6 +176,20 @@ public:
 		assert(0 <= Index && Index < UsedSize);
 #endif
 		return Index;
+	}
+
+	void LendData(Type* InData, int Size, bool bUsed = false)
+	{
+		Data = InData;
+		AllocatedSize = Size;
+		UsedSize = bUsed ? Size : 0;
+	}
+
+	void RemoveLend()
+	{
+		Data = nullptr;
+		AllocatedSize = 0;
+		UsedSize = 0;
 	}
 
 };

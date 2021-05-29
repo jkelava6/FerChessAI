@@ -3,8 +3,37 @@
 
 #include <ChessBoard.h>
 #include <NeuNet/Node.h>
+#include <Threading/ThreadingUtils.h>
 
-void FLeague::Initialize(int PopCount, int PopSize, int MaxMiddleNodes, int MaxRecurrentNodes)
+struct FThreadData
+{
+	FThreadData() = default;
+	DECLARE_MOVE(FThreadData);
+	FLeague* League = nullptr;
+	FDoubleBoard Board;
+	int PopIndexWhite = -1;
+	int PopIndexBlack = -1;
+	int UnitIndexWhite = -1;
+	int UnitIndexBlack = -1;
+	int MoveCount = -1;
+	FNetEvalMinMax WhiteAI;
+	FNetEvalMinMax BlackAI;
+};
+IMPLEMENT_MOVE(FThreadData);
+
+static void ExecPlay(void* Arg)
+{
+	FThreadData& Data = *(FThreadData*)Arg;
+	FLeague* League = Data.League;
+
+	Data.MoveCount = 0;
+	League->PlayGame(Data.Board, Data.WhiteAI, Data.BlackAI, Data.MoveCount);
+}
+
+FLeague::FLeague() = default;
+FLeague::~FLeague() = default;
+
+void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes)
 {
 	Populations.Clear();
 	Populations.Prealocate(PopCount);
@@ -13,66 +42,67 @@ void FLeague::Initialize(int PopCount, int PopSize, int MaxMiddleNodes, int MaxR
 	for (int Index = 0; Index < PopCount; ++Index)
 	{
 		FPopulation& Pop = Populations.Push();
-		Pop.Initialize(PopSize, MaxMiddleNodes, MaxRecurrentNodes);
+		Pop.Initialize(InPopSize, MaxMiddleNodes, MaxRecurrentNodes);
 		Ratings.Push() = 1000;
+	}
+	PopSize = InPopSize;
+
+	// if thread pool isn't initialize, initialize one with an arbitrary number of threads
+	if (ChessThreads::ThreadPoolCount() == 0)
+	{
+		ChessThreads::InitializeThreadPool(4);
 	}
 }
 
 void FLeague::Iterate()
 {
 	const int PopCount = Populations.Count();
-	for (int Index = 0; Index < PopCount; ++Index)
+	TArray<FThreadData> Games;
+	for (int LeftPop = 0; LeftPop < PopCount; ++LeftPop)
 	{
-		Populations[Index].PlayInLeague(*this);
+		for (int LeftUnit = 0; LeftUnit < PopSize; ++LeftUnit)
+		{
+			for (int RightPop = (LeftUnit == 0) ? LeftPop + 1 : 0; RightPop < PopCount; ++RightPop)
+			{
+				if (RightPop == LeftPop)
+				{
+					continue;
+				}
+
+				SetupGame(Games, LeftPop, LeftUnit, RightPop, 0);
+				SetupGame(Games, RightPop, 0, LeftPop, LeftUnit);
+			}
+		}
 	}
+
+	for (int Index = 0; Index < Games.Count(); ++Index)
+	{
+		ChessThreads::QueueTaskBlocking(0, ExecPlay, (void*)&Games[Index]);
+	}
+	ChessThreads::WaitForAllTasks(0);
+
+	for (int Index = 0; Index < Games.Count(); ++Index)
+	{
+		FThreadData& Game = Games[Index];
+		RateGame(Game.Board, Game.PopIndexWhite, Game.PopIndexBlack);
+		const float BoardScore = GameScore(Game.Board);
+		Populations[Game.PopIndexWhite].GradeMatch(Game.UnitIndexWhite, BoardScore, Game.MoveCount);
+		Populations[Game.PopIndexBlack].GradeMatch(Game.UnitIndexBlack, BoardScore, Game.MoveCount);
+	}
+
 	for (int Index = 0; Index < PopCount; ++Index)
 	{
 		Populations[Index].NextGeneration(*this);
 	}
 }
 
-void FLeague::PlayAI(IChessAI& Challenger, FPopulation* Population, int UnitId, bool bRated)
+const FDna& FLeague::GetDna(int PopulationIndex, int UnitIndex)
 {
-	const int ChallengingPop = Populations.IndexOf(Population);
-
-	FDoubleBoard Board;
-	for (int Index = 0; Index < Populations.Count(); ++Index)
-	{
-		if (Index == ChallengingPop)
-		{
-			continue;
-		}
-
-		IChessAI& Representative = Populations[Index].Representative();
-		int WhiteMoves;
-		PlayGame(Board, Challenger, Representative, WhiteMoves);
-		const float WhiteScore = GameScore(Board);
-		int BlackMoves;
-		PlayGame(Board, Representative, Challenger, BlackMoves);
-		const float BlackScore = GameScore(Board);
-
-		if (bRated)
-		{
-			RateGame(Board, ChallengingPop, Index);
-			RateGame(Board, Index, ChallengingPop);
-		}
-
-		Population->GradeMatch(UnitId, 0.5f * (1.0f + WhiteScore), WhiteMoves, 0.5f * (1.0f + BlackScore), BlackMoves);
-	}
-}
-
-void FLeague::GetAIs(TArray<IChessAI*>& OutTempAIs)
-{
-	for (int Index = 0; Index < Populations.Count(); ++Index)
-	{
-		OutTempAIs.Push() = &Populations[Index].Representative();
-	}
+	return Populations[PopulationIndex].GetDna(UnitIndex);
 }
 
 EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount)
 {
-	Board.DefaultBoard();
-
 	for (MoveCount = 1; MoveCount <= 60; ++MoveCount)
 	{
 		White.PlayMove(Board);
@@ -173,4 +203,28 @@ void FLeague::RateGame(FDoubleBoard& Board, int White, int Black)
 	const int RatingChange = (int)(20.0f * FinalScore);
 	Ratings[White] += RatingChange;
 	Ratings[Black] -= RatingChange;
+}
+
+void FLeague::SetupGame(TArray<FThreadData>& Games, int WhitePop, int WhiteUnit, int BlackPop, int BlackUnit)
+{
+	FThreadData& Game = Games.Push();
+
+	Game.League = this;
+
+	Game.Board.DefaultBoard();
+	Game.Board.AllocateStack(128);
+	Game.PopIndexWhite = WhitePop;
+	Game.UnitIndexWhite = WhiteUnit;
+	Game.PopIndexBlack = BlackPop;
+	Game.UnitIndexBlack = BlackUnit;
+
+	FNetEvalMinMax& White = Game.WhiteAI;
+	White.SetDepths(NormalDepth, VolatileDepth);
+	FDna DnaWhite = GetDna(WhitePop, WhiteUnit);
+	White.AccesNetwork().FromDna(DnaWhite);
+
+	FNetEvalMinMax& Black = Game.BlackAI;
+	Black.SetDepths(NormalDepth, VolatileDepth);
+	FDna DnaBlack = GetDna(BlackPop, BlackUnit);
+	Black.AccesNetwork().FromDna(DnaBlack);
 }

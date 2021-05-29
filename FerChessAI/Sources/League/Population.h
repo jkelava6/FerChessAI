@@ -23,21 +23,15 @@ class FPopulation
 {
 public:
 	void Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes);
-	void PlayInLeague(FLeague& League);
 	void NextGeneration(FLeague& League);
-	void GradeMatch(int UnitId, float WhiteScore, int WhiteMoves, float BlackScore, int BlackMoves);
-	IChessAI& Representative();
-	void SetDepths(int InNormalDepth, int InVolatileDepth);
+	void GradeMatch(int UnitId, float Score, int Moves);
+	const FDna& GetDna(int UnitIndex);
 private:
 	void MutateDna(FDna& InDna, FDna& OutDna);
 private:
-	FNetEvalMinMax RepAI;
 	TArray<FUnit> Units;
 	int MaxMiddleNodes;
 	int MaxRecurrentNodes;
-
-	int NormalDepth = 2;
-	int VolatileDepth = 4;
 };
 
 extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes);

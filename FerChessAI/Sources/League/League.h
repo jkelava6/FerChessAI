@@ -5,23 +5,33 @@
 
 class IChessAI;
 enum class EGameState : int;
+class FDoubleBoard;
+class FPopulation;
+struct FThreadData;
 
 class FLeague
 {
 public:
-	void Initialize(int PopCount, int PopSize, int MaxMiddleNodes, int MaxRecurrentNodes);
+	FLeague();
+	~FLeague();
+	DECLARE_NOCOPY(FLeague);
+	DECLARE_NOMOVE(FLeague);
+public:
+	void Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes);
 	void Iterate();
-	void PlayAI(IChessAI& Challenger, FPopulation* Population, int UnitId, bool bRated);
-	/** Generated pointers lose validity when this objects is destroyed, or Initialize() is called. */
-	void GetAIs(TArray<IChessAI*>& OutTempAIs);
-private:
+	const FDna& GetDna(int PopulationIndex, int UnitIndex);
 	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount);
+private:
 	float GameScore(FDoubleBoard& Board);
 	void RateGame(FDoubleBoard& Board, int White, int Black);
+	void SetupGame(TArray<FThreadData>& Games, int WhitePop, int WhiteUnit, int BlackPop, int BlackUnit);
 public:
 	TArray<int> Ratings;
+	int NormalDepth = 2;
+	int VolatileDepth = 4;
 private:
 	TArray<FPopulation> Populations;
+	int PopSize = -1;
 
 	TArray<float> GameResults;
 	int NextGameResult = 0;

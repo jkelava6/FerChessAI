@@ -3,10 +3,13 @@
 
 #include <StdH.h>
 
+#include <Array.h>
 #include <ChessBoard.h>
+#include <ThreadInclude.h>
 #include <Assisted/NetEvalMinMax.h>
 #include <Executable/DebugUtils.h>
 #include <League/League.h>
+#include <Threading/ThreadingUtils.h>
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
@@ -14,8 +17,12 @@
 
 int main()
 {
+	ChessThreads::InitializeThreadPool(8);
+	FirstThreadId = std::this_thread::get_id();
 	FLeague League;
-	League.Initialize(3, 4, 40, 10);
+	const int PopCount = 3;
+	const int PopSize = 4;
+	League.Initialize(PopCount, PopSize, 40, 10);
 	FMinMaxAI BenchmarkAIs[4];
 	for (int Index = 0; Index < ARRAY_SIZE(BenchmarkAIs); ++Index)
 	{
@@ -24,12 +31,10 @@ int main()
 
 	const int RatingsPeriod = 1;
 	const int BenchmarkPeriod = 10;
-	TArray<IChessAI*> LeagueAIs;
-	League.GetAIs(LeagueAIs);
 	FDoubleBoard Board;
 	TArray<char> BMResults;
 
-	for (int Generation = 1; ; Generation++)
+	for (int Generation = 1; ; ++Generation)
 	{
 		League.Iterate();
 
@@ -45,6 +50,14 @@ int main()
 
 		if (Generation % BenchmarkPeriod == 0)
 		{
+			TArray<FNetEvalMinMax> LeagueAIs;
+			for (int PopIndex = 0; PopIndex < PopCount; ++PopIndex)
+			{
+				FNetEvalMinMax& AI = LeagueAIs.Push();
+				FDna DNA = League.GetDna(PopIndex, 0);
+				AI.AccesNetwork().FromDna(DNA);
+			}
+
 			BMResults.Clear();
 			for (int PopIndex = 0; PopIndex < LeagueAIs.Count(); ++PopIndex)
 			{
@@ -56,7 +69,7 @@ int main()
 					bool bFlippedOnEnd = false;
 					for (Moves = 0; Moves < 120; ++Moves)
 					{
-						LeagueAIs[PopIndex]->PlayMove(Board);
+						LeagueAIs[PopIndex].PlayMove(Board);
 						Board.FlipBoard();
 
 						if (Board.GetGameState() > EGameState::ActiveBlack)

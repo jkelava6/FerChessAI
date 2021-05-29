@@ -185,6 +185,7 @@
     <ClInclude Include="Sources\NeuNet\Node.h" />
     <ClInclude Include="Sources\StdH.h" />
     <ClInclude Include="Sources\MinMaxAI.h" />
+    <ClInclude Include="Sources\ThreadInclude.h" />
     <ClInclude Include="Sources\Threading\ThreadingUtils.h" />
     <ClInclude Include="Sources\Threading\ThreadPool.h" />
   </ItemGroup>
