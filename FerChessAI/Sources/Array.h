@@ -9,7 +9,12 @@
 
 extern FCppThread::id FirstThreadId;
 
+#ifdef _DEBUG
 #define THREAD_GUARD() assert(FirstThreadId == FCppThread::id() || std::this_thread::get_id() == FirstThreadId)
+#else
+#define THREAD_GUARD() (void)0
+#endif // _DEBUG
+
 
 template <class Type> class TArray
 {
