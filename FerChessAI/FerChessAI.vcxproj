@@ -164,6 +164,8 @@
     <ClCompile Include="Sources\NeuNet\Network.cpp" />
     <ClCompile Include="Sources\NeuNet\NeuNetAI.cpp" />
     <ClCompile Include="Sources\NeuNet\Node.cpp" />
+    <ClCompile Include="Sources\Threading\ThreadingUtils.cpp" />
+    <ClCompile Include="Sources\Threading\ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Array.h" />
@@ -176,13 +178,15 @@
     <ClInclude Include="Sources\JavaIO\JavaTokenIO.h" />
     <ClInclude Include="Sources\League\League.h" />
     <ClInclude Include="Sources\League\Population.h" />
-    <ClInclude Include="Sources\Math.h" />
+    <ClInclude Include="Sources\ChessMath.h" />
     <ClInclude Include="Sources\NeuNet\Dna.h" />
     <ClInclude Include="Sources\NeuNet\Network.h" />
     <ClInclude Include="Sources\NeuNet\NeuNetAI.h" />
     <ClInclude Include="Sources\NeuNet\Node.h" />
     <ClInclude Include="Sources\StdH.h" />
     <ClInclude Include="Sources\MinMaxAI.h" />
+    <ClInclude Include="Sources\Threading\ThreadingUtils.h" />
+    <ClInclude Include="Sources\Threading\ThreadPool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

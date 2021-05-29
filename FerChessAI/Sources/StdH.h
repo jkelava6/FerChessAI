@@ -28,6 +28,8 @@ ClassName::ClassName(const ClassName&) = default
 ClassName& ClassName::operator= (ClassName&&) noexcept = default; \
 ClassName::ClassName(ClassName&&) noexcept = default
 
+#define FunctionPointer(Type, VarName, ...) Type (*VarName) (__VA_ARGS__)
+
 template <class Type>
 Type&& Move(Type& Moved) noexcept
 {

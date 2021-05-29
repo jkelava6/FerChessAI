@@ -2,7 +2,7 @@
 #include <StdH.h>
 #include <NeuNet/Network.h>
 
-#include <Math.h>
+#include <ChessMath.h>
 #include <NeuNet/Dna.h>
 #include <NeuNet/Node.h>
 

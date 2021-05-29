@@ -3,7 +3,7 @@
 #include <StdH.h>
 #include <ChessBoard.h>
 
-#include <Math.h>
+#include <ChessMath.h>
 #include <MinMaxAI.h>
 #include <JavaIO/JavaTokenIO.h>
 

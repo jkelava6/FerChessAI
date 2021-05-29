@@ -5,7 +5,7 @@
 #include <MinMaxAI.h>
 
 #include <ChessBoard.h>
-#include <Math.h>
+#include <ChessMath.h>
 
 
 FEvaluatedMove::FEvaluatedMove(int MoveRankFrom /*= -1*/, int MoveFileFrom /*= -1*/,
