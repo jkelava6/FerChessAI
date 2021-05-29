@@ -17,7 +17,7 @@
 
 int main()
 {
-	ChessThreads::InitializeThreadPool(8);
+	ChessThreads::InitializeThreadPool(4);
 	FirstThreadId = std::this_thread::get_id();
 	FLeague League;
 	const int PopCount = 3;
