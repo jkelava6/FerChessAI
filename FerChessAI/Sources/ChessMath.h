@@ -51,16 +51,18 @@ inline float SignF(float Value)
 	return 0.0;
 }
 
+#include <cmath>
 // Taylor series e^x implementation, taken from:
 // https://www.geeksforgeeks.org/program-to-efficiently-calculate-ex/
 inline float PowerNat(float Exp, int Precision = 20)
 {
-	float Res = 1.0f;
+	return pow(2.71828182846f, Exp);
+	/*float Res = 1.0f;
 
 	for (int i = Precision - 1; i > 0; --i)
 		Res = 1 + Exp * Res / i;
 
-	return Res;
+	return Res;*/
 }
 
 // Wang has random number generation, taken from:
