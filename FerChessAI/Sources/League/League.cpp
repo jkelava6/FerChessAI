@@ -181,7 +181,7 @@ void FLeague::RateGame(FDoubleBoard& Board, int White, int Black)
 	const float ScoreOffset = -0.5f * (WeightedDiff + WeightedGlobalScore);
 	const float FinalScore = BoardScore + ScoreOffset;
 
-	const int RatingChange = (int)(20.0f * FinalScore);
+	const int RatingChange = (int)ClampF(20.0f * FinalScore, -100.0f, 100.0f);
 	Ratings[White] += RatingChange;
 	Ratings[Black] -= RatingChange;
 }

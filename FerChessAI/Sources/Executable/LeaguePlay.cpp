@@ -17,11 +17,11 @@
 
 int main()
 {
-	ChessThreads::InitializeThreadPool(4);
+	ChessThreads::InitializeThreadPool(12);
 	FirstThreadId = std::this_thread::get_id();
 	FLeague League;
-	const int PopCount = 3;
-	const int PopSize = 4;
+	const int PopCount = 4;
+	const int PopSize = 6;
 	const int BMCount = 4;
 	League.Initialize(PopCount, PopSize, 40, 10);
 
