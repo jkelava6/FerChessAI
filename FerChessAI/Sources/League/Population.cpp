@@ -56,6 +56,11 @@ void FPopulation::NextGeneration(FLeague& League)
 
 	for (int Iteration = 0; Iteration < Units.Count(); ++Iteration)
 	{
+		TotalFitness += Units[Iteration].Fitness;
+	}
+
+	for (int Iteration = 0; Iteration < Units.Count(); ++Iteration)
+	{
 		float FitnessToGo = RandomF() * TotalFitness;
 
 		for (int Index = 0; Index < Units.Count(); ++Index)
@@ -63,7 +68,7 @@ void FPopulation::NextGeneration(FLeague& League)
 			FitnessToGo -= Units[Index].Fitness;
 			if (FitnessToGo >= 0)
 			{
-				return;
+				continue;
 			}
 
 			FUnit& Mutated = NextGen.Push();
