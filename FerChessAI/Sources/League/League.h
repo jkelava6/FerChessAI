@@ -33,7 +33,9 @@ public:
 	DECLARE_NOCOPY(FLeague);
 	DECLARE_NOMOVE(FLeague);
 public:
-	void Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes, int MaxLinksPerNode, float LinkCutChance = 0.01f);
+	void Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes, int MaxLinksPerNode, float LinkCutChance,
+		float NodeAnomalyChance, int NodeEquilibriumCount, float NodeDisruptionChance,
+		float RecurrentAnomalyChance, int EquilibriumRecurrentCount, float RecurrentDisruptionChance);
 	void Iterate();
 	const FDna& GetDna(int PopulationIndex, int UnitIndex);
 	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves);

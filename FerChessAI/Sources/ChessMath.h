@@ -28,6 +28,11 @@ inline float ClampF(float Value, float MinVal, float MaxVal)
 	return Max(Min(Value, MaxVal), MinVal);
 }
 
+inline float LerpF(float From, float To, float Distance)
+{
+	return From + Distance * (To - From);
+}
+
 inline float SquareF(float Squared)
 {
 	return Squared * Squared;

@@ -23,7 +23,11 @@ int main()
 	const int PopCount = 4;
 	const int PopSize = 6;
 	const int BMCount = 4;
-	League.Initialize(PopCount, PopSize, 40, 10, 8);
+	const int MaxMiddleNodes = 40;
+	const int MaxRecurrentNodes = 10;
+	League.Initialize(PopCount, PopSize, MaxMiddleNodes, MaxRecurrentNodes, 8, 0.001f,
+		0.1f, (int)(0.8f * MaxMiddleNodes), 0.1f,
+		0.1f, (int)(0.8f * MaxRecurrentNodes), 0.1f);
 
 	const int RatingsPeriod = 1;
 	const int BenchmarkPeriod = 10;

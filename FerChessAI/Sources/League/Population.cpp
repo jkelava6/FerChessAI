@@ -33,12 +33,20 @@ FUnit::FUnit(FUnit&& Moved) noexcept
 	*this = Move(Moved);
 }
 
-void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes, int InMaxLinksPerNode, float InLinkCutChance/* = 0.01f*/)
+void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes, int InMaxLinksPerNode, float InLinkCutChance,
+	float InNodeAnomalyChance, int InEquilibriumNodeCount, float InNodeDisruptionChance,
+	float InRecurrentAnomalyChance, int InEquilibriumRecurrentCount, float InRecurrentDisruptionChance)
 {
 	MaxMiddleNodes = InMaxMiddleNodes;
 	MaxRecurrentNodes = InMaxRecurrentNodes;
 	MaxLinksPerNode = InMaxLinksPerNode;
 	LinkCutChance = InLinkCutChance;
+	NodeAnomalyChance = InNodeAnomalyChance;
+	EquilibriumNodeCount = InEquilibriumNodeCount;
+	NodeDisruptionChance = InNodeDisruptionChance;
+	RecurrentAnomalyChance = InRecurrentAnomalyChance;
+	EquilibriumRecurrentCount = InEquilibriumRecurrentCount;
+	RecurrentDisruptionChance = InRecurrentDisruptionChance;
 
 	Units.Clear();
 	Units.Prealocate(Size);
@@ -114,33 +122,61 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 
 	InDna.Peek(0);
 	OutDna.PushInt(InDna.ReadInt());
+	const int Outputs = InDna.ReadInt();
+	OutDna.PushInt(Outputs);
 	OutDna.PushInt(InDna.ReadInt());
-	OutDna.PushInt(InDna.ReadInt());
+
 	const int RecurrentNodes = InDna.ReadInt();
 	OutDna.PushInt(RecurrentNodes);
+	const bool bRecurrentAnomaly = RandomF() < RecurrentAnomalyChance;
+	const float RecurrentCreationChance = RecurrentAnomalyChance < EquilibriumRecurrentCount
+		? LerpF(1.0f, 0.5f, RecurrentNodes / (float)EquilibriumRecurrentCount)
+		: LerpF(0.5f, 0.0f, (RecurrentNodes - EquilibriumRecurrentCount) / (float)(MaxRecurrentNodes - EquilibriumRecurrentCount));
+	const bool bNewRecurrent = bRecurrentAnomaly && RandomF() < RecurrentCreationChance && RecurrentNodes < MaxRecurrentNodes;
+	const bool bDestroyRecurrent = bRecurrentAnomaly && !bNewRecurrent && RecurrentNodes > 0;
+	const int DestroyedRecurrent = bDestroyRecurrent ? RandomF() * RecurrentNodes : -1;
+
 	const int MiddleNodes = InDna.ReadInt();
 	OutDna.PushInt(MiddleNodes);
+	const bool bMiddleAnomaly = RandomF() < NodeAnomalyChance;
+	const float MiddleCreationChance = NodeAnomalyChance < EquilibriumNodeCount
+		? LerpF(1.0f, 0.5f, MiddleNodes / (float)EquilibriumNodeCount)
+		: LerpF(0.5f, 0.0f, (MiddleNodes - EquilibriumNodeCount) / (float)(MaxMiddleNodes - EquilibriumNodeCount));
+	const bool bNewMiddle = bMiddleAnomaly && RandomF() < MiddleCreationChance && MiddleNodes < MaxMiddleNodes;
+	const bool bDestroyMiddle = bMiddleAnomaly && !bNewMiddle && MiddleNodes > 0;
+	const int DestroyedMiddle = bDestroyMiddle ? RandomF() * MiddleNodes : -1;
+
 	for (int Index = 0; Index < RecurrentNodes; ++Index)
 	{
 		const float PrevBias = InDna.ReadFloat();
-		OutDna.PushFloat(ClampF(PrevBias - 0.01f + RandomF() * 0.02f, -MaxBias, MaxBias));
+		if (Index != DestroyedRecurrent)
+		{
+			OutDna.PushFloat(ClampF(PrevBias - 0.01f + RandomF() * 0.02f, -MaxBias, MaxBias));
+		}
 	}
-	for (int Index = 0; Index < MiddleNodes + 1 + RecurrentNodes; ++Index)
+	for (int Index = 0; Index < MiddleNodes + Outputs + RecurrentNodes; ++Index)
 	{
 		const float PrevBias = InDna.ReadFloat();
-		OutDna.PushFloat(ClampF(PrevBias - 0.01f + RandomF() * 0.02f, -MaxBias, MaxBias));
+		const bool bPushNode = Index != DestroyedMiddle && (bDestroyRecurrent && Index != MiddleNodes + Outputs + DestroyedRecurrent);
+		if (bPushNode)
+		{
+			OutDna.PushFloat(ClampF(PrevBias - 0.01f + RandomF() * 0.02f, -MaxBias, MaxBias));
+		}
 
 		const int LinkCount = InDna.ReadInt();
 		const bool bLinkCut = RandomF() < LinkCutChance;
 		const bool bNewLink = bLinkCut && RandomF() < 0.5f && LinkCount < MaxLinksPerNode;
 		const bool bDestroyLink = bLinkCut && !bNewLink && LinkCount > 0;
-		OutDna.PushInt(LinkCount + bNewLink - bDestroyLink);
+		if (bPushNode)
+		{
+			OutDna.PushInt(LinkCount + bNewLink - bDestroyLink);
+		}
 
 		const int DestroyedLink = bDestroyLink ? (int)(RandomF() * LinkCount) : -1;
 
 		for (int Link = 0; Link < LinkCount; ++Link)
 		{
-			if (Link == DestroyedLink)
+			if (Link == DestroyedLink || !bPushNode)
 			{
 				InDna.ReadInt();
 				InDna.ReadFloat();
@@ -151,7 +187,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 			OutDna.PushFloat(ClampF(PrevLink - 0.01f + RandomF() * 0.02f, -MaxLinkStrength, MaxLinkStrength));
 		}
 
-		if (bNewLink)
+		if (bNewLink && bPushNode)
 		{
 			OutDna.PushInt((int)(RandomF() * (Inputs + Index)));
 			OutDna.PushFloat(-MaxLinkStrength + RandomF() * 2.0f * MaxLinkStrength);

@@ -22,7 +22,9 @@ public:
 class FPopulation
 {
 public:
-	void Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes, int InMaxLinksPerNode, float InLinkCutChance = 0.01f);
+	void Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes, int InMaxLinksPerNode, float InLinkCutChance,
+		float InNodeAnomalyChance, int InEquilibriumNodeCount, float InNodeDisruptionChance,
+		float InRecurrentAnomalyChance, int InEquilibriumRecurrentCount, float InRecurrentDisruptionChance);
 	void NextGeneration(FLeague& League);
 	void GradeMatch(int UnitId, float Score, int Moves);
 	const FDna& GetDna(int UnitIndex);
@@ -34,6 +36,12 @@ private:
 	int MaxRecurrentNodes;
 	int MaxLinksPerNode;
 	float LinkCutChance;
+	float NodeAnomalyChance;
+	int EquilibriumNodeCount;
+	float NodeDisruptionChance;
+	float RecurrentAnomalyChance;
+	int EquilibriumRecurrentCount;
+	float RecurrentDisruptionChance;
 };
 
 extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes, int MaxLinksPerNode = 5);
