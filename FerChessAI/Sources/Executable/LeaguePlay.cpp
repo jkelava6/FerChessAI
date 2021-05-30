@@ -39,7 +39,7 @@ int main()
 
 		if (Generation % RatingsPeriod == 0)
 		{
-			printf("Ratings: ");
+			printf("[Gen%4d] Ratings: ", Generation);
 			for (int Index = 0; Index < League.Ratings.Count(); ++Index)
 			{
 				printf("%d ", League.Ratings[Index]);
@@ -117,6 +117,7 @@ int main()
 					}
 					DebugBoard(Board);
 				}
+				BMResults.Push() = ' ';
 			}
 			for (int BMIndex = 0; BMIndex < BMResults.Count(); ++BMIndex)
 			{
