@@ -11,7 +11,7 @@ IMPLEMENT_MOVE(FThreadData);
 FLeague::FLeague() = default;
 FLeague::~FLeague() = default;
 
-void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes)
+void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes, int MaxLinksPerNode, float LinkCutChance/* = 0.01f*/)
 {
 	Populations.Clear();
 	Populations.Prealocate(PopCount);
@@ -20,7 +20,7 @@ void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int Ma
 	for (int Index = 0; Index < PopCount; ++Index)
 	{
 		FPopulation& Pop = Populations.Push();
-		Pop.Initialize(InPopSize, MaxMiddleNodes, MaxRecurrentNodes);
+		Pop.Initialize(InPopSize, MaxMiddleNodes, MaxRecurrentNodes, MaxLinksPerNode, LinkCutChance);
 		Ratings.Push() = 1000;
 	}
 	PopSize = InPopSize;

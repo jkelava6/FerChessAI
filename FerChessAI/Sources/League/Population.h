@@ -22,7 +22,7 @@ public:
 class FPopulation
 {
 public:
-	void Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes);
+	void Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes, int InMaxLinksPerNode, float InLinkCutChance = 0.01f);
 	void NextGeneration(FLeague& League);
 	void GradeMatch(int UnitId, float Score, int Moves);
 	const FDna& GetDna(int UnitIndex);
@@ -32,6 +32,8 @@ private:
 	TArray<FUnit> Units;
 	int MaxMiddleNodes;
 	int MaxRecurrentNodes;
+	int MaxLinksPerNode;
+	float LinkCutChance;
 };
 
-extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes);
+extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes, int MaxLinksPerNode = 5);

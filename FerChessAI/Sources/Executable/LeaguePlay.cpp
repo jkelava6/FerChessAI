@@ -23,7 +23,7 @@ int main()
 	const int PopCount = 4;
 	const int PopSize = 6;
 	const int BMCount = 4;
-	League.Initialize(PopCount, PopSize, 40, 10);
+	League.Initialize(PopCount, PopSize, 40, 10, 8);
 
 	const int RatingsPeriod = 1;
 	const int BenchmarkPeriod = 10;
