@@ -35,7 +35,14 @@ public:
 public:
 	void Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes, int MaxLinksPerNode, float LinkCutChance,
 		float NodeAnomalyChance, int NodeEquilibriumCount, float NodeDisruptionChance,
-		float RecurrentAnomalyChance, int EquilibriumRecurrentCount, float RecurrentDisruptionChance);
+		float RecurrentAnomalyChance, int EquilibriumRecurrentCount, float RecurrentDisruptionChance
+#if USE_CONSUMER_FUNCTIONS
+		, float ConsumerAnomalyChance
+#endif
+#if USE_MAPPING_FUNCTIONS
+		, float MappingAnomalyChance
+#endif
+	);
 	void Iterate();
 	const FDna& GetDna(int PopulationIndex, int UnitIndex);
 	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves);

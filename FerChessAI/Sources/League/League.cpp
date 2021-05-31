@@ -13,7 +13,14 @@ FLeague::~FLeague() = default;
 
 void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int MaxRecurrentNodes, int MaxLinksPerNode, float LinkCutChance,
 	float NodeAnomalyChance, int NodeEquilibriumCount, float NodeDisruptionChance,
-	float RecurrentAnomalyChance, int EquilibriumRecurrentCount, float RecurrentDisruptionChance)
+	float RecurrentAnomalyChance, int EquilibriumRecurrentCount, float RecurrentDisruptionChance
+#if USE_CONSUMER_FUNCTIONS
+	, float ConsumerAnomalyChance
+#endif
+#if USE_MAPPING_FUNCTIONS
+	, float MappingAnomalyChance
+#endif
+)
 {
 	Populations.Clear();
 	Populations.Prealocate(PopCount);
@@ -24,7 +31,14 @@ void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int Ma
 		FPopulation& Pop = Populations.Push();
 		Pop.Initialize(InPopSize, MaxMiddleNodes, MaxRecurrentNodes, MaxLinksPerNode, LinkCutChance,
 			NodeAnomalyChance, NodeEquilibriumCount, NodeDisruptionChance,
-			RecurrentAnomalyChance, EquilibriumRecurrentCount, RecurrentDisruptionChance);
+			RecurrentAnomalyChance, EquilibriumRecurrentCount, RecurrentDisruptionChance
+#if USE_CONSUMER_FUNCTIONS
+			, ConsumerAnomalyChance
+#endif
+#if USE_MAPPING_FUNCTIONS
+			, MappingAnomalyChance
+#endif
+		);
 		Ratings.Push() = 1000;
 	}
 	PopSize = InPopSize;

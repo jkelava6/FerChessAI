@@ -37,7 +37,14 @@ FUnit::FUnit(FUnit&& Moved) noexcept
 
 void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentNodes, int InMaxLinksPerNode, float InLinkCutChance,
 	float InNodeAnomalyChance, int InEquilibriumNodeCount, float InNodeDisruptionChance,
-	float InRecurrentAnomalyChance, int InEquilibriumRecurrentCount, float InRecurrentDisruptionChance)
+	float InRecurrentAnomalyChance, int InEquilibriumRecurrentCount, float InRecurrentDisruptionChance
+#if USE_CONSUMER_FUNCTIONS
+	, float InConsumerAnomalyChance
+#endif
+#if USE_MAPPING_FUNCTIONS
+	, float InMappingAnomalyChance
+#endif
+)
 {
 	MaxMiddleNodes = InMaxMiddleNodes;
 	MaxRecurrentNodes = InMaxRecurrentNodes;
@@ -49,6 +56,12 @@ void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentN
 	RecurrentAnomalyChance = InRecurrentAnomalyChance;
 	EquilibriumRecurrentCount = InEquilibriumRecurrentCount;
 	RecurrentDisruptionChance = InRecurrentDisruptionChance;
+#if USE_CONSUMER_FUNCTIONS
+	ConsumerAnomalyChance = InConsumerAnomalyChance;
+#endif
+#if USE_MAPPING_FUNCTIONS
+	MappingAnomalyChance = InMappingAnomalyChance;
+#endif
 
 	Units.Clear();
 	Units.Prealocate(Size);
@@ -178,14 +191,14 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		const int ConsumerIndex = InDna.ReadInt();
 		if (bPushNode)
 		{
-			OutDna.PushInt(ConsumerIndex);
+			OutDna.PushInt(RandomF() < ConsumerAnomalyChance ? RandomConsumerIndex() : ConsumerIndex);
 		}
 #endif
 #if USE_MAPPING_FUNCTIONS
 		const int MapperIndex = InDna.ReadInt();
 		if (bPushNode)
 		{
-			OutDna.PushInt(MapperIndex);
+			OutDna.PushInt(RandomF() < MappingAnomalyChance ? RandomMappingIndex() : MapperIndex);
 		}
 #endif
 
