@@ -157,7 +157,7 @@ void FPopulation::GradeMatch(int UnitId, float Score, int Moves)
 	}
 	else
 	{
-		Unit.Fitness += Score;
+		Unit.Fitness += 0.5f + 0.5f * Score;
 	}
 }
 
@@ -267,9 +267,9 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 
 extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes, int MaxLinksPerNode/* = 5*/)
 {
-	const float MaxBias = 1.0f;
+	const float MaxBias = START_WITH_ZERO ? 0.0f : 1.0f;
 	const int MinLinks = 1;
-	const float MaxLinkStrength = 2.0f;
+	const float MaxLinkStrength = START_WITH_ZERO ? 0.0f : 2.0f;
 
 	const int Inputs = RANKS * FILES;
 
