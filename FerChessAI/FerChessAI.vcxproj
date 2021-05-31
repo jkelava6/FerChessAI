@@ -160,7 +160,9 @@
     <ClCompile Include="Sources\League\League.cpp" />
     <ClCompile Include="Sources\League\Population.cpp" />
     <ClCompile Include="Sources\MinMaxAI.cpp" />
+    <ClCompile Include="Sources\NeuNet\ConsumerFunctions.cpp" />
     <ClCompile Include="Sources\NeuNet\Dna.cpp" />
+    <ClCompile Include="Sources\NeuNet\MappingFunctions.cpp" />
     <ClCompile Include="Sources\NeuNet\Network.cpp" />
     <ClCompile Include="Sources\NeuNet\NeuNetAI.cpp" />
     <ClCompile Include="Sources\NeuNet\Node.cpp" />
@@ -179,7 +181,9 @@
     <ClInclude Include="Sources\League\League.h" />
     <ClInclude Include="Sources\League\Population.h" />
     <ClInclude Include="Sources\ChessMath.h" />
+    <ClInclude Include="Sources\NeuNet\ConsumerFunctions.h" />
     <ClInclude Include="Sources\NeuNet\Dna.h" />
+    <ClInclude Include="Sources\NeuNet\MappingFunctions.h" />
     <ClInclude Include="Sources\NeuNet\Network.h" />
     <ClInclude Include="Sources\NeuNet\NeuNetAI.h" />
     <ClInclude Include="Sources\NeuNet\Node.h" />

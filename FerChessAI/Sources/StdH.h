@@ -38,6 +38,9 @@ Type&& Move(Type& Moved) noexcept
 
 #define OPTIMIZED_GAME_STATE_CHECK 0
 
+#define USE_CONSUMER_FUNCTIONS 1
+#define USE_MAPPING_FUNCTIONS 1
+
 #define RANKS 8
 #define FILES 8
 #define DEFAULT_BOARD (RANKS == 8 && FILES == 8)

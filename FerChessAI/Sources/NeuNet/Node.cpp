@@ -39,10 +39,18 @@ void FNode::Update()
 	for (int Index = 0; Index < NumOfInputs; ++Index)
 	{
 		FNodeInput& Link = Inputs[Index];
+#if USE_CONSUMER_FUNCTIONS
+		Sum = Consumer(Sum, Link.LinkStrength * Link.HarvestNode->GetState());
+#else
 		Sum += Link.LinkStrength * Link.HarvestNode->GetState();
+#endif
 	}
 
+#if USE_MAPPING_FUNCTIONS
+	SetState(Mapper(Sum));
+#else
 	SetState(SigmoidFunction(Sum));
+#endif
 }
 
 extern float SigmoidFunction(float Input)

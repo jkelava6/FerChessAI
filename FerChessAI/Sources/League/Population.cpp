@@ -3,6 +3,8 @@
 
 #include <ChessBoard.h>
 #include <League/League.h>
+#include <NeuNet/ConsumerFunctions.h>
+#include <NeuNet/MappingFunctions.h>
 #include <NeuNet/Node.h>
 
 FUnit::FUnit() = default;
@@ -172,6 +174,21 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 			OutDna.PushInt(LinkCount + bNewLink - bDestroyLink);
 		}
 
+#if USE_CONSUMER_FUNCTIONS
+		const int ConsumerIndex = InDna.ReadInt();
+		if (bPushNode)
+		{
+			OutDna.PushInt(ConsumerIndex);
+		}
+#endif
+#if USE_MAPPING_FUNCTIONS
+		const int MapperIndex = InDna.ReadInt();
+		if (bPushNode)
+		{
+			OutDna.PushInt(MapperIndex);
+		}
+#endif
+
 		const int DestroyedLink = bDestroyLink ? (int)(RandomF() * LinkCount) : -1;
 
 		for (int Link = 0; Link < LinkCount; ++Link)
@@ -217,6 +234,12 @@ extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes, int MaxL
 		Dna.PushFloat(-MaxBias + 2.0f * MaxBias * RandomF());
 		const int LinkCount = MinLinks + (int)(RandomF() * (MaxLinksPerNode - MinLinks + 1));
 		Dna.PushInt(LinkCount);
+#if USE_CONSUMER_FUNCTIONS
+		Dna.PushInt(RandomConsumerIndex());
+#endif
+#if USE_MAPPING_FUNCTIONS
+		Dna.PushInt(RandomMappingIndex());
+#endif
 		for (int Link = 0; Link < LinkCount; ++Link)
 		{
 			Dna.PushInt((int)(RandomF() * (Inputs + Index)));

@@ -3,7 +3,9 @@
 #include <NeuNet/Network.h>
 
 #include <ChessMath.h>
+#include <NeuNet/ConsumerFunctions.h>
 #include <NeuNet/Dna.h>
+#include <NeuNet/MappingFunctions.h>
 #include <NeuNet/Node.h>
 
 extern float NetworkDerivativeEpsilon = 1e-6f;
@@ -46,7 +48,19 @@ void FNetwork::FromDna(FDna& Dna)
 	{
 		const float Bias = Dna.ReadFloat();
 		const int Links = Node < FirstMiddleNode ? 0 : Dna.ReadInt();
-		Nodes.Push() = FNode(Links, Bias);
+		FNode& Pushed = Nodes.Push() = FNode(Links, Bias);
+#if USE_CONSUMER_FUNCTIONS
+		if (Node >= FirstMiddleNode)
+		{
+			Pushed.Consumer = ConsumerFunctionFromIndex(Dna.ReadInt());
+		}
+#endif
+#if USE_MAPPING_FUNCTIONS
+		if (Node >= FirstMiddleNode)
+		{
+			Pushed.Mapper = MappingFunctionFromIndex(Dna.ReadInt());
+		}
+#endif
 
 		for (int Link = 0; Link < Links; ++Link)
 		{
@@ -85,6 +99,12 @@ void FNetwork::ToDna(FDna& Dna)
 		}
 		const int LinkCount = Node.Inputs.Count();
 		Dna.PushInt(LinkCount);
+#if USE_CONSUMER_FUNCTIONS
+		Dna.PushInt(ConsumerFunctionToIndex(Node.Consumer));
+#endif
+#if USE_MAPPING_FUNCTIONS
+		Dna.PushInt(MappingFunctionToIndex(Node.Mapper));
+#endif
 
 		for (int Link = 0; Link < LinkCount; ++Link)
 		{
@@ -134,7 +154,7 @@ void FNetwork::ResetRecurrent(int Level)
 	const int LastRecurrent = Inputs + TotalRecurrent;
 	for (int Index = Inputs; Index < LastRecurrent; ++Index)
 	{
-		Nodes[Index].Update();
+		Nodes[Index] = Nodes[Index].Bias;
 	}
 }
 

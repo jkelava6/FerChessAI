@@ -28,6 +28,13 @@ public:
 	float GetState() const;
 	void AddLink(FNode* Node, float Strength);
 	void Update();
+public:
+#if USE_CONSUMER_FUNCTIONS
+	FunctionPointer(float, Consumer, float, float) = nullptr;
+#endif
+#if USE_MAPPING_FUNCTIONS
+	FunctionPointer(float, Mapper, float) = nullptr;
+#endif
 private:
 	friend class FNetwork;
 	float Bias;
