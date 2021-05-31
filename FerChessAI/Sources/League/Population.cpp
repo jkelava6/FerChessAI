@@ -189,7 +189,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		: LerpF(0.5f, 0.0f, (RecurrentNodes - EquilibriumRecurrentCount) / (float)(MaxRecurrentNodes - EquilibriumRecurrentCount));
 	const bool bNewRecurrent = bRecurrentAnomaly && RandomF() < RecurrentCreationChance && RecurrentNodes < MaxRecurrentNodes;
 	const bool bDestroyRecurrent = bRecurrentAnomaly && !bNewRecurrent && RecurrentNodes > 0;
-	const int DestroyedRecurrent = bDestroyRecurrent ? RandomF() * RecurrentNodes : -1;
+	const int DestroyedRecurrent = bDestroyRecurrent ? (int)(RandomF() * RecurrentNodes) : -1;
 
 	const int MiddleNodes = InDna.ReadInt();
 	OutDna.PushInt(MiddleNodes);
@@ -199,7 +199,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		: LerpF(0.5f, 0.0f, (MiddleNodes - EquilibriumNodeCount) / (float)(MaxMiddleNodes - EquilibriumNodeCount));
 	const bool bNewMiddle = bMiddleAnomaly && RandomF() < MiddleCreationChance && MiddleNodes < MaxMiddleNodes;
 	const bool bDestroyMiddle = bMiddleAnomaly && !bNewMiddle && MiddleNodes > 0;
-	const int DestroyedMiddle = bDestroyMiddle ? RandomF() * MiddleNodes : -1;
+	const int DestroyedMiddle = bDestroyMiddle ? (int)(RandomF() * MiddleNodes) : -1;
 
 	for (int Index = 0; Index < RecurrentNodes; ++Index)
 	{
