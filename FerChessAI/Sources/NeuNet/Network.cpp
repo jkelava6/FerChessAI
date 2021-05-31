@@ -154,7 +154,7 @@ void FNetwork::ResetRecurrent(int Level)
 	const int LastRecurrent = Inputs + TotalRecurrent;
 	for (int Index = Inputs; Index < LastRecurrent; ++Index)
 	{
-		Nodes[Index] = Nodes[Index].Bias;
+		Nodes[Index].State = Nodes[Index].Bias;
 	}
 }
 

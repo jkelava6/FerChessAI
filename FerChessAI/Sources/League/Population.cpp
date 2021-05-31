@@ -7,6 +7,8 @@
 #include <NeuNet/MappingFunctions.h>
 #include <NeuNet/Node.h>
 
+#include <assert.h>
+
 FUnit::FUnit() = default;
 FUnit::~FUnit() = default;
 
@@ -72,19 +74,57 @@ void FPopulation::Initialize(int Size, int InMaxMiddleNodes, int InMaxRecurrentN
 	}
 }
 
+static float FitnessMapping(float MappedFitness, float WorstFitnesss, float BestFitness)
+{
+	assert(MappedFitness > 0.0f);
+
+	if (BestFitness == WorstFitnesss)
+	{
+		return 1.0f;
+	}
+
+	const float MinFitness = 0.1f;
+	const float Strictness = 2.0f;
+
+	const float Ratio = (MappedFitness - WorstFitnesss) / (BestFitness - WorstFitnesss);
+	return LerpF(MinFitness, 1.0f, pow(Ratio, Strictness));
+}
+
 void FPopulation::NextGeneration(FLeague& League)
 {
 	TArray<FUnit> NextGen;
 	NextGen.Prealocate(Units.Count());
 
 	float TotalFitness = 0.0f;
+	float BestFitness = -1.0f;
+	float WorstFitness = 1000.0f;
+#if USE_BEST_PRESERVATION
+	int BestIndex = -1;
+#endif
 
-	for (int Iteration = 0; Iteration < Units.Count(); ++Iteration)
+	for (int Index = 0; Index < Units.Count(); ++Index)
 	{
-		TotalFitness += Units[Iteration].Fitness;
+#if USE_BEST_PRESERVATION
+		if (Units[Index].Fitness > BestFitness)
+		{
+			BestIndex = Index;
+		}
+#endif
+		BestFitness = Max(BestFitness, Units[Index].Fitness);
+		WorstFitness = Min(WorstFitness, Units[Index].Fitness);
 	}
 
-	for (int Iteration = 0; Iteration < Units.Count(); ++Iteration)
+	for (int Index = 0; Index < Units.Count(); ++Index)
+	{
+		Units[Index].Fitness = FitnessMapping(Units[Index].Fitness, WorstFitness, BestFitness);
+		TotalFitness += Units[Index].Fitness;
+	}
+
+#if USE_BEST_PRESERVATION
+	NextGen.Push().Dna = Units[BestIndex].Dna;
+#endif
+
+	for (int Iteration = USE_BEST_PRESERVATION; Iteration < Units.Count(); ++Iteration)
 	{
 		float FitnessToGo = RandomF() * TotalFitness;
 

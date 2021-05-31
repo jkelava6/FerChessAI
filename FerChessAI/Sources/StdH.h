@@ -40,6 +40,7 @@ Type&& Move(Type& Moved) noexcept
 
 #define USE_CONSUMER_FUNCTIONS 1
 #define USE_MAPPING_FUNCTIONS 1
+#define USE_BEST_PRESERVATION 1
 
 #define RANKS 8
 #define FILES 8
