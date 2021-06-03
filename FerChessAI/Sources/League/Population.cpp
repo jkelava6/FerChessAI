@@ -254,7 +254,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 			}
 			OutDna.PushInt(InDna.ReadInt());
 			const float PrevLink = InDna.ReadFloat();
-			OutDna.PushFloat(ClampF(PrevLink - 0.01f + RandomF() * 0.02f, -MaxLinkStrength, MaxLinkStrength));
+			OutDna.PushFloat(ClampF(PrevLink - 0.025f + RandomF() * 0.05f, -MaxLinkStrength, MaxLinkStrength));
 		}
 
 		if (bNewLink && bPushNode)

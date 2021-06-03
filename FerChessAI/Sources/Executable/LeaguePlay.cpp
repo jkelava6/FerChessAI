@@ -20,15 +20,15 @@ int main()
 	ChessThreads::InitializeThreadPool(12);
 	FirstThreadId = std::this_thread::get_id();
 	FLeague League;
-	const int PopCount = 4;
-	const int PopSize = 6;
+	const int PopCount = 6;
+	const int PopSize = 5;
 	const int BMCount = 4;
 	const int MaxMiddleNodes = 40;
 	const int MaxRecurrentNodes = 10;
-	League.Initialize(PopCount, PopSize, MaxMiddleNodes, MaxRecurrentNodes, 8, 0.001f,
-		0.1f, (int)(0.8f * MaxMiddleNodes), 0.1f,
-		0.1f, (int)(0.8f * MaxRecurrentNodes), 0.1f
-		, 0.001f, 0.001f
+	League.Initialize(PopCount, PopSize, MaxMiddleNodes, MaxRecurrentNodes, RANKS, 0.05f,
+		0.7f, (int)(0.8f * MaxMiddleNodes), 0.1f,
+		0.7f, (int)(0.8f * MaxRecurrentNodes), 0.1f
+		, 0.004f, 0.004f
 	);
 
 	const int RatingsPeriod = 1;
@@ -65,7 +65,7 @@ int main()
 
 					FDna DNA = League.GetDna(PopIndex, 0);
 					Game.WhiteAI.AccesNetwork().FromDna(DNA);
-					Game.WhiteAI.SetDepths(2, 4);
+					Game.WhiteAI.SetDepths(BMIndex + 1, BMIndex * 2 + 2);
 
 					Game.BlackAI.SetDepths(BMIndex + 1, BMIndex * 2 + 2);
 
