@@ -13,6 +13,8 @@
 
 #include <Windows.h>
 #include <cstring>
+#include <cstdlib>
+#include <ctime>
 
 void WriteBoard(FDoubleBoard& Board, char* Target)
 {
@@ -35,13 +37,21 @@ void SendBoard(FDoubleBoard& Board)
 
 int main()
 {
+	srand(time(0));
+	SetRandomSeed(rand());
+	const int Rnd = 4 + rand() % 5;
+	for (int i = 0; i < Rnd; ++i)
+	{
+		RandomI();
+	}
 	FDoubleBoard Board;
 	Board.DefaultBoard();
 	FLeague League;
-	League.Initialize(1, 1, 80, 20);
-	TArray<IChessAI*> LeagueAIs;
-	League.GetAIs(LeagueAIs);
-	FNetEvalMinMax& AI = *(FNetEvalMinMax*)LeagueAIs[0];
+	League.Initialize(1, 1, 80, 20, 8, 0.05f, 0.8f, 64, 0.1f, 0.8f, 16, 0.1f, 0.03f, 0.03f);
+	League.Iterate();
+	FNetEvalMinMax AI;
+	FDna Dna = League.GetDna(0, 0);
+	AI.AccesNetwork().FromDna(Dna);
 
 	const int BufferSize = 1000;
 	char MessageBuffer[BufferSize];
