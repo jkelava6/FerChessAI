@@ -85,8 +85,14 @@ void FLeague::Iterate()
 			RateGame(Game.Board, Game.PopIndexWhite, Game.PopIndexBlack);
 		}
 		const float BoardScore = GameScore(Game.Board);
-		Populations[Game.PopIndexWhite].GradeMatch(Game.UnitIndexWhite, BoardScore, Game.MoveCount);
-		Populations[Game.PopIndexBlack].GradeMatch(Game.UnitIndexBlack, BoardScore, Game.MoveCount);
+		if (Game.UnitIndexWhite == 0)
+		{
+			Populations[Game.PopIndexBlack].GradeMatch(Game.UnitIndexBlack, BoardScore, Game.MoveCount);
+		}
+		if (Game.UnitIndexBlack == 0)
+		{
+			Populations[Game.PopIndexWhite].GradeMatch(Game.UnitIndexWhite, BoardScore, Game.MoveCount);
+		}
 	}
 
 	for (int Index = 0; Index < PopCount; ++Index)

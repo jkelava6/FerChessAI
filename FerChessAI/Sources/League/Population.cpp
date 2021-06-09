@@ -149,11 +149,11 @@ void FPopulation::GradeMatch(int UnitId, float Score, int Moves)
 
 	if (Score == 1.0f)
 	{
-		Unit.Fitness += 1.0f - 0.01f * Moves;
+		Unit.Fitness += 1.0f - 0.001f * Moves;
 	}
 	else if (Score == 0.0f)
 	{
-		Unit.Fitness += 0.01f * Moves;
+		Unit.Fitness += 0.001f * Moves;
 	}
 	else
 	{
@@ -169,6 +169,8 @@ const FDna& FPopulation::GetDna(int UnitIndex)
 static void GenerateNode(FDna& Dna, int NodeIndex, int MaxLinksPerNode, float MaxBias, float MaxLinkStrength)
 {
 	const int MinLinks = 1;
+	MaxBias *= GEN_SCALE;
+	MaxLinkStrength *= GEN_SCALE;
 
 	Dna.PushFloat(-MaxBias + 2.0f * MaxBias * RandomF());
 	const int LinkCount = MaxLinksPerNode > 0 ? MinLinks + (int)(RandomF() * (MaxLinksPerNode - MinLinks + 1)) : 0;
@@ -226,7 +228,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		const float PrevBias = InDna.ReadFloat();
 		if (Index != DestroyedRecurrent)
 		{
-			OutDna.PushFloat(ClampF(PrevBias - 0.01f + RandomF() * 0.02f, -MaxBias, MaxBias));
+			OutDna.PushFloat(ClampF(PrevBias - 0.001f + RandomF() * 0.002f, -MaxBias, MaxBias));
 		}
 	}
 	if (bNewRecurrent)
@@ -245,7 +247,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		const bool bPushNode = Index != DestroyedMiddle && !(bDestroyRecurrent && Index == MiddleNodes + Outputs);
 		if (bPushNode)
 		{
-			OutDna.PushFloat(ClampF(PrevBias - 0.01f + RandomF() * 0.02f, -MaxBias, MaxBias));
+			OutDna.PushFloat(ClampF(PrevBias - 0.001f + RandomF() * 0.002f, -MaxBias, MaxBias));
 		}
 
 		const int LinkCount = InDna.ReadInt();
@@ -284,7 +286,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 			}
 			OutDna.PushInt(InDna.ReadInt());
 			const float PrevLink = InDna.ReadFloat();
-			OutDna.PushFloat(ClampF(PrevLink - 0.025f + RandomF() * 0.05f, -MaxLinkStrength, MaxLinkStrength));
+			OutDna.PushFloat(ClampF(PrevLink - 0.075f + RandomF() * 0.15f, -MaxLinkStrength, MaxLinkStrength));
 		}
 
 		if (bNewLink && bPushNode)

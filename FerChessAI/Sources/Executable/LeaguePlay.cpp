@@ -32,7 +32,7 @@ int main()
 	);
 
 	const int RatingsPeriod = 1;
-	const int BenchmarkPeriod = 10;
+	const int BenchmarkPeriod = 50;
 	TArray<char> BMResults;
 
 	for (int Generation = 1; ; ++Generation)
@@ -70,6 +70,20 @@ int main()
 					Game.BlackAI.SetDepths(BMIndex + 1, BMIndex * 2 + 2);
 
 					Game.MaxMoves = 120;
+
+					FThreadData& Game2 = Games.Push();
+
+					Game2.League = &League;
+					Game2.Board.DefaultBoard();
+					Game2.Board.AllocateStack(256);
+
+					DNA = League.GetDna(PopIndex, 0);
+					Game2.BlackAI.AccesNetwork().FromDna(DNA);
+					Game2.BlackAI.SetDepths(BMIndex + 1, BMIndex * 2 + 2);
+
+					Game2.WhiteAI.SetDepths(BMIndex + 1, BMIndex * 2 + 2);
+
+					Game2.MaxMoves = 120;
 				}
 			}
 
@@ -85,39 +99,42 @@ int main()
 				printf("(%d) Rating: %d\n", PopIndex, League.Ratings[PopIndex]);
 				for (int BMIndex = 0; BMIndex < BMCount; ++BMIndex)
 				{
-					FThreadData& Game = Games[PopIndex * BMCount + BMIndex];
-					FDoubleBoard& Board = Game.Board;
-
-					char Result = ' ';
-					EGameState EndState = Board.GetGameState();
-					switch (EndState)
+					for (int GameIndex = 0; GameIndex < 2; ++GameIndex)
 					{
-					case EGameState::ActiveWhite:
-						// fal through
-					case EGameState::ActiveBlack:
-						Result = '-';
-						break;
-					case EGameState::OverWhite:
-						Result = 'W';
-						break;
-					case EGameState::OverDraw:
-						Result = 'D';
-						break;
-					case EGameState::OverBlack:
-						Result = 'L';
-						break;
-					default:
-						break;
-					}
+						FThreadData& Game = Games[PopIndex * BMCount * 2 + 2 * BMIndex + GameIndex];
+						FDoubleBoard& Board = Game.Board;
 
-					printf(" - vs MinMax(%d, %d) : [Result: %c] [Moves: %d]\n", BMIndex + 1, 2 * BMIndex + 2, Result, Game.MoveCount);
-					BMResults.Push() = Result;
+						char Result = ' ';
+						EGameState EndState = Board.GetGameState();
+						switch (EndState)
+						{
+						case EGameState::ActiveWhite:
+							// fal through
+						case EGameState::ActiveBlack:
+							Result = '-';
+							break;
+						case EGameState::OverWhite:
+							Result = 'W';
+							break;
+						case EGameState::OverDraw:
+							Result = 'D';
+							break;
+						case EGameState::OverBlack:
+							Result = 'L';
+							break;
+						default:
+							break;
+						}
 
-					if (Board.IsFlipped())
-					{
-						Board.FlipBoard();
+						printf(" - %c vs MinMax(%d, %d) : [Result: %c] [Moves: %d]\n", (GameIndex == 0 ? 'W' : 'B'), BMIndex + 1, 2 * BMIndex + 2, Result, Game.MoveCount);
+						BMResults.Push() = Result;
+
+						if (Board.IsFlipped())
+						{
+							Board.FlipBoard();
+						}
+						DebugBoard(Board);
 					}
-					DebugBoard(Board);
 				}
 				BMResults.Push() = ' ';
 			}
