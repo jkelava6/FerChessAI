@@ -33,13 +33,20 @@ int main()
 
 	const int RatingsPeriod = 1;
 	const int BenchmarkPeriod = 50;
+	const int LockPeriod = 50;
+	const int InitialLocks = 1;
+	int NextLock = 0;
+	for (; NextLock < InitialLocks; ++NextLock)
+	{
+		League.SetLocked(NextLock, true);
+	}
 	TArray<char> BMResults;
 
 	for (int Generation = 1; ; ++Generation)
 	{
 		League.Iterate();
 
-		if (Generation % RatingsPeriod == 0)
+		if (RatingsPeriod != -1 && Generation % RatingsPeriod == 0)
 		{
 			printf("[Gen%4d] Ratings: ", Generation);
 			for (int Index = 0; Index < League.Ratings.Count(); ++Index)
@@ -49,7 +56,17 @@ int main()
 			printf("\n");
 		}
 
-		if (Generation % BenchmarkPeriod == 0)
+		if (LockPeriod != -1 && Generation % LockPeriod == 0)
+		{
+			League.SetLocked(NextLock++, true);
+			if (NextLock == PopCount)
+			{
+				printf("All populations locked from evolving! Ending simulation...\n");
+				break;
+			}
+		}
+
+		if (BenchmarkPeriod != -1 && Generation % BenchmarkPeriod == 0)
 		{
 			TArray<FThreadData> Games;
 
