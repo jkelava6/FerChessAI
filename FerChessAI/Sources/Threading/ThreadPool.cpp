@@ -4,7 +4,18 @@
 #include <Threading/ThreadingUtils.h>
 
 FThreadPool::FThreadPool() = default;
-FThreadPool::~FThreadPool() = default;
+
+FThreadPool::~FThreadPool()
+{
+	for (int Index = 0; Index < Threads.Count(); ++Index)
+	{
+		if (Threads[Index].joinable())
+		{
+			Threads[Index].join();
+		}
+	}
+}
+
 IMPLEMENT_MOVE(FThreadPool);
 
 static void ExecuteTaskWrapper(FThreadPool* Pool, int Index, FunctionPointer(void, Task, void*), void* Arg)

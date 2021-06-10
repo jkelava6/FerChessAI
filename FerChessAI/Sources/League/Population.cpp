@@ -328,7 +328,7 @@ extern void GenerateDna(FDna& Dna, int MiddleNodes, int RecurrentNodes, int MaxL
 	Dna.PushInt(MiddleNodes);
 	for (int Index = 0; Index < RecurrentNodes; ++Index)
 	{
-		Dna.PushFloat(-MaxBias + 2.0f * MaxBias * RandomF());
+		Dna.PushFloat(-MaxBias + 2.0f * MaxBias * GEN_SCALE * RandomF());
 	}
 	for (int Index = 0; Index < MiddleNodes + 1 + RecurrentNodes; ++Index)
 	{

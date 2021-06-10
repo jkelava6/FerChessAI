@@ -32,8 +32,8 @@ int main()
 	);
 
 	const int RatingsPeriod = 1;
-	const int BenchmarkPeriod = 50;
-	const int LockPeriod = 50;
+	const int BenchmarkPeriod = 99;
+	const int LockPeriod = 20;
 	const int InitialLocks = 1;
 	int NextLock = 0;
 	for (; NextLock < InitialLocks; ++NextLock)
@@ -131,13 +131,13 @@ int main()
 							Result = '-';
 							break;
 						case EGameState::OverWhite:
-							Result = 'W';
+							Result = GameIndex == 0 ? 'W' : 'L';
 							break;
 						case EGameState::OverDraw:
 							Result = 'D';
 							break;
 						case EGameState::OverBlack:
-							Result = 'L';
+							Result = GameIndex == 0 ? 'L' : 'W';
 							break;
 						default:
 							break;
