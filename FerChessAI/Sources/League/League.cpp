@@ -213,7 +213,7 @@ void FLeague::RateGame(FDoubleBoard& Board, int White, int Black)
 	const float WeightedGlobalScore = bIsPoolFull ? GlobalScore / (float)PoolSize : 0.0f;
 
 	const int RatingDiff = Ratings[White] - Ratings[Black];
-	const float WeightedDiff = SigmoidFunction((float)RatingDiff);
+	const float WeightedDiff = SigmoidFunction(RatingDiff / 300.0f);
 	const float ScoreOffset = -0.5f * (WeightedDiff + WeightedGlobalScore);
 	const float FinalScore = BoardScore + ScoreOffset;
 
