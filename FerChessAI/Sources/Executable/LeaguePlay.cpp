@@ -32,7 +32,7 @@ int main()
 	);
 
 	const int RatingsPeriod = 1;
-	const int BenchmarkPeriod = 99;
+	const int BenchmarkPeriod = 100;
 	const int LockPeriod = 20;
 	const int InitialLocks = 1;
 	int NextLock = 0;
@@ -54,16 +54,6 @@ int main()
 				printf("%d ", League.Ratings[Index]);
 			}
 			printf("\n");
-		}
-
-		if (LockPeriod != -1 && Generation % LockPeriod == 0)
-		{
-			League.SetLocked(NextLock++, true);
-			if (NextLock == PopCount)
-			{
-				printf("All populations locked from evolving! Ending simulation...\n");
-				break;
-			}
 		}
 
 		if (BenchmarkPeriod != -1 && Generation % BenchmarkPeriod == 0)
@@ -160,6 +150,16 @@ int main()
 				printf("%c", BMResults[BMIndex]);
 			}
 			printf("\n");
+		}
+
+		if (LockPeriod != -1 && Generation % LockPeriod == 0)
+		{
+			League.SetLocked(NextLock++, true);
+			if (NextLock == PopCount)
+			{
+				printf("All populations locked from evolving! Ending simulation...\n");
+				break;
+			}
 		}
 	}
 
