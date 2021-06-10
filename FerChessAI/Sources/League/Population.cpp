@@ -120,6 +120,7 @@ void FPopulation::NextGeneration(FLeague& League)
 
 #if USE_BEST_PRESERVATION
 	NextGen.Push().Dna = Units[BestIndex].Dna;
+	League.BestSwitched[League.IndexOf(this)] = BestIndex != 0;
 #endif
 
 	for (int Iteration = USE_BEST_PRESERVATION; Iteration < Units.Count(); ++Iteration)
@@ -149,15 +150,15 @@ void FPopulation::GradeMatch(int UnitId, float Score, int Moves)
 
 	if (Score == 1.0f)
 	{
-		Unit.Fitness += 1.0f - 0.001f * Moves;
+		Unit.Fitness += 1.0f - 0.0001f * Moves;
 	}
-	else if (Score == 0.0f)
+	else if (Score == -1.0f)
 	{
-		Unit.Fitness += 0.001f * Moves;
+		Unit.Fitness += 0.0001f * Moves;
 	}
 	else
 	{
-		Unit.Fitness += 0.5f + 0.5f * Score;
+		Unit.Fitness += 0.01f + 0.01f * Score;
 	}
 }
 

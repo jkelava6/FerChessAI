@@ -31,10 +31,15 @@ int main()
 		, 0.004f, 0.004f
 	);
 
-	const int RatingsPeriod = 1;
+	const int RatingsPeriod = -1;
 	const int BenchmarkPeriod = 100;
 	const int LockPeriod = 20;
 	const int InitialLocks = 1;
+	const int ScoresPeriod = 1;
+#if USE_BEST_PRESERVATION
+	const int SwapsPeriod = -1;
+#endif
+	const int LinePeriod = -1;
 	int NextLock = 0;
 	for (; NextLock < InitialLocks; ++NextLock)
 	{
@@ -51,8 +56,36 @@ int main()
 			printf("[Gen%4d] Ratings: ", Generation);
 			for (int Index = 0; Index < League.Ratings.Count(); ++Index)
 			{
-				printf("%d ", League.Ratings[Index]);
+				printf("%4d ", League.Ratings[Index]);
 			}
+			printf("\n");
+		}
+
+
+		if (ScoresPeriod != -1 && Generation % ScoresPeriod == 0)
+		{
+			printf("[Gen%4d] Scores : ", Generation);
+			for (int Index = 0; Index < League.Ratings.Count(); ++Index)
+			{
+				printf("%4.1f ", League.GenPoints[Index]);
+			}
+			printf("\n");
+		}
+
+#if USE_BEST_PRESERVATION
+		if (SwapsPeriod != -1 && Generation % SwapsPeriod == 0)
+		{
+			printf("[Gen%4d] Swaps  : ", Generation);
+			for (int Index = 0; Index < League.Ratings.Count(); ++Index)
+			{
+				printf(League.BestSwitched[Index] ? "swap " : "     ");
+			}
+			printf("\n");
+		}
+#endif
+
+		if (LinePeriod != -1 && Generation % LinePeriod == 0)
+		{
 			printf("\n");
 		}
 

@@ -26,6 +26,12 @@ void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int Ma
 	Populations.Prealocate(PopCount);
 	Ratings.Clear();
 	Ratings.Prealocate(PopCount);
+	GenPoints.Clear();
+	GenPoints.Prealocate(PopCount);
+#if USE_BEST_PRESERVATION
+	BestSwitched.Clear();
+	BestSwitched.Prealocate(PopCount);
+#endif
 	for (int Index = 0; Index < PopCount; ++Index)
 	{
 		FPopulation& Pop = Populations.Push();
@@ -41,6 +47,10 @@ void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int Ma
 		);
 		Ratings.Push() = 1000;
 		Locks.Push() = false;
+		GenPoints.Push() = -1e9f;
+#if USE_BEST_PRESERVATION
+		BestSwitched.Push();
+#endif
 	}
 	PopSize = InPopSize;
 
@@ -57,6 +67,7 @@ void FLeague::Iterate()
 	TArray<FThreadData> Games;
 	for (int LeftPop = 0; LeftPop < PopCount; ++LeftPop)
 	{
+		GenPoints[LeftPop] = 0.0f;
 		const int MaxUnit = Locks[LeftPop] ? 1 : PopSize;
 		for (int LeftUnit = 0; LeftUnit < MaxUnit; ++LeftUnit)
 		{
@@ -86,11 +97,37 @@ void FLeague::Iterate()
 		if (Game.UnitIndexWhite == 0 && Game.UnitIndexBlack == 0)
 		{
 			RateGame(Game.Board, Game.PopIndexWhite, Game.PopIndexBlack);
+			EGameState FinalState = Game.Board.GetGameState();
+			switch (FinalState)
+			{
+			case EGameState::ActiveWhite:
+				GenPoints[Game.PopIndexWhite] += 0.5f;
+				GenPoints[Game.PopIndexBlack] += 0.5f;
+				break;
+			case EGameState::ActiveBlack:
+				GenPoints[Game.PopIndexWhite] += 0.5f;
+				GenPoints[Game.PopIndexBlack] += 0.5f;
+				break;
+			case EGameState::OverWhite:
+				GenPoints[Game.PopIndexWhite] += 1.0f;
+				GenPoints[Game.PopIndexBlack] += 0.0f;
+				break;
+			case EGameState::OverDraw:
+				GenPoints[Game.PopIndexWhite] += 0.5f;
+				GenPoints[Game.PopIndexBlack] += 0.5f;
+				break;
+			case EGameState::OverBlack:
+				GenPoints[Game.PopIndexWhite] += 0.0f;
+				GenPoints[Game.PopIndexBlack] += 1.0f;
+				break;
+			default:
+				break;
+			}
 		}
 		const float BoardScore = GameScore(Game.Board);
 		if (Game.UnitIndexWhite == 0)
 		{
-			Populations[Game.PopIndexBlack].GradeMatch(Game.UnitIndexBlack, BoardScore, Game.MoveCount);
+			Populations[Game.PopIndexBlack].GradeMatch(Game.UnitIndexBlack, -BoardScore, Game.MoveCount);
 		}
 		if (Game.UnitIndexBlack == 0)
 		{
@@ -104,6 +141,12 @@ void FLeague::Iterate()
 		if (!Locks[Index])
 		{
 			Populations[Index].NextGeneration(*this);
+		}
+		else
+		{
+#if USE_BEST_PRESERVATION
+			BestSwitched[Index] = false;
+#endif
 		}
 	}
 }
@@ -141,6 +184,11 @@ EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Bla
 void FLeague::SetLocked(int PopIndex, bool bLocked)
 {
 	Locks[PopIndex] = bLocked;
+}
+
+int FLeague::IndexOf(FPopulation* Pop)
+{
+	return Populations.IndexOf(Pop);
 }
 
 float FLeague::GameScore(FDoubleBoard& Board)

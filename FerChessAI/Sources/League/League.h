@@ -47,14 +47,19 @@ public:
 	const FDna& GetDna(int PopulationIndex, int UnitIndex);
 	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves);
 	void SetLocked(int PopIndex, bool bLocked);
+	int IndexOf(FPopulation* Pop);
 private:
 	float GameScore(FDoubleBoard& Board);
 	void RateGame(FDoubleBoard& Board, int White, int Black);
 	void SetupGame(TArray<FThreadData>& Games, int WhitePop, int WhiteUnit, int BlackPop, int BlackUnit);
 public:
 	TArray<int> Ratings;
+	TArray<float> GenPoints;
 	int NormalDepth = 2;
 	int VolatileDepth = 4;
+#if USE_BEST_PRESERVATION
+	TArray<bool> BestSwitched;
+#endif
 private:
 	TArray<FPopulation> Populations;
 	TArray<bool> Locks;
