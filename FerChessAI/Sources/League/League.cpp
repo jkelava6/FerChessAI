@@ -40,6 +40,7 @@ void FLeague::Initialize(int PopCount, int InPopSize, int MaxMiddleNodes, int Ma
 #endif
 		);
 		Ratings.Push() = 1000;
+		Locks.Push() = false;
 	}
 	PopSize = InPopSize;
 
@@ -56,7 +57,8 @@ void FLeague::Iterate()
 	TArray<FThreadData> Games;
 	for (int LeftPop = 0; LeftPop < PopCount; ++LeftPop)
 	{
-		for (int LeftUnit = 0; LeftUnit < PopSize; ++LeftUnit)
+		const int MaxUnit = Locks[LeftPop] ? 1 : PopSize;
+		for (int LeftUnit = 0; LeftUnit < MaxUnit; ++LeftUnit)
 		{
 			for (int RightPop = (LeftUnit == 0) ? LeftPop + 1 : 0; RightPop < PopCount; ++RightPop)
 			{
@@ -77,6 +79,7 @@ void FLeague::Iterate()
 	}
 	ChessThreads::WaitForAllTasks(0);
 
+	NewRatings = Ratings;
 	for (int Index = 0; Index < Games.Count(); ++Index)
 	{
 		FThreadData& Game = Games[Index];
@@ -94,10 +97,14 @@ void FLeague::Iterate()
 			Populations[Game.PopIndexWhite].GradeMatch(Game.UnitIndexWhite, BoardScore, Game.MoveCount);
 		}
 	}
+	Ratings = Move(NewRatings);
 
 	for (int Index = 0; Index < PopCount; ++Index)
 	{
-		Populations[Index].NextGeneration(*this);
+		if (!Locks[Index])
+		{
+			Populations[Index].NextGeneration(*this);
+		}
 	}
 }
 
@@ -129,6 +136,11 @@ EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Bla
 
 	--MoveCount;
 	return Board.GetGameState();
+}
+
+void FLeague::SetLocked(int PopIndex, bool bLocked)
+{
+	Locks[PopIndex] = bLocked;
 }
 
 float FLeague::GameScore(FDoubleBoard& Board)
@@ -206,8 +218,8 @@ void FLeague::RateGame(FDoubleBoard& Board, int White, int Black)
 	const float FinalScore = BoardScore + ScoreOffset;
 
 	const int RatingChange = (int)ClampF(20.0f * FinalScore, -100.0f, 100.0f);
-	Ratings[White] += RatingChange;
-	Ratings[Black] -= RatingChange;
+	NewRatings[White] += RatingChange;
+	NewRatings[Black] -= RatingChange;
 }
 
 void FLeague::SetupGame(TArray<FThreadData>& Games, int WhitePop, int WhiteUnit, int BlackPop, int BlackUnit)

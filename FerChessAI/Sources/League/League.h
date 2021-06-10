@@ -46,6 +46,7 @@ public:
 	void Iterate();
 	const FDna& GetDna(int PopulationIndex, int UnitIndex);
 	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves);
+	void SetLocked(int PopIndex, bool bLocked);
 private:
 	float GameScore(FDoubleBoard& Board);
 	void RateGame(FDoubleBoard& Board, int White, int Black);
@@ -56,6 +57,8 @@ public:
 	int VolatileDepth = 4;
 private:
 	TArray<FPopulation> Populations;
+	TArray<bool> Locks;
+	TArray<int> NewRatings;
 	int PopSize = -1;
 
 	TArray<float> GameResults;
