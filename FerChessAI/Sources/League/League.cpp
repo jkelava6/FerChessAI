@@ -86,7 +86,8 @@ void FLeague::Iterate()
 
 	for (int Index = 0; Index < Games.Count(); ++Index)
 	{
-		ChessThreads::QueueTaskBlocking(0, ExecPlay, (void*)&Games[Index]);
+		void* GameData = (void*)&Games[Index];
+		ChessThreads::QueueTaskBlocking(0, ExecPlay, GameData);
 	}
 	ChessThreads::WaitForAllTasks(0);
 
@@ -156,7 +157,7 @@ const FDna& FLeague::GetDna(int PopulationIndex, int UnitIndex)
 	return Populations[PopulationIndex].GetDna(UnitIndex);
 }
 
-EGameState FLeague::PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves)
+static EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves)
 {
 	for (MoveCount = 1; MoveCount <= MaxMoves; ++MoveCount)
 	{
@@ -274,8 +275,6 @@ void FLeague::SetupGame(TArray<FThreadData>& Games, int WhitePop, int WhiteUnit,
 {
 	FThreadData& Game = Games.Push();
 
-	Game.League = this;
-
 	Game.Board.DefaultBoard();
 	Game.Board.AllocateStack(128);
 	Game.PopIndexWhite = WhitePop;
@@ -297,8 +296,7 @@ void FLeague::SetupGame(TArray<FThreadData>& Games, int WhitePop, int WhiteUnit,
 extern void ExecPlay(void* Arg)
 {
 	FThreadData& Data = *(FThreadData*)Arg;
-	FLeague* League = Data.League;
 
 	Data.MoveCount = 0;
-	League->PlayGame(Data.Board, Data.WhiteAI, Data.BlackAI, Data.MoveCount, Data.MaxMoves);
+	PlayGame(Data.Board, Data.WhiteAI, Data.BlackAI, Data.MoveCount, Data.MaxMoves);
 }

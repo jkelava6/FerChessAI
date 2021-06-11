@@ -120,7 +120,7 @@ void FPopulation::NextGeneration(FLeague& League)
 
 #if USE_BEST_PRESERVATION
 	NextGen.Push().Dna = Units[BestIndex].Dna;
-	League.BestSwitched[League.IndexOf(this)] = BestIndex != 0;
+	League.BestSwitched[League.IndexOf(this)] = BestIndex;
 #endif
 
 	for (int Iteration = USE_BEST_PRESERVATION; Iteration < Units.Count(); ++Iteration)
@@ -210,6 +210,7 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		? LerpF(1.0f, 0.5f, RecurrentNodes / (float)EquilibriumRecurrentCount)
 		: LerpF(0.5f, 0.0f, (RecurrentNodes - EquilibriumRecurrentCount) / (float)(MaxRecurrentNodes - EquilibriumRecurrentCount));
 	const bool bNewRecurrent = bRecurrentAnomaly && RandomF() < RecurrentCreationChance && RecurrentNodes < MaxRecurrentNodes;
+	const bool bNonDisruptiveRecurrent = bNewRecurrent && RandomF() >= RecurrentDisruptionChance;
 	const bool bDestroyRecurrent = bRecurrentAnomaly && !bNewRecurrent && RecurrentNodes > 0;
 	const int DestroyedRecurrent = bDestroyRecurrent ? (int)(RandomF() * RecurrentNodes) : -1;
 	OutDna.PushInt(RecurrentNodes + bNewRecurrent - bDestroyRecurrent);
@@ -220,8 +221,10 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		? LerpF(1.0f, 0.5f, MiddleNodes / (float)EquilibriumNodeCount)
 		: LerpF(0.5f, 0.0f, (MiddleNodes - EquilibriumNodeCount) / (float)(MaxMiddleNodes - EquilibriumNodeCount));
 	const bool bNewMiddle = bMiddleAnomaly && RandomF() < MiddleCreationChance && MiddleNodes < MaxMiddleNodes;
+	bool bNonDisruptiveMiddle = false;
 	const bool bDestroyMiddle = bMiddleAnomaly && !bNewMiddle && MiddleNodes > 0;
 	const int DestroyedMiddle = bDestroyMiddle ? (int)(RandomF() * MiddleNodes) : -1;
+	const int InsertedMiddle = (int)(RandomF() * (MiddleNodes + 1));
 	OutDna.PushInt(MiddleNodes + bNewMiddle - bDestroyMiddle);
 
 	for (int Index = 0; Index < RecurrentNodes; ++Index)
@@ -242,8 +245,22 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 	}
 
 	int PushedNodes = Inputs + RecurrentNodes + bNewRecurrent - bDestroyRecurrent;
+	int LinkMagnetIndex = -1;
+	float LinkMagnetChance = 0.0f;
 	for (int Index = 0; Index < MiddleNodes + Outputs + RecurrentNodes; ++Index)
 	{
+		if (bNewMiddle && Index == InsertedMiddle)
+		{
+			bNonDisruptiveMiddle = RandomF() >= NodeDisruptionChance;
+			GenerateNode(OutDna, PushedNodes, MaxLinksPerNode, MaxBias, MaxLinkStrength);
+			if (bNonDisruptiveMiddle)
+			{
+				LinkMagnetIndex = PushedNodes;
+				LinkMagnetChance = 0.5f * MaxLinksPerNode / (MiddleNodes + Outputs + RecurrentNodes);
+			}
+			++PushedNodes;
+		}
+
 		const float PrevBias = InDna.ReadFloat();
 		const bool bPushNode = Index != DestroyedMiddle && !(bDestroyRecurrent && Index == MiddleNodes + Outputs);
 		if (bPushNode)
@@ -255,9 +272,10 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 		const bool bLinkCut = RandomF() < LinkCutChance;
 		const bool bNewLink = bLinkCut && RandomF() < 0.5f && LinkCount < MaxLinksPerNode;
 		const bool bDestroyLink = bLinkCut && !bNewLink && LinkCount > 0;
+		const bool bMagnetLink = RandomF() < LinkMagnetChance;
 		if (bPushNode)
 		{
-			OutDna.PushInt(LinkCount + bNewLink - bDestroyLink);
+			OutDna.PushInt(LinkCount + bNewLink + bMagnetLink - bDestroyLink);
 		}
 
 #if USE_CONSUMER_FUNCTIONS
@@ -285,24 +303,24 @@ void FPopulation::MutateDna(FDna& InDna, FDna& OutDna)
 				InDna.ReadFloat();
 				continue;
 			}
-			OutDna.PushInt(InDna.ReadInt());
+			OutDna.PushInt(InDna.ReadInt() + bNonDisruptiveRecurrent + bNonDisruptiveMiddle);
 			const float PrevLink = InDna.ReadFloat();
 			OutDna.PushFloat(ClampF(PrevLink - 0.075f + RandomF() * 0.15f, -MaxLinkStrength, MaxLinkStrength));
 		}
 
 		if (bNewLink && bPushNode)
 		{
-			OutDna.PushInt((int)(RandomF() * (Inputs + Index)));
+			OutDna.PushInt((int)(RandomF() * PushedNodes));
+			OutDna.PushFloat(-MaxLinkStrength + RandomF() * 2.0f * MaxLinkStrength);
+		}
+
+		if (bMagnetLink && bPushNode)
+		{
+			OutDna.PushInt(LinkMagnetIndex);
 			OutDna.PushFloat(-MaxLinkStrength + RandomF() * 2.0f * MaxLinkStrength);
 		}
 
 		PushedNodes += bPushNode;
-
-		if (Index + 1 == MiddleNodes && bNewMiddle)
-		{
-			GenerateNode(OutDna, PushedNodes, MaxLinksPerNode, MaxBias, MaxLinkStrength);
-			++PushedNodes;
-		}
 
 		if (Index + 1 == MiddleNodes + Outputs + RecurrentNodes && bNewRecurrent)
 		{

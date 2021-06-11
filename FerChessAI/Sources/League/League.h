@@ -13,7 +13,6 @@ struct FThreadData
 {
 	FThreadData();
 	DECLARE_MOVE(FThreadData);
-	FLeague* League = nullptr;
 	int MaxMoves = 60;
 	FDoubleBoard Board;
 	int PopIndexWhite = -1;
@@ -45,7 +44,6 @@ public:
 	);
 	void Iterate();
 	const FDna& GetDna(int PopulationIndex, int UnitIndex);
-	EGameState PlayGame(FDoubleBoard& Board, IChessAI& White, IChessAI& Black, int& MoveCount, int MaxMoves);
 	void SetLocked(int PopIndex, bool bLocked);
 	int IndexOf(FPopulation* Pop);
 private:

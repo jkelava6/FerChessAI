@@ -17,7 +17,7 @@
 
 int main()
 {
-	ChessThreads::InitializeThreadPool(12);
+	ChessThreads::InitializeThreadPool(10);
 	FirstThreadId = std::this_thread::get_id();
 	FLeague League;
 	const int PopCount = 6;
@@ -31,15 +31,15 @@ int main()
 		, 0.004f, 0.004f
 	);
 
-	const int RatingsPeriod = -1;
+	const int RatingsPeriod = 1;
 	const int BenchmarkPeriod = 100;
 	const int LockPeriod = 20;
 	const int InitialLocks = 1;
 	const int ScoresPeriod = 1;
 #if USE_BEST_PRESERVATION
-	const int SwapsPeriod = -1;
+	const int SwapsPeriod = 1;
 #endif
-	const int LinePeriod = -1;
+	const int LinePeriod = 1;
 	int NextLock = 0;
 	for (; NextLock < InitialLocks; ++NextLock)
 	{
@@ -99,7 +99,6 @@ int main()
 				{
 					FThreadData& Game = Games.Push();
 
-					Game.League = &League;
 					Game.Board.DefaultBoard();
 					Game.Board.AllocateStack(256);
 
@@ -113,7 +112,6 @@ int main()
 
 					FThreadData& Game2 = Games.Push();
 
-					Game2.League = &League;
 					Game2.Board.DefaultBoard();
 					Game2.Board.AllocateStack(256);
 
@@ -194,6 +192,8 @@ int main()
 				break;
 			}
 		}
+
+		fflush(stdout);
 	}
 
 	return 0;
