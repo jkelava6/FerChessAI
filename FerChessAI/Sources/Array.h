@@ -1,6 +1,7 @@
 #pragma once
 
 #include <AiMath.h>
+#include <BuildFlags.h>
 
 #ifdef _DEBUG
 #include <cassert>
@@ -62,7 +63,7 @@ public:
 		*this = Copied;
 	}
 
-	TArray<Type>& operator= (TArray<Type>&& Moved)
+	TArray<Type>& operator= (TArray<Type>&& Moved) noexcept
 	{
 		if (Data)
 		{
@@ -81,7 +82,7 @@ public:
 		return *this;
 	}
 
-	TArray(TArray<Type>&& Moved)
+	TArray(TArray<Type>&& Moved) noexcept
 	{
 		*this = Move(Moved);
 	}

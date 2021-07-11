@@ -3,8 +3,8 @@
 #include <cstdio>
 #include <StdH.h>
 
-namespace FConsoleC
+namespace FStdio
 {
-	FunctionPointer(int, Write, const char* Format, ...) = printf;
-	FunctionPointer(int, Read, const char* Format, ...) = scanf_s;
+	FunctionPointer(int, ConsoleOut, const char* Format, ...) = printf;
+	FunctionPointer(int, ConsoleIn, const char* Format, ...) = scanf_s;
 }

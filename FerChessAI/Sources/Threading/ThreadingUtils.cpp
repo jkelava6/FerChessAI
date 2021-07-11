@@ -7,7 +7,7 @@
 static TArray<FThreadPool> ThreadPools;
 extern FCppThread::id MainThreadId = FCppThread::id();
 
-namespace ChessThreads
+namespace AiThreads
 {
 	extern int DefaultWaitTime = 100;
 

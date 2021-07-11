@@ -8,7 +8,7 @@
 
 int main()
 {
-	FConsoleC::Write("Hello World!\n\n\nExecuting default main, Executables/DefaultMain.cpp\n\n\n");
+	FStdio::ConsoleOut("Hello World!\n\n\nExecuting default main, Executables/DefaultMain.cpp\n\n\n");
 
 	return 0;
 }

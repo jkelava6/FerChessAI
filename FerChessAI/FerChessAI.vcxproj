@@ -144,7 +144,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\Array.cpp" />
     <ClCompile Include="Sources\Executable\DefaultMain.cpp" />
     <ClCompile Include="Sources\JavaIO\JavaTokenIO.cpp" />
     <ClCompile Include="Sources\NeuNet\ConsumerFunctions.cpp" />
@@ -154,6 +153,8 @@
     <ClCompile Include="Sources\NeuNet\Node.cpp" />
     <ClCompile Include="Sources\Threading\ThreadingUtils.cpp" />
     <ClCompile Include="Sources\Threading\ThreadPool.cpp" />
+    <ClCompile Include="Sources\Array.cpp" />
+    <ClCompile Include="Sources\Utils\LeaguePlay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Array.h" />
@@ -171,6 +172,8 @@
     <ClInclude Include="Sources\Threading\ThreadingUtils.h" />
     <ClInclude Include="Sources\Threading\ThreadPool.h" />
     <ClInclude Include="Sources\Utils\IncludeStdio.h" />
+    <ClInclude Include="Sources\Utils\LeaguePlay.h" />
+    <ClInclude Include="Sources\Utils\LeaguePlay_Imp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

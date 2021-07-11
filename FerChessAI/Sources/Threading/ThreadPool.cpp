@@ -33,7 +33,7 @@ void FThreadPool::ResizeBlocking(int Size)
 	{
 		while (Busy[Index])
 		{
-			ChessThreads::Sleep(ChessThreads::DefaultWaitTime);
+			AiThreads::Sleep(AiThreads::DefaultWaitTime);
 		}
 		if (Threads[Index].joinable())
 		{
@@ -75,7 +75,7 @@ void FThreadPool::WaitUntilDone()
 	{
 		while (Busy[Index])
 		{
-			ChessThreads::Sleep(ChessThreads::DefaultWaitTime);
+			AiThreads::Sleep(AiThreads::DefaultWaitTime);
 		}
 	}
 }
