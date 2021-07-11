@@ -1,7 +1,7 @@
 #include <StdH.h>
 #include <NeuNet/ConsumerFunctions.h>
 
-#include <ChessMath.h>
+#include <AiMath.h>
 
 static FunctionPointer(float, ConsumerFunctions[], float, float) =
 {

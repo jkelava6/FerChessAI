@@ -1,7 +1,7 @@
 #include <StdH.h>
 #include <NeuNet/MappingFunctions.h>
 
-#include <ChessMath.h>
+#include <AiMath.h>
 #include <NeuNet/Node.h>
 
 static FunctionPointer(float, MappingFunctions[], float) =

@@ -1,5 +1,12 @@
 #pragma once
 
+#include <Threading/ThreadInclude.h> // FCppThread
+#include <cassert> // assert()
+
+extern FCppThread::id MainThreadId;
+#define THREAD_GUARD() assert(MainThreadId == FCppThread::id() || std::this_thread::get_id() == MainThreadId)
+#define SET_THIS_THREAD_AS_MAIN() MainThreadId = std::this_thread::get_id();
+
 namespace ChessThreads
 {
 	extern int DefaultWaitTime;

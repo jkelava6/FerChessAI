@@ -1,19 +1,18 @@
 #pragma once
 
-#include <ChessMath.h>
+#include <AiMath.h>
 
 #ifdef _DEBUG
 #include <cassert>
 #endif
-#include <ThreadInclude.h>
+#include <Threading/ThreadingUtils.h>
 
-extern FCppThread::id FirstThreadId;
 
-#ifdef _DEBUG
-#define THREAD_GUARD() assert(FirstThreadId == FCppThread::id() || std::this_thread::get_id() == FirstThreadId)
+#if !ALLOW_NON_THREADED_ARRAY_ALLOC
+#define ARRAY_THREAD_GUARD() THREAD_GUARD()
 #else
-#define THREAD_GUARD() (void)0
-#endif // _DEBUG
+#define ARRAY_THREAD_GUARD() (void)0
+#endif // !ALLOW_NON_THREADED_ARRAY_ALLOC
 
 
 template <class Type> class TArray
@@ -34,7 +33,7 @@ public:
 	{
 		if (Data)
 		{
-			THREAD_GUARD();
+			ARRAY_THREAD_GUARD();
 			delete[] Data;
 		}
 	}
@@ -48,7 +47,7 @@ public:
 
 		AllocatedSize = Copied.AllocatedSize;
 		UsedSize = Copied.UsedSize;
-		THREAD_GUARD();
+		ARRAY_THREAD_GUARD();
 		Data = new Type[AllocatedSize];
 		for (int Index = 0; Index < UsedSize; ++Index)
 		{
@@ -67,7 +66,7 @@ public:
 	{
 		if (Data)
 		{
-			THREAD_GUARD();
+			ARRAY_THREAD_GUARD();
 			delete[] Data;
 		}
 
@@ -94,7 +93,7 @@ public:
 			return;
 		}
 
-		THREAD_GUARD();
+		ARRAY_THREAD_GUARD();
 		Type* NewData = Size > 0 ? new Type[Size] : nullptr;
 		UsedSize = Min(Size, UsedSize);
 

@@ -145,53 +145,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Array.cpp" />
-    <ClCompile Include="Sources\Assisted\NetEvalMinMax.cpp" />
-    <ClCompile Include="Sources\ChessBoard.cpp" />
-    <ClCompile Include="Sources\Executable\BasicFullAiEvo.cpp" />
-    <ClCompile Include="Sources\Executable\BoardLib.cpp" />
-    <ClCompile Include="Sources\Executable\DebugUtils.cpp" />
-    <ClCompile Include="Sources\Executable\FerChessAI.cpp" />
-    <ClCompile Include="Sources\Executable\JavaAgent.cpp" />
-    <ClCompile Include="Sources\Executable\LeaguePlay.cpp" />
-    <ClCompile Include="Sources\Executable\ReinforcementEvo.cpp" />
-    <ClCompile Include="Sources\Executable\SimpleNetworkReinforcement.cpp" />
-    <ClCompile Include="Sources\GenericAI.cpp" />
+    <ClCompile Include="Sources\Executable\DefaultMain.cpp" />
     <ClCompile Include="Sources\JavaIO\JavaTokenIO.cpp" />
-    <ClCompile Include="Sources\League\League.cpp" />
-    <ClCompile Include="Sources\League\Population.cpp" />
-    <ClCompile Include="Sources\MinMaxAI.cpp" />
     <ClCompile Include="Sources\NeuNet\ConsumerFunctions.cpp" />
     <ClCompile Include="Sources\NeuNet\Dna.cpp" />
     <ClCompile Include="Sources\NeuNet\MappingFunctions.cpp" />
     <ClCompile Include="Sources\NeuNet\Network.cpp" />
-    <ClCompile Include="Sources\NeuNet\NeuNetAI.cpp" />
     <ClCompile Include="Sources\NeuNet\Node.cpp" />
     <ClCompile Include="Sources\Threading\ThreadingUtils.cpp" />
     <ClCompile Include="Sources\Threading\ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Array.h" />
-    <ClInclude Include="Sources\Assisted\NetEvalMinMax.h" />
-    <ClInclude Include="Sources\ChessBoard.h" />
-    <ClInclude Include="Sources\Executable\BoardLib.h" />
-    <ClInclude Include="Sources\Executable\DebugUtils.h" />
     <ClInclude Include="Sources\Executable\MainSwitch.h" />
-    <ClInclude Include="Sources\GenericAI.h" />
+    <ClInclude Include="Sources\BuildFlags.h" />
     <ClInclude Include="Sources\JavaIO\JavaTokenIO.h" />
-    <ClInclude Include="Sources\League\League.h" />
-    <ClInclude Include="Sources\League\Population.h" />
-    <ClInclude Include="Sources\ChessMath.h" />
+    <ClInclude Include="Sources\AiMath.h" />
     <ClInclude Include="Sources\NeuNet\ConsumerFunctions.h" />
     <ClInclude Include="Sources\NeuNet\Dna.h" />
     <ClInclude Include="Sources\NeuNet\MappingFunctions.h" />
     <ClInclude Include="Sources\NeuNet\Network.h" />
-    <ClInclude Include="Sources\NeuNet\NeuNetAI.h" />
     <ClInclude Include="Sources\NeuNet\Node.h" />
     <ClInclude Include="Sources\StdH.h" />
-    <ClInclude Include="Sources\MinMaxAI.h" />
-    <ClInclude Include="Sources\ThreadInclude.h" />
+    <ClInclude Include="Sources\Threading\ThreadInclude.h" />
     <ClInclude Include="Sources\Threading\ThreadingUtils.h" />
     <ClInclude Include="Sources\Threading\ThreadPool.h" />
+    <ClInclude Include="Sources\Utils\IncludeStdio.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -58,10 +58,8 @@ inline float PowerNat(float Exp, int Precision = 20)
 {
 	return pow(2.71828182846f, Exp);
 	/*float Res = 1.0f;
-
 	for (int i = Precision - 1; i > 0; --i)
 		Res = 1 + Exp * Res / i;
-
 	return Res;*/
 }
 
@@ -94,5 +92,4 @@ inline float RandomF()
 	// Multipltying with 2^-32 maps this to [0, 1)
 	return (float)(RandomI() * 2.3283064e-10);
 }
-
 

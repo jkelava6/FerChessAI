@@ -4,9 +4,8 @@
 #include <Array.h>
 #include <Threading/ThreadPool.h>
 
-#include <ThreadInclude.h>
-
 static TArray<FThreadPool> ThreadPools;
+extern FCppThread::id MainThreadId = FCppThread::id();
 
 namespace ChessThreads
 {
